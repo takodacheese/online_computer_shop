@@ -199,17 +199,34 @@ function generateResetLink($token) {
     return "http://localhost/online_computer_shop/reset_password.php?token=" . urlencode($token);
 }
 
+function validateResetToken(PDO $conn, string $token): ?int {
+    $stmt = $conn->prepare("SELECT user_id FROM password_reset_tokens WHERE token = ? AND expires_at > NOW()");
+    $stmt->execute([$token]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? (int)$row['user_id'] : null;
+}
+
+function resetUserPassword(PDO $conn, int $user_id, string $plainPassword): void {
+    $hashedPassword = password_hash($plainPassword, PASSWORD_DEFAULT);
+    $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+    $stmt->execute([$hashedPassword, $user_id]);
+}
+
+function deleteResetToken(PDO $conn, string $token): void {
+    $stmt = $conn->prepare("DELETE FROM password_reset_tokens WHERE token = ?");
+    $stmt->execute([$token]);
+}
+
+function validatePasswordStrength(string $password): bool {
+    return strlen($password) >= 8; // Add more rules as needed
+}
+
+
 // ------------------------
 // 🛠️ CUSTOM PC BUILDER
 // ------------------------
 
 // Get models by selected part (for dynamic dropdowns)
-function getModelsByPartId($part_id) {
-    global $conn;
-    $stmt = $conn->prepare("SELECT * FROM model WHERE part_id = ?");
-    $stmt->execute([$part_id]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
 
 // ------------------------
 // 🧼 UTILITIES

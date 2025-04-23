@@ -1,7 +1,7 @@
 <?php
 session_start();
 include 'includes/header.php';
-require_once 'functions.php';
+require_once '../functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email']);

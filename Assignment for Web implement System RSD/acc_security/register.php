@@ -2,7 +2,7 @@
 // register.php
 session_start();
 include 'includes/header.php';
-include 'functions.php'; // Include the functions file
+include '../functions.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);

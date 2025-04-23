@@ -1,43 +1,54 @@
 <?php
 // reset_password.php
 session_start();
-include 'includes/header.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $token = $_POST['token'];
-    $password = $_POST['password']; // New password (plain text)
+require_once 'includes/header.php';
+require_once 'db.php';
+require_once '../functions.php';
 
-    include 'db.php';
-    $stmt = $conn->prepare("SELECT * FROM password_reset_tokens WHERE token = ? AND expires_at > NOW()");
-    $stmt->execute([$token]);
-    $token_data = $stmt->fetch(PDO::FETCH_ASSOC);
+$token = $_GET['token'] ?? ($_POST['token'] ?? null);
+$success = false;
+$error = '';
 
-    if ($token_data) {
-        // Update password
-        $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
-        $stmt->execute([$password, $token_data['user_id']]);
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $password = $_POST['password'] ?? '';
 
-        // Delete the used token
-        $stmt = $conn->prepare("DELETE FROM password_reset_tokens WHERE token = ?");
-        $stmt->execute([$token]);
-
-        echo "<p>Password reset successfully. <a href='login.php'>Login</a></p>";
+    if (!$token || !$password) {
+        $error = "Missing required fields.";
+    } elseif (!validatePasswordStrength($password)) {
+        $error = "Password must meet security requirements.";
     } else {
-        echo "<p>Invalid or expired token.</p>";
+        $user_id = validateResetToken($conn, $token);
+
+        if ($user_id) {
+            resetUserPassword($conn, $user_id, $password);
+            deleteResetToken($conn, $token);
+            $success = true;
+        } else {
+            $error = "Invalid or expired token.";
+        }
     }
-} else {
-    $token = $_GET['token']; // Get the token from the URL
 }
 ?>
 
 <h2>Reset Password</h2>
-<form method="POST" action="reset_password.php">
-    <input type="hidden" name="token" value="<?php echo $token; ?>">
-    <label for="password">New Password:</label>
-    <input type="password" name="password" required><br>
-    <button type="submit">Reset Password</button>
-</form>
+
+<?php if ($success): ?>
+    <p>Password reset successfully. <a href="login.php">Login here</a>.</p>
+<?php else: ?>
+    <?php if ($error): ?>
+        <p style="color: red;"><?php echo htmlspecialchars($error); ?></p>
+    <?php endif; ?>
+
+    <form method="POST" action="reset_password.php">
+        <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
+        <label for="password">New Password:</label>
+        <input type="password" name="password" required><br>
+        <button type="submit">Reset Password</button>
+    </form>
+<?php endif; ?>
 
 <?php
-include 'includes/footer.php';
+require_once 'includes/footer.php';
 ?>
