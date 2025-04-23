@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 include 'db.php';
-include 'functions.php';
+include '../functions.php';
 
 $product_id = $_POST['product_id'];
 $quantity = $_POST['quantity'];
