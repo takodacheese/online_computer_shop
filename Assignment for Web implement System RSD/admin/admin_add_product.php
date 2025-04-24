@@ -8,47 +8,34 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 include 'includes/header.php';
 include 'db.php';
+include '../functions.php'; // Include functions file
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $description = $_POST['description'];
     $price = $_POST['price'];
 
-    // Handle file upload
+    // Handle file upload using the function
     $target_dir = "uploads/products/";
-    if (!is_dir($target_dir)) {
-        mkdir($target_dir, 0777, true);
-    }
+    $uploadResult = handleImageUpload($_FILES['image'], $target_dir);
 
-    $target_file = $target_dir . basename($_FILES['image']['name']);
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-
-    // Check if the file is an image
-    $check = getimagesize($_FILES['image']['tmp_name']);
-    if ($check === false) {
-        echo "<p>File is not an image.</p>";
+    if ($uploadResult['success']) {
     } else {
-        // Check file size (limit to 2MB)
-        if ($_FILES['image']['size'] > 2000000) {
-            echo "<p>File is too large. Maximum size is 2MB.</p>";
-        } else {
-            // Allow only certain file formats
-            if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
-                echo "<p>Only JPG, JPEG, PNG, and GIF files are allowed.</p>";
-            } else {
-                // Upload the file
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
-                    // Insert product into the database
-                    $stmt = $conn->prepare("INSERT INTO products (name, description, price, image) VALUES (?, ?, ?, ?)");
-                    $stmt->execute([$name, $description, $price, $target_file]);
-                    echo "<p>Product added successfully.</p>";
-                } else {
-                    echo "<p>Error uploading file.</p>";
-                }
-            }
-        }
+        $_SESSION['error'] = $uploadResult['error'];
+        header("Location: error_handler.php");
+        exit();
     }
-}
+        // Insert product into database
+        try {
+            $stmt = $conn->prepare("INSERT INTO products (name, description, price, image) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$name, $description, $price, $uploadResult['path']]);
+            echo "<p>Product added successfully.</p>";
+        } catch (PDOException $e) {
+            echo "<p>Error saving product: " . $e->getMessage() . "</p>";
+        }
+    } else {
+        echo "<p>" . $uploadResult['error'] . "</p>";
+    }
 ?>
 
 <h2>Add New Product (Admin)</h2>

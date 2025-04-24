@@ -1,6 +1,6 @@
 <?php
 // admin_dashboard.php
-require_once 'includes/functions.php';
+require_once '../functions.php';
 require_admin(); // Session + role check
 
 include 'includes/header.php';

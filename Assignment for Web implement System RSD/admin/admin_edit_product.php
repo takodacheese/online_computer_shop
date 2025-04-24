@@ -8,11 +8,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 include 'includes/header.php';
 include 'db.php';
+include '../functions.php'; 
 
 $product_id = $_GET['id'];
-$stmt = $conn->prepare("SELECT * FROM products WHERE product_id = ?");
-$stmt->execute([$product_id]);
-$product = $stmt->fetch(PDO::FETCH_ASSOC);
+$product = getProductById($conn, $product_id);
 
 if (!$product) {
     echo "<p>Product not found.</p>";
@@ -24,43 +23,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $description = $_POST['description'];
     $price = $_POST['price'];
+    $imagePath = $product['image']; // Keep existing image by default
 
-    // Handle file upload if a new image is provided
+    // Handle new image upload if provided
     if ($_FILES['image']['size'] > 0) {
-        $target_dir = "uploads/products/";
-        $target_file = $target_dir . basename($_FILES['image']['name']);
-        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-
-        // Check if the file is an image
-        $check = getimagesize($_FILES['image']['tmp_name']);
-        if ($check === false) {
-            echo "<p>File is not an image.</p>";
+        $uploadResult = handleImageUpload($_FILES['image'], "uploads/products/");
+        
+        if ($uploadResult['success']) {
+            $imagePath = $uploadResult['path'];
         } else {
-            // Check file size (limit to 2MB)
-            if ($_FILES['image']['size'] > 2000000) {
-                echo "<p>File is too large. Maximum size is 2MB.</p>";
-            } else {
-                // Allow only certain file formats
-                if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
-                    echo "<p>Only JPG, JPEG, PNG, and GIF files are allowed.</p>";
-                } else {
-                    // Upload the file
-                    if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
-                        // Update product with new image
-                        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ?, image = ? WHERE product_id = ?");
-                        $stmt->execute([$name, $description, $price, $target_file, $product_id]);
-                        echo "<p>Product updated successfully.</p>";
-                    } else {
-                        echo "<p>Error uploading file.</p>";
-                    }
-                }
-            }
+            echo "<p>" . $uploadResult['error'] . "</p>";
+            include 'includes/footer.php';
+            exit();
         }
-    } else {
-        // Update product without changing the image
-        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ? WHERE product_id = ?");
-        $stmt->execute([$name, $description, $price, $product_id]);
+    }
+
+    // Update product using reusable function
+    if (updateProduct($conn, $product_id, $name, $description, $price, $imagePath)) {
         echo "<p>Product updated successfully.</p>";
+    } else {
+        echo "<p>Error updating product.</p>";
     }
 }
 ?>

@@ -278,37 +278,64 @@ function getProductById($conn, $product_id) {
 }
 
 // Handle image upload and return file path or null
-function handleImageUpload($file) {
-    $target_dir = "uploads/products/";
-    $target_file = $target_dir . basename($file['name']);
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+function handleImageUpload($file, $targetDir = "uploads/products/", $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'], $maxSize = 2000000) {
+    // Return array structure for new usage
+    $result = [
+        'success' => false,
+        'error' => '',
+        'path' => null
+    ];
 
-    // Check if the file is an image
+    // Validate image file
     $check = getimagesize($file['tmp_name']);
     if ($check === false) {
-        echo "<p>File is not an image.</p>";
-        return null;
+        $result['error'] = 'File is not an image.';
+        return $result; 
     }
 
-    // Check file size (limit to 2MB)
-    if ($file['size'] > 2000000) {
-        echo "<p>File is too large. Maximum size is 2MB.</p>";
-        return null;
+    // Check file size
+    if ($file['size'] > $maxSize) {
+        $result['error'] = "File is too large. Maximum size is " . ($maxSize /  5000000) . "MB.";
+        return $result;
     }
 
-    // Allow only certain file formats
-    if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
-        echo "<p>Only JPG, JPEG, PNG, and GIF files are allowed.</p>";
-        return null;
+    // Get file extension
+    $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    
+    // Validate file type
+    if (!in_array($fileExtension, $allowedTypes)) {
+        $result['error'] = "Only " . implode(', ', $allowedTypes) . " files are allowed.";
+        return $result;
     }
 
-    // Upload the file
-    if (move_uploaded_file($file['tmp_name'], $target_file)) {
-        return $target_file;
-    } else {
-        echo "<p>Error uploading file.</p>";
-        return null;
+    // Create directory if it doesn't exist
+    if (!is_dir($targetDir)) {
+        mkdir($targetDir, 0777, true);
     }
+
+    // Generate unique filename
+    $fileName = uniqid() . '_' . bin2hex(random_bytes(8)) . '.' . $fileExtension;
+    $targetPath = $targetDir . $fileName;
+
+    // Move uploaded file
+    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+        $result['success'] = true;
+        $result['path'] = $targetPath;
+        return $result;
+    }
+
+    $result['error'] = 'Error uploading file.';
+    return $result;
+}
+
+// Maintain backward compatibility wrapper
+function legacyImageUpload($file) {
+    $uploadResult = handleImageUpload($file);
+    if ($uploadResult['success']) {
+        return $uploadResult['path'];
+    }
+    echo $uploadResult['error'];
+    return null;
 }
 
 // Update product
@@ -352,4 +379,13 @@ function getOrderItems($conn, $order_id) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Add to existing admin functions
+function updateProductWithImage($conn, $product_id, $name, $description, $price, $imagePath) {
+    try {
+        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ?, image = ? WHERE product_id = ?");
+        return $stmt->execute([$name, $description, $price, $imagePath, $product_id]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
 ?>
