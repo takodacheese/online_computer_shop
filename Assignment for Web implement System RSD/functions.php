@@ -232,9 +232,155 @@ function validatePasswordStrength(string $password): bool {
 // 🧼 UTILITIES
 // ------------------------
 
+// Log error to file
+function logError($message) {
+    $logFile = 'logs/error.log';
+    $timestamp = date('Y-m-d H:i:s');
+    $logMessage = "[$timestamp] $message\n";
+    
+    // Create logs directory if it doesn't exist
+    if (!file_exists('logs')) {
+        mkdir('logs', 0777, true);
+    }
+    
+    // Write to log file
+    error_log($logMessage, 3, $logFile);
+}
+
 // Sanitize any user input
 function sanitizeInput($input) {
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+}
+
+// ------------------------
+// 🏦 PAYPAL INTEGRATION
+// ------------------------
+
+// Get PayPal access token with error handling
+function getPaypalAccessToken() {
+    try {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, PAYPAL_API_URL . '/v1/oauth2/token');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERPWD, PAYPAL_CLIENT_ID . ':' . PAYPAL_CLIENT_SECRET);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, 'grant_type=client_credentials');
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($response === false) {
+            throw new Exception('CURL error: ' . curl_error($ch));
+        }
+        
+        $token = json_decode($response);
+        
+        if ($http_code !== 200) {
+            throw new Exception('PayPal API error: ' . $token->error_description ?? 'Unknown error');
+        }
+        
+        return $token->access_token;
+    } catch (Exception $e) {
+        logError('Failed to get PayPal access token: ' . $e->getMessage());
+        throw new Exception('Failed to get PayPal access token. Please try again later.');
+    }
+}
+
+/**
+ * Create PayPal payment with error handling
+ * 
+ * @param PDO $conn Database connection
+ * @param int $order_id Order ID
+ * @param float $total_amount Total amount
+ * @return string PayPal order ID
+ * @throws Exception If payment creation fails
+ */
+function createPaypalPayment($conn, $order_id, $total_amount) {
+    try {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, PAYPAL_API_URL . '/v2/checkout/orders');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . getPaypalAccessToken()
+        ]);
+        
+        $data = [
+            'intent' => 'CAPTURE',
+            'purchase_units' => [[
+                'amount' => [
+                    'currency_code' => 'USD',
+                    'value' => $total_amount
+                ]
+            ]],
+            'application_context' => [
+                'return_url' => PAYPAL_RETURN_URL,
+                'cancel_url' => PAYPAL_CANCEL_URL
+            ]
+        ];
+        
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($response === false) {
+            throw new Exception('CURL error: ' . curl_error($ch));
+        }
+        
+        $order = json_decode($response);
+        
+        if ($http_code !== 201) {
+            throw new Exception('PayPal API error: ' . ($order->details ?? 'Unknown error'));
+        }
+        
+        return $order->id;
+    } catch (Exception $e) {
+        logError('Failed to create PayPal payment: ' . $e->getMessage());
+        throw new Exception('Failed to create PayPal payment. Please try again later.');
+    }
+}
+
+/**
+ * Capture PayPal payment with error handling
+ * 
+ * @param string $paypal_order_id PayPal order ID
+ * @return object Capture response
+ * @throws Exception If payment capture fails
+ */
+function capturePaypalPayment($paypal_order_id) {
+    try {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, PAYPAL_API_URL . '/v2/checkout/orders/' . $paypal_order_id . '/capture');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . getPaypalAccessToken()
+        ]);
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($response === false) {
+            throw new Exception('CURL error: ' . curl_error($ch));
+        }
+        
+        $capture = json_decode($response);
+        
+        if ($http_code !== 201) {
+            throw new Exception('PayPal API error: ' . ($capture->details ?? 'Unknown error'));
+        }
+        
+        return $capture;
+    } catch (Exception $e) {
+        logError('Failed to capture PayPal payment: ' . $e->getMessage());
+        throw new Exception('Failed to capture PayPal payment. Please try again later.');
+    }
 }
 
 // ------------------------
