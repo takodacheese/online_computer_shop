@@ -4,7 +4,9 @@ session_start();
 
 require_once 'includes/header.php';
 require_once 'db.php';
-require_once '../functions.php';
+require_once '../base.php';
+
+// /TODO (SQL): Ensure 'reset_token_expiry' column exists in 'password_resets' table
 
 $token = $_GET['token'] ?? ($_POST['token'] ?? null);
 $success = false;
@@ -17,16 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$token || !$password) {
         $error = "Missing required fields.";
     } elseif (!validatePasswordStrength($password)) {
-        $error = "Password must meet security requirements.";
+        $error = "Password must meet security requirements (at least 8 characters, mix of letters/numbers).";
     } else {
-        $user_id = validateResetToken($conn, $token);
-
-        if ($user_id) {
-            resetUserPassword($conn, $user_id, $password);
-            deleteResetToken($conn, $token);
+        // Use improved reset logic
+        if (resetUserPassword($conn, $token, $password)) {
             $success = true;
         } else {
-            $error = "Invalid or expired token.";
+            $error = "Invalid, expired, or already used token, or weak password.";
         }
     }
 }
@@ -38,13 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p>Password reset successfully. <a href="login.php">Login here</a>.</p>
 <?php else: ?>
     <?php if ($error): ?>
-        <p style="color: red;"><?php echo htmlspecialchars($error); ?></p>
+        <p style="color: red;"><?= htmlspecialchars($error) ?></p>
     <?php endif; ?>
 
     <form method="POST" action="reset_password.php">
-        <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
+        <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
         <label for="password">New Password:</label>
-        <input type="password" name="password" required><br>
+        <input type="password" name="password" required minlength="8"><br>
         <button type="submit">Reset Password</button>
     </form>
 <?php endif; ?>

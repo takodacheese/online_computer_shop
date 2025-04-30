@@ -1,4 +1,4 @@
 <?php
-require 'functions.php';
+require 'base.php';
 logoutUser();
 ?>

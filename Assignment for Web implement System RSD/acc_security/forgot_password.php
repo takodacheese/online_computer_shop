@@ -4,7 +4,7 @@ session_start();
 
 require_once 'includes/header.php';
 require_once 'db.php';
-require_once '../functions.php'; 
+require_once '../base.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Sanitize and validate the email input

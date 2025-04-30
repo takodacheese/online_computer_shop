@@ -47,6 +47,14 @@ function logoutUser() {
     exit();
 }
 
+// Require user to be logged in
+function require_login() {
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: login.php");
+        exit();
+    }
+}
+
 // ------------------------
 // 👤 USER PROFILE
 // ------------------------
@@ -180,11 +188,45 @@ function addOrderItems($conn, $order_id, $cart_items) {
 }
 
 // ------------------------
+// 🔑 PASSWORD RESET (Improved)
+// ------------------------
+// /TODO (SQL): Add 'reset_token_expiry' column (DATETIME) to 'password_resets' table
+
+function createPasswordResetToken($conn, $user_id) {
+    $token = bin2hex(random_bytes(32));
+    $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+    // Remove any existing tokens for this user
+    $conn->prepare("DELETE FROM password_resets WHERE user_id = ?")->execute([$user_id]);
+    $stmt = $conn->prepare("INSERT INTO password_resets (user_id, token, reset_token_expiry) VALUES (?, ?, ?)");
+    $stmt->execute([$user_id, $token, $expiry]);
+    return $token;
+}
+
+function isResetTokenValid($conn, $token) {
+    $stmt = $conn->prepare("SELECT * FROM password_resets WHERE token = ? AND reset_token_expiry > NOW()");
+    $stmt->execute([$token]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function resetUserPassword($conn, $token, $new_password) {
+    $reset = isResetTokenValid($conn, $token);
+    if (!$reset) return false;
+    if (!validatePasswordStrength($new_password)) return false;
+    $hashed = password_hash($new_password, PASSWORD_BCRYPT);
+    // Update user's password
+    $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+    $stmt->execute([$hashed, $reset['user_id']]);
+    // Delete the token (single-use)
+    $conn->prepare("DELETE FROM password_resets WHERE token = ?")->execute([$token]);
+    return true;
+}
+
+// ------------------------
 // 🧠 PASSWORD RESET
 // ------------------------
 
 // Generate secure token for password reset
-function createPasswordResetToken($conn, $user_id) {
+function createPasswordResetTokenOld($conn, $user_id) {
     $token = bin2hex(random_bytes(32));
     $expires_at = date("Y-m-d H:i:s", strtotime("+1 hour"));
 
@@ -206,7 +248,7 @@ function validateResetToken(PDO $conn, string $token): ?int {
     return $row ? (int)$row['user_id'] : null;
 }
 
-function resetUserPassword(PDO $conn, int $user_id, string $plainPassword): void {
+function resetUserPasswordOld(PDO $conn, int $user_id, string $plainPassword): void {
     $hashedPassword = password_hash($plainPassword, PASSWORD_DEFAULT);
     $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
     $stmt->execute([$hashedPassword, $user_id]);
@@ -221,6 +263,13 @@ function validatePasswordStrength(string $password): bool {
     return strlen($password) >= 8; // Add more rules as needed
 }
 
+// Get featured products (limit default: 4)
+function getFeaturedProducts($conn, $limit = 4) {
+    $stmt = $conn->prepare("SELECT * FROM products LIMIT ?");
+    $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 // ------------------------
 // 🛠️ CUSTOM PC BUILDER
@@ -289,12 +338,6 @@ function getPaypalAccessToken() {
 
 /**
  * Create PayPal payment with error handling
- * 
- * @param PDO $conn Database connection
- * @param int $order_id Order ID
- * @param float $total_amount Total amount
- * @return string PayPal order ID
- * @throws Exception If payment creation fails
  */
 function createPaypalPayment($conn, $order_id, $total_amount) {
     try {
@@ -346,10 +389,6 @@ function createPaypalPayment($conn, $order_id, $total_amount) {
 
 /**
  * Capture PayPal payment with error handling
- * 
- * @param string $paypal_order_id PayPal order ID
- * @return object Capture response
- * @throws Exception If payment capture fails
  */
 function capturePaypalPayment($paypal_order_id) {
     try {
@@ -513,6 +552,37 @@ function getOrderItems($conn, $order_id) {
                             WHERE order_items.order_id = ?");
     $stmt->execute([$order_id]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// ------------------------
+// 📂 CATEGORY MAINTENANCE
+// ------------------------
+// /TODO (SQL): Create 'categories' table (category_id, category_name) and add 'category_id' to 'products' table
+
+function getAllCategories($conn) {
+    $stmt = $conn->query("SELECT * FROM categories ORDER BY category_name ASC");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getCategoryById($conn, $category_id) {
+    $stmt = $conn->prepare("SELECT * FROM categories WHERE category_id = ?");
+    $stmt->execute([$category_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function addCategory($conn, $category_name) {
+    $stmt = $conn->prepare("INSERT INTO categories (category_name) VALUES (?)");
+    return $stmt->execute([$category_name]);
+}
+
+function updateCategory($conn, $category_id, $category_name) {
+    $stmt = $conn->prepare("UPDATE categories SET category_name = ? WHERE category_id = ?");
+    return $stmt->execute([$category_name, $category_id]);
+}
+
+function deleteCategory($conn, $category_id) {
+    $stmt = $conn->prepare("DELETE FROM categories WHERE category_id = ?");
+    return $stmt->execute([$category_id]);
 }
 
 ?>
