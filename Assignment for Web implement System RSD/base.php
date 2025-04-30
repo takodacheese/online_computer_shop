@@ -1,11 +1,16 @@
 <?php
+// base.php - Core business logic and utility functions for Online Computer Shop
+// All database access and reusable logic should be defined here.
+
 require_once 'db.php'; // Database connection
 
 // ------------------------
 // 🔐 AUTHENTICATION
 // ------------------------
 
-// Register new user (with hashed password)
+/**
+ * Register new user (with hashed password)
+ */
 function registerUser($username, $email, $password) {
     global $conn;
     $username = sanitizeInput($username);
@@ -15,7 +20,9 @@ function registerUser($username, $email, $password) {
     return $stmt->execute([$username, $email, $hashedPassword]);
 }
 
-// Get user by email
+/**
+ * Get user by email
+ */
 function getUserByEmail($email) {
     global $conn;
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
@@ -23,7 +30,9 @@ function getUserByEmail($email) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Verify login credentials
+/**
+ * Verify login credentials. Sets session on success.
+ */
 function loginUser($email, $password) {
     $user = getUserByEmail($email);
     if ($user && password_verify($password, $user['password'])) {
@@ -34,12 +43,16 @@ function loginUser($email, $password) {
     return false;
 }
 
-// Check if email is already registered
+/**
+ * Check if email is already registered
+ */
 function emailExists($email) {
     return getUserByEmail($email) !== false;
 }
 
-// Logout user
+/**
+ * Logout user and destroy session
+ */
 function logoutUser() {
     session_unset();
     session_destroy();
@@ -47,7 +60,9 @@ function logoutUser() {
     exit();
 }
 
-// Require user to be logged in
+/**
+ * Require user to be logged in, else redirect to login
+ */
 function require_login() {
     if (!isset($_SESSION['user_id'])) {
         header("Location: login.php");
@@ -59,57 +74,57 @@ function require_login() {
 // 👤 USER PROFILE
 // ------------------------
 
-// Get user by ID
+/**
+ * Get user by ID
+ */
 function getUserById($conn, $user_id) {
     $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
     $stmt->execute([$user_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Update username and email
+/**
+ * Update username and email
+ */
 function updateUserProfile($conn, $user_id, $username, $email) {
     $username = sanitizeInput($username);
     $email = sanitizeInput($email);
-
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? AND user_id != ?");
     $stmt->execute([$email, $user_id]);
-
     if ($stmt->fetch()) {
         return "Error: Email is already in use.";
     }
-
     $stmt = $conn->prepare("UPDATE users SET username = ?, email = ? WHERE user_id = ?");
-    return $stmt->execute([$username, $email]) ? "Profile updated successfully." : "Error: Unable to update profile.";
+    return $stmt->execute([$username, $email, $user_id]) ? "Profile updated successfully." : "Error: Unable to update profile.";
 }
 
-// Update password securely
+/**
+ * Update password securely
+ */
 function updateUserPassword($conn, $user_id, $current_password, $new_password) {
     $user = getUserById($conn, $user_id);
-
     if (!$user || !password_verify($current_password, $user['password'])) {
         return "Error: Current password is incorrect.";
     }
-
     $hashedPassword = password_hash($new_password, PASSWORD_BCRYPT);
     $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
     return $stmt->execute([$hashedPassword, $user_id]) ? "Password updated successfully." : "Error: Unable to update password.";
 }
 
-// Upload and store profile photo
+/**
+ * Upload and store profile photo
+ */
 function uploadProfilePhoto($conn, $user_id, $file) {
     $uploadDir = "uploads/profile_photos/";
     if (!file_exists($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }
-
     $uniqueName = uniqid('profile_', true) . '_' . basename($file['name']);
     $filePath = $uploadDir . $uniqueName;
-
     if (move_uploaded_file($file['tmp_name'], $filePath)) {
         $stmt = $conn->prepare("UPDATE users SET profile_photo = ? WHERE user_id = ?");
         return $stmt->execute([$filePath, $user_id]) ? "Profile photo uploaded successfully." : "Error: Unable to update profile photo.";
     }
-
     return "Error: Unable to upload profile photo.";
 }
 
@@ -117,7 +132,9 @@ function uploadProfilePhoto($conn, $user_id, $file) {
 // 🛒 SHOPPING CART
 // ------------------------
 
-// Get all cart items with product details
+/**
+ * Get all cart items with product details for a user
+ */
 function getCartItems($conn, $user_id) {
     $stmt = $conn->prepare("SELECT cart.*, products.name, products.price, products.image 
                             FROM cart 
@@ -127,19 +144,22 @@ function getCartItems($conn, $user_id) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Calculate cart total
+/**
+ * Calculate total price of cart items
+ */
 function calculateCartTotal($cart_items) {
     return array_sum(array_map(function($item) {
         return $item['price'] * $item['quantity'];
     }, $cart_items));
 }
 
-// Add to cart (or update quantity if exists)
+/**
+ * Add to cart (or update quantity if already exists)
+ */
 function addToCart($conn, $user_id, $product_id, $quantity) {
     $stmt = $conn->prepare("SELECT * FROM cart WHERE user_id = ? AND product_id = ?");
     $stmt->execute([$user_id, $product_id]);
     $existing_item = $stmt->fetch(PDO::FETCH_ASSOC);
-
     if ($existing_item) {
         $new_quantity = $existing_item['quantity'] + $quantity;
         $stmt = $conn->prepare("UPDATE cart SET quantity = ? WHERE cart_id = ?");
@@ -150,19 +170,25 @@ function addToCart($conn, $user_id, $product_id, $quantity) {
     }
 }
 
-// Remove item from cart
+/**
+ * Remove item from cart by cart_id
+ */
 function removeCartItem($conn, $cart_id) {
     $stmt = $conn->prepare("DELETE FROM cart WHERE cart_id = ?");
     return $stmt->execute([$cart_id]);
 }
 
-// Securely remove item by user (extra validation)
+/**
+ * Securely remove item by user (extra validation)
+ */
 function removeFromCart($conn, $cart_id, $user_id) {
     $stmt = $conn->prepare("DELETE FROM cart WHERE cart_id = ? AND user_id = ?");
     return $stmt->execute([$cart_id, $user_id]);
 }
 
-// Clear entire cart after checkout
+/**
+ * Clear entire cart after checkout
+ */
 function clearCart($conn, $user_id) {
     $stmt = $conn->prepare("DELETE FROM cart WHERE user_id = ?");
     return $stmt->execute([$user_id]);
@@ -172,14 +198,18 @@ function clearCart($conn, $user_id) {
 // 🧾 ORDERS
 // ------------------------
 
-// Create order and return order ID
+/**
+ * Create order and return new order ID
+ */
 function createOrder($conn, $user_id, $total_amount) {
     $stmt = $conn->prepare("INSERT INTO orders (user_id, total_amount) VALUES (?, ?)");
     $stmt->execute([$user_id, $total_amount]);
     return $conn->lastInsertId();
 }
 
-// Insert all cart items into order_items table
+/**
+ * Insert all cart items into order_items table
+ */
 function addOrderItems($conn, $order_id, $cart_items) {
     foreach ($cart_items as $item) {
         $stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
@@ -192,6 +222,9 @@ function addOrderItems($conn, $order_id, $cart_items) {
 // ------------------------
 // /TODO (SQL): Add 'reset_token_expiry' column (DATETIME) to 'password_resets' table
 
+/**
+ * Create a password reset token and store in DB
+ */
 function createPasswordResetToken($conn, $user_id) {
     $token = bin2hex(random_bytes(32));
     $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
@@ -202,12 +235,18 @@ function createPasswordResetToken($conn, $user_id) {
     return $token;
 }
 
+/**
+ * Check if a password reset token is valid
+ */
 function isResetTokenValid($conn, $token) {
     $stmt = $conn->prepare("SELECT * FROM password_resets WHERE token = ? AND reset_token_expiry > NOW()");
     $stmt->execute([$token]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
+/**
+ * Reset user password using a valid token
+ */
 function resetUserPassword($conn, $token, $new_password) {
     $reset = isResetTokenValid($conn, $token);
     if (!$reset) return false;
@@ -225,7 +264,9 @@ function resetUserPassword($conn, $token, $new_password) {
 // 🧠 PASSWORD RESET
 // ------------------------
 
-// Generate secure token for password reset
+/**
+ * Generate secure token for password reset
+ */
 function createPasswordResetTokenOld($conn, $user_id) {
     $token = bin2hex(random_bytes(32));
     $expires_at = date("Y-m-d H:i:s", strtotime("+1 hour"));
@@ -236,11 +277,16 @@ function createPasswordResetTokenOld($conn, $user_id) {
     return $token;
 }
 
-// Generate reset password URL (customize base URL as needed)
+/**
+ * Generate reset password URL (customize base URL as needed)
+ */
 function generateResetLink($token) {
     return "http://localhost/online_computer_shop/reset_password.php?token=" . urlencode($token);
 }
 
+/**
+ * Validate password reset token
+ */
 function validateResetToken(PDO $conn, string $token): ?int {
     $stmt = $conn->prepare("SELECT user_id FROM password_reset_tokens WHERE token = ? AND expires_at > NOW()");
     $stmt->execute([$token]);
@@ -248,64 +294,280 @@ function validateResetToken(PDO $conn, string $token): ?int {
     return $row ? (int)$row['user_id'] : null;
 }
 
+/**
+ * Reset user password
+ */
 function resetUserPasswordOld(PDO $conn, int $user_id, string $plainPassword): void {
     $hashedPassword = password_hash($plainPassword, PASSWORD_DEFAULT);
     $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
     $stmt->execute([$hashedPassword, $user_id]);
 }
 
+/**
+ * Delete password reset token
+ */
 function deleteResetToken(PDO $conn, string $token): void {
     $stmt = $conn->prepare("DELETE FROM password_reset_tokens WHERE token = ?");
     $stmt->execute([$token]);
 }
 
+/**
+ * Validate password strength
+ */
 function validatePasswordStrength(string $password): bool {
     return strlen($password) >= 8; // Add more rules as needed
 }
 
-// Get featured products (limit default: 4)
-function getFeaturedProducts($conn, $limit = 4) {
-    $stmt = $conn->prepare("SELECT * FROM products LIMIT ?");
+// ------------------------
+// 🛠️ PRODUCT/UTILITY FUNCTIONS
+// ------------------------
+
+/**
+ * Handle image upload and return file path or null
+ */
+function handleImageUpload($file) {
+    $target_dir = "uploads/products/";
+    $target_file = $target_dir . basename($file['name']);
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    // Check if the file is an image
+    $check = getimagesize($file['tmp_name']);
+    if ($check === false) {
+        echo "<p>File is not an image.</p>";
+        return null;
+    }
+    // Check file size (limit to 2MB)
+    if ($file['size'] > 2000000) {
+        echo "<p>File is too large. Maximum size is 2MB.</p>";
+        return null;
+    }
+    // Allow only certain file formats
+    if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
+        echo "<p>Only JPG, JPEG, PNG, and GIF files are allowed.</p>";
+        return null;
+    }
+    // Upload the file
+    if (move_uploaded_file($file['tmp_name'], $target_file)) {
+        return $target_file;
+    } else {
+        echo "<p>Error uploading file.</p>";
+        return null;
+    }
+}
+
+/**
+ * Update product details
+ */
+function updateProduct($conn, $product_id, $name, $description, $price, $image = null) {
+    if ($image) {
+        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ?, image = ? WHERE product_id = ?");
+        return $stmt->execute([$name, $description, $price, $image, $product_id]);
+    } else {
+        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ? WHERE product_id = ?");
+        return $stmt->execute([$name, $description, $price, $product_id]);
+    }
+}
+
+/**
+ * Fetch all orders with user details (admin view)
+ */
+function getAllOrders($conn) {
+    $stmt = $conn->prepare("SELECT orders.*, users.username 
+                            FROM orders 
+                            JOIN users ON orders.user_id = users.user_id 
+                            ORDER BY orders.created_at DESC");
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Fetch order details with user information
+ */
+function getOrderDetails($conn, $order_id) {
+    $stmt = $conn->prepare("SELECT orders.*, users.username 
+                            FROM orders 
+                            JOIN users ON orders.user_id = users.user_id 
+                            WHERE orders.order_id = ?");
+    $stmt->execute([$order_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Fetch order items for a specific order
+ */
+function getOrderItems($conn, $order_id) {
+    $stmt = $conn->prepare("SELECT order_items.*, products.name 
+                            FROM order_items 
+                            JOIN products ON order_items.product_id = products.product_id 
+                            WHERE order_items.order_id = ?");
+    $stmt->execute([$order_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// ------------------------
+// 📂 CATEGORY MAINTENANCE
+// ------------------------
+// /TODO (SQL): Create 'categories' table (category_id, category_name) and add 'category_id' to 'products' table
+
+/**
+ * Get all categories
+ */
+function getAllCategories($conn) {
+    $stmt = $conn->query("SELECT * FROM categories ORDER BY category_name ASC");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Get category by ID
+ */
+function getCategoryById($conn, $category_id) {
+    $stmt = $conn->prepare("SELECT * FROM categories WHERE category_id = ?");
+    $stmt->execute([$category_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Add new category
+ */
+function addCategory($conn, $category_name) {
+    $stmt = $conn->prepare("INSERT INTO categories (category_name) VALUES (?)");
+    return $stmt->execute([$category_name]);
+}
+
+/**
+ * Update category name
+ */
+function updateCategory($conn, $category_id, $category_name) {
+    $stmt = $conn->prepare("UPDATE categories SET category_name = ? WHERE category_id = ?");
+    return $stmt->execute([$category_name, $category_id]);
+}
+
+/**
+ * Delete category
+ */
+function deleteCategory($conn, $category_id) {
+    $stmt = $conn->prepare("DELETE FROM categories WHERE category_id = ?");
+    return $stmt->execute([$category_id]);
+}
+
+// ------------------------
+// 📦 PRODUCT STOCK HANDLING
+// ------------------------
+
+/**
+ * Deduct product stock after successful order/checkout
+ * @param PDO $conn
+ * @param int $product_id
+ * @param int $quantity
+ * @return bool
+ */
+function deductProductStock($conn, $product_id, $quantity) {
+    // TODO: Update the products table to reduce stock by $quantity for $product_id
+    // Example: UPDATE products SET stock = stock - ? WHERE product_id = ?
+    // $stmt = $conn->prepare("UPDATE products SET stock = stock - ? WHERE product_id = ?");
+    // return $stmt->execute([$quantity, $product_id]);
+    return true; // Placeholder
+}
+
+/**
+ * Check if product stock is below threshold and alert admin if so
+ * @param PDO $conn
+ * @param int $product_id
+ * @param int $threshold (default 5)
+ * @return bool True if low stock, false otherwise
+ */
+function checkLowStockAndAlert($conn, $product_id, $threshold = 5) {
+    // TODO: Query the products table for current stock of $product_id
+    // Example: SELECT stock FROM products WHERE product_id = ?
+    // $stmt = $conn->prepare("SELECT stock FROM products WHERE product_id = ?");
+    // $stmt->execute([$product_id]);
+    // $stock = $stmt->fetchColumn();
+    $stock = 10; // Placeholder
+    if ($stock < $threshold) {
+        // TODO: Implement alert logic (e.g., send email to admin, show dashboard alert, etc.)
+        // Example: sendLowStockAlert($product_id, $stock);
+        return true;
+    }
+    return false;
+}
+
+// ------------------------
+// ⚙️ ADMIN 
+// ------------------------
+
+/**
+ * Require admin access
+ */
+function require_admin() {
+    session_start();
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        header("Location: login.php");
+        exit();
+    }
+}
+
+/**
+ * Fetch total number of orders
+ */
+function get_total_orders($conn) {
+    $stmt = $conn->query("SELECT COUNT(*) AS total_orders FROM orders");
+    return $stmt->fetch(PDO::FETCH_ASSOC)['total_orders'];
+}
+
+/**
+ * Fetch total revenue
+ */
+function get_total_revenue($conn) {
+    $stmt = $conn->query("SELECT SUM(total_amount) AS total_revenue FROM orders");
+    return $stmt->fetch(PDO::FETCH_ASSOC)['total_revenue'];
+}
+
+/**
+ * Fetch number of pending orders
+ */
+function get_pending_orders($conn) {
+    $stmt = $conn->query("SELECT COUNT(*) AS pending_orders FROM orders WHERE order_status = 'pending'");
+    return $stmt->fetch(PDO::FETCH_ASSOC)['pending_orders'];
+}
+
+/**
+ * Fetch recent orders with user info
+ */
+function get_recent_orders($conn, $limit = 5) {
+    $stmt = $conn->prepare("SELECT orders.*, users.username 
+                            FROM orders 
+                            JOIN users ON orders.user_id = users.user_id 
+                            ORDER BY orders.created_at DESC 
+                            LIMIT ?");
     $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// ------------------------
-// 🛠️ CUSTOM PC BUILDER
-// ------------------------
-
-// Get models by selected part (for dynamic dropdowns)
-
-// ------------------------
-// 🧼 UTILITIES
-// ------------------------
-
-// Log error to file
-function logError($message) {
-    $logFile = 'logs/error.log';
-    $timestamp = date('Y-m-d H:i:s');
-    $logMessage = "[$timestamp] $message\n";
-    
-    // Create logs directory if it doesn't exist
-    if (!file_exists('logs')) {
-        mkdir('logs', 0777, true);
-    }
-    
-    // Write to log file
-    error_log($logMessage, 3, $logFile);
+/**
+ * Search products by name or description
+ */
+function search_products($conn, $search) {
+    $stmt = $conn->prepare("SELECT * FROM products WHERE name LIKE ? OR description LIKE ?");
+    $stmt->execute(["%$search%", "%$search%"]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Sanitize any user input
-function sanitizeInput($input) {
-    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+/**
+ * Get product by ID
+ */
+function getProductById($conn, $product_id) {
+    $stmt = $conn->prepare("SELECT * FROM products WHERE product_id = ?");
+    $stmt->execute([$product_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 // ------------------------
 // 🏦 PAYPAL INTEGRATION
 // ------------------------
 
-// Get PayPal access token with error handling
+/**
+ * Get PayPal access token with error handling
+ */
 function getPaypalAccessToken() {
     try {
         $ch = curl_init();
@@ -423,166 +685,45 @@ function capturePaypalPayment($paypal_order_id) {
 }
 
 // ------------------------
-// ⚙️ ADMIN 
+// 🧼 UTILITIES
 // ------------------------
 
-// Admin access control
-function require_admin() {
-    session_start();
-    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-        header("Location: login.php");
-        exit();
+/**
+ * Log error to file
+ */
+function logError($message) {
+    $logFile = 'logs/error.log';
+    $timestamp = date('Y-m-d H:i:s');
+    $logMessage = "[$timestamp] $message\n";
+    
+    // Create logs directory if it doesn't exist
+    if (!file_exists('logs')) {
+        mkdir('logs', 0777, true);
     }
+    
+    // Write to log file
+    error_log($logMessage, 3, $logFile);
 }
 
-// Fetch total number of orders
-function get_total_orders($conn) {
-    $stmt = $conn->query("SELECT COUNT(*) AS total_orders FROM orders");
-    return $stmt->fetch(PDO::FETCH_ASSOC)['total_orders'];
+/**
+ * Sanitize any user input
+ */
+function sanitizeInput($input) {
+    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
 
-// Fetch total revenue
-function get_total_revenue($conn) {
-    $stmt = $conn->query("SELECT SUM(total_amount) AS total_revenue FROM orders");
-    return $stmt->fetch(PDO::FETCH_ASSOC)['total_revenue'];
-}
+// ------------------------
+// 📊 FEATURED PRODUCTS
+// ------------------------
 
-// Fetch number of pending orders
-function get_pending_orders($conn) {
-    $stmt = $conn->query("SELECT COUNT(*) AS pending_orders FROM orders WHERE order_status = 'pending'");
-    return $stmt->fetch(PDO::FETCH_ASSOC)['pending_orders'];
-}
-
-// Fetch recent orders with user info
-function get_recent_orders($conn, $limit = 5) {
-    $stmt = $conn->prepare("SELECT orders.*, users.username 
-                            FROM orders 
-                            JOIN users ON orders.user_id = users.user_id 
-                            ORDER BY orders.created_at DESC 
-                            LIMIT ?");
+/**
+ * Get featured products (limit default: 4)
+ */
+function getFeaturedProducts($conn, $limit = 4) {
+    $stmt = $conn->prepare("SELECT * FROM products LIMIT ?");
     $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// Search products by name or description
-function search_products($conn, $search) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE name LIKE ? OR description LIKE ?");
-    $stmt->execute(["%$search%", "%$search%"]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// Get product by ID
-function getProductById($conn, $product_id) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE product_id = ?");
-    $stmt->execute([$product_id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-// Handle image upload and return file path or null
-function handleImageUpload($file) {
-    $target_dir = "uploads/products/";
-    $target_file = $target_dir . basename($file['name']);
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-
-    // Check if the file is an image
-    $check = getimagesize($file['tmp_name']);
-    if ($check === false) {
-        echo "<p>File is not an image.</p>";
-        return null;
-    }
-
-    // Check file size (limit to 2MB)
-    if ($file['size'] > 2000000) {
-        echo "<p>File is too large. Maximum size is 2MB.</p>";
-        return null;
-    }
-
-    // Allow only certain file formats
-    if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
-        echo "<p>Only JPG, JPEG, PNG, and GIF files are allowed.</p>";
-        return null;
-    }
-
-    // Upload the file
-    if (move_uploaded_file($file['tmp_name'], $target_file)) {
-        return $target_file;
-    } else {
-        echo "<p>Error uploading file.</p>";
-        return null;
-    }
-}
-
-// Update product
-function updateProduct($conn, $product_id, $name, $description, $price, $image = null) {
-    if ($image) {
-        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ?, image = ? WHERE product_id = ?");
-        return $stmt->execute([$name, $description, $price, $image, $product_id]);
-    } else {
-        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ? WHERE product_id = ?");
-        return $stmt->execute([$name, $description, $price, $product_id]);
-    }
-}
-
-// Fetch all orders with user details
-function getAllOrders($conn) {
-    $stmt = $conn->prepare("SELECT orders.*, users.username 
-                            FROM orders 
-                            JOIN users ON orders.user_id = users.user_id 
-                            ORDER BY orders.created_at DESC");
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// Fetch order details with user information
-function getOrderDetails($conn, $order_id) {
-    $stmt = $conn->prepare("SELECT orders.*, users.username 
-                            FROM orders 
-                            JOIN users ON orders.user_id = users.user_id 
-                            WHERE orders.order_id = ?");
-    $stmt->execute([$order_id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-// Fetch order items for a specific order
-function getOrderItems($conn, $order_id) {
-    $stmt = $conn->prepare("SELECT order_items.*, products.name 
-                            FROM order_items 
-                            JOIN products ON order_items.product_id = products.product_id 
-                            WHERE order_items.order_id = ?");
-    $stmt->execute([$order_id]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// ------------------------
-// 📂 CATEGORY MAINTENANCE
-// ------------------------
-// /TODO (SQL): Create 'categories' table (category_id, category_name) and add 'category_id' to 'products' table
-
-function getAllCategories($conn) {
-    $stmt = $conn->query("SELECT * FROM categories ORDER BY category_name ASC");
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-function getCategoryById($conn, $category_id) {
-    $stmt = $conn->prepare("SELECT * FROM categories WHERE category_id = ?");
-    $stmt->execute([$category_id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-function addCategory($conn, $category_name) {
-    $stmt = $conn->prepare("INSERT INTO categories (category_name) VALUES (?)");
-    return $stmt->execute([$category_name]);
-}
-
-function updateCategory($conn, $category_id, $category_name) {
-    $stmt = $conn->prepare("UPDATE categories SET category_name = ? WHERE category_id = ?");
-    return $stmt->execute([$category_name, $category_id]);
-}
-
-function deleteCategory($conn, $category_id) {
-    $stmt = $conn->prepare("DELETE FROM categories WHERE category_id = ?");
-    return $stmt->execute([$category_id]);
 }
 
 ?>
