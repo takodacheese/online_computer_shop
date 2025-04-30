@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 include 'db.php';
-include '../base.php';
+include 'functions.php';
 
 $cart_id = $_GET['cart_id'];
 

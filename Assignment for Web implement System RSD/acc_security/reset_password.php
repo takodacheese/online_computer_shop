@@ -1,53 +1,43 @@
 <?php
 // reset_password.php
 session_start();
+include 'includes/header.php';
 
-require_once 'includes/header.php';
-require_once 'db.php';
-require_once '../base.php';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $token = $_POST['token'];
+    $password = $_POST['password']; // New password (plain text)
 
-// /TODO (SQL): Ensure 'reset_token_expiry' column exists in 'password_resets' table
+    include 'db.php';
+    $stmt = $conn->prepare("SELECT * FROM password_reset_tokens WHERE token = ? AND expires_at > NOW()");
+    $stmt->execute([$token]);
+    $token_data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$token = $_GET['token'] ?? ($_POST['token'] ?? null);
-$success = false;
-$error = '';
+    if ($token_data) {
+        // Update password
+        $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+        $stmt->execute([$password, $token_data['user_id']]);
 
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $password = $_POST['password'] ?? '';
+        // Delete the used token
+        $stmt = $conn->prepare("DELETE FROM password_reset_tokens WHERE token = ?");
+        $stmt->execute([$token]);
 
-    if (!$token || !$password) {
-        $error = "Missing required fields.";
-    } elseif (!validatePasswordStrength($password)) {
-        $error = "Password must meet security requirements (at least 8 characters, mix of letters/numbers).";
+        echo "<p>Password reset successfully. <a href='login.php'>Login</a></p>";
     } else {
-        // Use improved reset logic
-        if (resetUserPassword($conn, $token, $password)) {
-            $success = true;
-        } else {
-            $error = "Invalid, expired, or already used token, or weak password.";
-        }
+        echo "<p>Invalid or expired token.</p>";
     }
+} else {
+    $token = $_GET['token']; // Get the token from the URL
 }
 ?>
 
 <h2>Reset Password</h2>
-
-<?php if ($success): ?>
-    <p>Password reset successfully. <a href="login.php">Login here</a>.</p>
-<?php else: ?>
-    <?php if ($error): ?>
-        <p style="color: red;"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
-
-    <form method="POST" action="reset_password.php">
-        <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
-        <label for="password">New Password:</label>
-        <input type="password" name="password" required minlength="8"><br>
-        <button type="submit">Reset Password</button>
-    </form>
-<?php endif; ?>
+<form method="POST" action="reset_password.php">
+    <input type="hidden" name="token" value="<?php echo $token; ?>">
+    <label for="password">New Password:</label>
+    <input type="password" name="password" required><br>
+    <button type="submit">Reset Password</button>
+</form>
 
 <?php
-require_once 'includes/footer.php';
+include 'includes/footer.php';
 ?>

@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 include 'db.php';
-include '../base.php';
+include 'functions.php';
 
 $user_id = $_SESSION['user_id'];
 

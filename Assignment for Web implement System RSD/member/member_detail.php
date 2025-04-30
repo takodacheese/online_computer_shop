@@ -1,14 +1,18 @@
 <?php
 // member_detail.php
 session_start();
-require_once '../base.php';
-require_admin();
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login.php");
+    exit();
+}
 
 include 'includes/header.php';
 include 'db.php';
 
 $user_id = $_GET['id'];
-$user = getUserById($conn, $user_id);
+$stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
     echo "<p>User not found.</p>";
