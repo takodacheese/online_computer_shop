@@ -1,14 +1,11 @@
 <?php
 // cart.php
 session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+require_once '../base.php';
+require_login();
 
 require_once 'includes/header.php';
 require_once 'db.php';
-require_once 'functions.php';
 
 $user_id = $_SESSION['user_id'];
 $cart_items = getCartItems($conn, $user_id);

@@ -1,16 +1,12 @@
 <?php
 // profile.php
 session_start();
-
-// Redirect to login if the user is not logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+require_once '../base.php';
+require_login();
 
 require_once 'includes/header.php';
 require_once 'db.php';
-require_once 'functions.php';
+require_once 'base.php';
 
 $user_id = $_SESSION['user_id'];
 $user = getUserById($conn, $user_id); // Fetch user details
