@@ -1,6 +1,10 @@
 <?php
 // admin_dashboard.php
+<<<<<<< HEAD
 require_once '../functions.php';
+=======
+require_once '../base.php';
+>>>>>>> ea389f02f381054d9ea618e664dc2b6676255985
 require_admin(); // Session + role check
 
 include 'includes/header.php';
