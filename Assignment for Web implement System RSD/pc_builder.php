@@ -1,6 +1,13 @@
 <?php
+// cart.php
 session_start();
-include 'includes/header.php';
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+require_once 'includes/header.php';
+require_once 'db.php';
 
 // TODO: Fetch component options from database (CPU, GPU, RAM, etc.)
 //The option group data should be taken from database instead of hardcoding
