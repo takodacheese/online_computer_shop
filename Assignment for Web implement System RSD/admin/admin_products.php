@@ -1,10 +1,6 @@
 <?php
-// admin_dashboard.php
-<<<<<<< HEAD
-require_once '../functions.php';
-=======
+// admin_products.php
 require_once '../base.php';
->>>>>>> ea389f02f381054d9ea618e664dc2b6676255985
 require_admin(); // Session + role check
 
 include 'includes/header.php';
@@ -120,4 +116,4 @@ $recent_orders = get_recent_orders($conn);
 
 <p><a href="admin_add_product.php">Add New Product</a></p>
 
-<?php include 'includes/footer.php'; ?>
+<?php include 'includes/footer.php';

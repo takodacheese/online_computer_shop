@@ -7,11 +7,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 include 'includes/header.php';
 include 'db.php';
-<<<<<<< HEAD
 include '../functions.php';
-=======
 include '../base.php';
->>>>>>> ea389f02f381054d9ea618e664dc2b6676255985
 
 $order_id = $_GET['id'];
 
@@ -24,7 +21,9 @@ if (!$order) {
     include 'includes/footer.php';
     exit();
 }
+?>
 
+<?php
 // Fetch order items
 $order_items = getOrderItems($conn, $order_id);
 ?>
