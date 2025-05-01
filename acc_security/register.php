@@ -1,8 +1,8 @@
 <?php
 // register.php
 session_start();
-include 'includes/header.php';
-include '../base.php'; 
+include '../includes/header.php';
+require_once '../base.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
@@ -31,5 +31,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </form>
 
 <?php
-include 'includes/footer.php';
+include '../includes/footer.php';
 ?>
