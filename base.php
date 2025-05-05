@@ -329,146 +329,49 @@ function validatePasswordStrength(string $password): bool {
 // ------------------------
 // 🛠️ PRODUCT/UTILITY FUNCTIONS
 // ------------------------
-// /TODO (SQL): Create `product_photos` table (`photo_id`, `product_id`, `photo_path`, `is_primary` BOOLEAN, `created_at` DATETIME)
-// /TODO (SQL): Add `primary_photo` column (VARCHAR) to `products` table
-// /TODO (SQL): Add foreign key constraint to ensure product_id exists in products table
 
 /**
  * Handle image upload and return file path or null
- * 
- * @param array $file File upload array
- * @param bool $isPrimary Whether this is the primary photo
- * @return string|null File path or null on error
  */
-function handleImageUpload($file, $isPrimary = false) {
+function handleImageUpload($file) {
     $target_dir = "uploads/products/";
     $target_file = $target_dir . basename($file['name']);
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-    
     // Check if the file is an image
     $check = getimagesize($file['tmp_name']);
     if ($check === false) {
-        error_log("File is not an image.");
+        echo "<p>File is not an image.</p>";
         return null;
     }
-    
     // Check file size (limit to 2MB)
     if ($file['size'] > 2000000) {
-        error_log("File is too large. Maximum size is 2MB.");
+        echo "<p>File is too large. Maximum size is 2MB.</p>";
         return null;
     }
-    
     // Allow only certain file formats
     if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
-        error_log("Only JPG, JPEG, PNG, and GIF files are allowed.");
+        echo "<p>Only JPG, JPEG, PNG, and GIF files are allowed.</p>";
         return null;
     }
-    
-    // Create unique filename to prevent overwriting
-    $filename = uniqid() . '.' . $imageFileType;
-    $target_file = $target_dir . $filename;
-    
-    // Create uploads directory if it doesn't exist
-    if (!file_exists($target_dir)) {
-        mkdir($target_dir, 0777, true);
-    }
-    
     // Upload the file
     if (move_uploaded_file($file['tmp_name'], $target_file)) {
-        return $filename;
+        return $target_file;
     } else {
-        error_log("Error uploading file.");
+        echo "<p>Error uploading file.</p>";
         return null;
     }
-}
-
-/**
- * Add product photo
- * 
- * @param PDO $conn Database connection
- * @param int $product_id Product ID
- * @param string $photo_path Photo file path
- * @param bool $isPrimary Whether this is the primary photo
- * @return bool Success status
- */
-function addProductPhoto($conn, $product_id, $photo_path, $isPrimary = false) {
-    try {
-        $stmt = $conn->prepare("
-            INSERT INTO product_photos (product_id, photo_path, is_primary, created_at)
-            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-        ");
-        return $stmt->execute([$product_id, $photo_path, $isPrimary ? 1 : 0]);
-    } catch (Exception $e) {
-        error_log("Error adding product photo: " . $e->getMessage());
-        return false;
-    }
-}
-
-/**
- * Get all photos for a product
- * 
- * @param PDO $conn Database connection
- * @param int $product_id Product ID
- * @return array Array of photos
- */
-function getProductPhotos($conn, $product_id) {
-    $stmt = $conn->prepare("
-        SELECT *
-        FROM product_photos
-        WHERE product_id = ?
-        ORDER BY is_primary DESC, created_at ASC
-    ");
-    $stmt->execute([$product_id]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 /**
  * Update product details
- * 
- * @param PDO $conn Database connection
- * @param int $product_id Product ID
- * @param string $name Product name
- * @param string $description Product description
- * @param float $price Product price
- * @param array $photos Array of photo files
- * @return bool Success status
  */
-function updateProduct($conn, $product_id, $name, $description, $price, $photos = []) {
-    try {
-        // Start transaction
-        $conn->beginTransaction();
-        
-        // Update product details
-        $stmt = $conn->prepare("
-            UPDATE products 
-            SET name = ?, 
-                description = ?, 
-                price = ? 
-            WHERE id = ?
-        ");
-        $stmt->execute([$name, $description, $price, $product_id]);
-        
-        // Handle photos
-        if (!empty($photos)) {
-            // First photo is primary
-            $isPrimary = true;
-            foreach ($photos as $photo) {
-                $filename = handleImageUpload($photo, $isPrimary);
-                if ($filename) {
-                    addProductPhoto($conn, $product_id, $filename, $isPrimary);
-                }
-                $isPrimary = false;
-            }
-        }
-        
-        // Commit transaction
-        $conn->commit();
-        return true;
-    } catch (Exception $e) {
-        // Rollback transaction on error
-        $conn->rollBack();
-        error_log("Error updating product: " . $e->getMessage());
-        return false;
+function updateProduct($conn, $product_id, $name, $description, $price, $image = null) {
+    if ($image) {
+        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ?, image = ? WHERE product_id = ?");
+        return $stmt->execute([$name, $description, $price, $image, $product_id]);
+    } else {
+        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ? WHERE product_id = ?");
+        return $stmt->execute([$name, $description, $price, $product_id]);
     }
 }
 
@@ -512,197 +415,87 @@ function getOrderItems($conn, $order_id) {
 // 📂 CATEGORY MAINTENANCE
 // ------------------------
 // /TODO (SQL): Create 'categories' table (category_id, category_name) and add 'category_id' to 'products' table
-// /TODO (SQL): Add foreign key constraint to ensure category_id exists in categories table
 
 /**
- * Get all categories with product counts
- * 
- * @param PDO $conn Database connection
- * @return array Array of categories with product counts
+ * Get all categories
  */
 function getAllCategories($conn) {
-    $stmt = $conn->prepare("
-        SELECT c.*, COUNT(p.id) as product_count 
-        FROM categories c 
-        LEFT JOIN products p ON c.id = p.category_id 
-        GROUP BY c.id 
-        ORDER BY c.name ASC
-    ");
-    $stmt->execute();
+    $stmt = $conn->query("SELECT * FROM categories ORDER BY category_name ASC");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 /**
- * Get category details including product count
- * 
- * @param PDO $conn Database connection
- * @param int $category_id Category ID
- * @return array Category details with product count
+ * Get category by ID
  */
 function getCategoryById($conn, $category_id) {
-    $stmt = $conn->prepare("
-        SELECT c.*, COUNT(p.id) as product_count 
-        FROM categories c 
-        LEFT JOIN products p ON c.id = p.category_id 
-        WHERE c.id = ? 
-        GROUP BY c.id
-    ");
+    $stmt = $conn->prepare("SELECT * FROM categories WHERE category_id = ?");
     $stmt->execute([$category_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 /**
- * Add new category with validation
- * 
- * @param PDO $conn Database connection
- * @param string $category_name Category name
- * @return bool Success status
+ * Add new category
  */
 function addCategory($conn, $category_name) {
-    $category_name = trim($category_name);
-    if (empty($category_name)) {
-        return false;
-    }
-    
-    $stmt = $conn->prepare("INSERT INTO categories (name) VALUES (?)");
+    $stmt = $conn->prepare("INSERT INTO categories (category_name) VALUES (?)");
     return $stmt->execute([$category_name]);
 }
 
 /**
- * Update category name with validation
- * 
- * @param PDO $conn Database connection
- * @param int $category_id Category ID
- * @param string $category_name New category name
- * @return bool Success status
+ * Update category name
  */
 function updateCategory($conn, $category_id, $category_name) {
-    $category_name = trim($category_name);
-    if (empty($category_name)) {
-        return false;
-    }
-    
-    $stmt = $conn->prepare("UPDATE categories SET name = ? WHERE id = ?");
+    $stmt = $conn->prepare("UPDATE categories SET category_name = ? WHERE category_id = ?");
     return $stmt->execute([$category_name, $category_id]);
 }
 
 /**
- * Delete category and handle product reassignment
- * 
- * @param PDO $conn Database connection
- * @param int $category_id Category ID
- * @return bool Success status
+ * Delete category
  */
 function deleteCategory($conn, $category_id) {
-    try {
-        // Start transaction
-        $conn->beginTransaction();
-        
-        // Reassign products to default category (ID 1)
-        $stmt = $conn->prepare("UPDATE products SET category_id = 1 WHERE category_id = ?");
-        $stmt->execute([$category_id]);
-        
-        // Delete the category
-        $stmt = $conn->prepare("DELETE FROM categories WHERE id = ?");
-        $stmt->execute([$category_id]);
-        
-        // Commit transaction
-        $conn->commit();
-        return true;
-    } catch (Exception $e) {
-        // Rollback transaction on error
-        $conn->rollBack();
-        error_log("Error deleting category: " . $e->getMessage());
-        return false;
-    }
+    $stmt = $conn->prepare("DELETE FROM categories WHERE category_id = ?");
+    return $stmt->execute([$category_id]);
 }
 
 // ------------------------
 // 📦 PRODUCT STOCK HANDLING
 // ------------------------
-// /TODO (SQL): Add 'low_stock_threshold' column (INT) to 'products' table
-// /TODO (SQL): Add 'last_stock_update' column (DATETIME) to 'products' table
-// /TODO (SQL): Add 'reorder_level' column (INT) to 'products' table
-// /TODO (SQL): Add 'stock_alert_email' column (VARCHAR) to 'products' table
 
 /**
- * Deduct product stock with transaction support
- * 
- * @param PDO $conn Database connection
- * @param int $product_id Product ID
- * @param int $quantity Quantity to deduct
- * @return bool Success status
+ * Deduct product stock after successful order/checkout
+ * @param PDO $conn
+ * @param int $product_id
+ * @param int $quantity
+ * @return bool
  */
-function deductStock($conn, $product_id, $quantity) {
-    try {
-        // Start transaction
-        $conn->beginTransaction();
-
-        // Get current stock
-        $stmt = $conn->prepare("
-            SELECT stock, low_stock_threshold, reorder_level 
-            FROM products 
-            WHERE id = ?
-        ");
-        $stmt->execute([$product_id]);
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$product || $product['stock'] < $quantity) {
-            return false;
-        }
-
-        // Update stock
-        $newStock = $product['stock'] - $quantity;
-        $stmt = $conn->prepare("
-            UPDATE products 
-            SET stock = ?, 
-                last_stock_update = CURRENT_TIMESTAMP 
-            WHERE id = ?
-        ");
-        $stmt->execute([$newStock, $product_id]);
-
-        // Check stock levels and trigger alerts
-        if ($newStock <= $product['low_stock_threshold']) {
-            // TODO: Implement low stock alert (email/notification)
-            // Example: sendLowStockAlert($product_id, $newStock);
-        }
-
-        if ($newStock <= $product['reorder_level']) {
-            // TODO: Implement reorder alert (email/manager notification)
-            // Example: sendReorderAlert($product_id, $newStock);
-        }
-
-        // Commit transaction
-        $conn->commit();
-        return true;
-    } catch (Exception $e) {
-        // Rollback transaction on error
-        $conn->rollBack();
-        error_log("Error deducting stock: " . $e->getMessage());
-        return false;
-    }
+function deductProductStock($conn, $product_id, $quantity) {
+    // TODO: Update the products table to reduce stock by $quantity for $product_id
+    // Example: UPDATE products SET stock = stock - ? WHERE product_id = ?
+    // $stmt = $conn->prepare("UPDATE products SET stock = stock - ? WHERE product_id = ?");
+    // return $stmt->execute([$quantity, $product_id]);
+    return true; // Placeholder
 }
 
 /**
- * Get products with low stock and reorder alerts
- * 
- * @param PDO $conn Database connection
- * @return array Array of products with stock alerts
+ * Check if product stock is below threshold and alert admin if so
+ * @param PDO $conn
+ * @param int $product_id
+ * @param int $threshold (default 5)
+ * @return bool True if low stock, false otherwise
  */
-function getLowStockProducts($conn) {
-    $stmt = $conn->prepare("
-        SELECT p.*, 
-               CASE 
-                   WHEN p.stock <= p.low_stock_threshold THEN 'low_stock'
-                   WHEN p.stock <= p.reorder_level THEN 'reorder'
-                   ELSE 'normal'
-               END as alert_level
-        FROM products p
-        WHERE p.stock <= p.low_stock_threshold OR p.stock <= p.reorder_level
-        ORDER BY p.stock ASC
-    ");
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+function checkLowStockAndAlert($conn, $product_id, $threshold = 5) {
+    // TODO: Query the products table for current stock of $product_id
+    // Example: SELECT stock FROM products WHERE product_id = ?
+    // $stmt = $conn->prepare("SELECT stock FROM products WHERE product_id = ?");
+    // $stmt->execute([$product_id]);
+    // $stock = $stmt->fetchColumn();
+    $stock = 10; // Placeholder
+    if ($stock < $threshold) {
+        // TODO: Implement alert logic (e.g., send email to admin, show dashboard alert, etc.)
+        // Example: sendLowStockAlert($product_id, $stock);
+        return true;
+    }
+    return false;
 }
 
 // ------------------------
@@ -972,184 +765,7 @@ function getFeaturedProducts($conn, $limit) {
 }
 
 // ------------------------
-// ORDER STATUS MANAGEMENT
-// ------------------------
-
-// ------------------------
-// PRODUCT REVIEWS
-// ------------------------
-
-// Add a new review for a product
-// 
-// Parameters:
-// $conn - PDO database connection
-// $product_id - Product ID
-// $user_id - User ID
-// $rating - Rating (1-5)
-// $comment - Optional comment
-// Return: bool Success status
-function addProductReview($conn, $product_id, $user_id, $rating, $comment = null) {
-    // Check if user has already reviewed this product
-    $stmt = $conn->prepare("SELECT review_id FROM reviews WHERE product_id = ? AND user_id = ?");
-    $stmt->execute([$product_id, $user_id]);
-    if ($stmt->fetch()) {
-        return false; // User has already reviewed this product
-    }
-
-    // Insert new review
-    $stmt = $conn->prepare("
-        INSERT INTO reviews (product_id, user_id, rating, comment)
-        VALUES (?, ?, ?, ?)
-    ");
-    $success = $stmt->execute([$product_id, $user_id, $rating, $comment]);
-
-    // Update product's average rating and review count
-    if ($success) {
-        updateProductRating($conn, $product_id);
-    }
-
-    return $success;
-}
-
-// Get all reviews for a product
-// 
-// Parameters:
-// $conn - PDO database connection
-// $product_id - Product ID
-// Return: array Array of reviews
-function getProductReviews($conn, $product_id) {
-    $stmt = $conn->prepare("
-        SELECT r.*, u.username 
-        FROM reviews r
-        JOIN users u ON r.user_id = u.user_id
-        WHERE r.product_id = ?
-        ORDER BY r.created_at DESC
-    ");
-    $stmt->execute([$product_id]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// Update product's average rating and review count
-// 
-// Parameters:
-// $conn - PDO database connection
-// $product_id - Product ID
-// Return: bool Success status
-function updateProductRating($conn, $product_id) {
-    // Get total rating and count of reviews
-    $stmt = $conn->prepare("
-        SELECT AVG(rating) as avg_rating, COUNT(*) as review_count 
-        FROM reviews 
-        WHERE product_id = ?
-    ");
-    $stmt->execute([$product_id]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Update product's average rating and review count
-    $stmt = $conn->prepare("
-        UPDATE products 
-        SET average_rating = ?, review_count = ?
-        WHERE product_id = ?
-    ");
-    return $stmt->execute([
-        $result['avg_rating'] ?? 0,
-        $result['review_count'] ?? 0,
-        $product_id
-    ]);
-}
-
-// Get product's average rating and review count
-// 
-// Parameters:
-// $conn - PDO database connection
-// $product_id - Product ID
-// Return: array Array with average_rating and review_count
-function getProductRating($conn, $product_id) {
-    $stmt = $conn->prepare("
-        SELECT average_rating, review_count 
-        FROM products 
-        WHERE product_id = ?
-    ");
-    $stmt->execute([$product_id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC) ?: ['average_rating' => 0, 'review_count' => 0];
-}
-
-// ------------------------
-// WISHLIST
-// ------------------------
-
-/**
- * Add product to wishlist
- * 
- * @param PDO $conn Database connection
- * @param int $user_id User ID
- * @param int $product_id Product ID
- * @return bool Success status
- */
-function addToWishlist($conn, $user_id, $product_id) {
-    // Check if product is already in wishlist
-    $stmt = $conn->prepare("SELECT wishlist_id FROM wishlists WHERE user_id = ? AND product_id = ?");
-    $stmt->execute([$user_id, $product_id]);
-    if ($stmt->fetch()) {
-        return false; // Product already in wishlist
-    }
-
-    // Add to wishlist
-    $stmt = $conn->prepare("
-        INSERT INTO wishlists (user_id, product_id, added_at)
-        VALUES (?, ?, CURRENT_TIMESTAMP)
-    ");
-    return $stmt->execute([$user_id, $product_id]);
-}
-
-/**
- * Remove product from wishlist
- * 
- * @param PDO $conn Database connection
- * @param int $user_id User ID
- * @param int $product_id Product ID
- * @return bool Success status
- */
-function removeFromWishlist($conn, $user_id, $product_id) {
-    $stmt = $conn->prepare("DELETE FROM wishlists WHERE user_id = ? AND product_id = ?");
-    return $stmt->execute([$user_id, $product_id]);
-}
-
-/**
- * Get all products in user's wishlist
- * 
- * @param PDO $conn Database connection
- * @param int $user_id User ID
- * @return array Array of wishlist products
- */
-function getWishlistProducts($conn, $user_id) {
-    $stmt = $conn->prepare("
-        SELECT p.*, w.added_at
-        FROM wishlists w
-        JOIN products p ON w.product_id = p.product_id
-        WHERE w.user_id = ?
-        ORDER BY w.added_at DESC
-    ");
-    $stmt->execute([$user_id]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-/**
- * Check if product is in user's wishlist
- * 
- * @param PDO $conn Database connection
- * @param int $user_id User ID
- * @param int $product_id Product ID
- * @return bool True if product is in wishlist
- */
-function isProductInWishlist($conn, $user_id, $product_id) {
-    $stmt = $conn->prepare("SELECT wishlist_id FROM wishlists WHERE user_id = ? AND product_id = ?");
-    $stmt->execute([$user_id, $product_id]);
-    return $stmt->fetch() !== false;
-}
-
-// ------------------------
-// ORDER STATUS MANAGEMENT
+// 📦 ORDER STATUS MANAGEMENT
 // ------------------------
 
 /**

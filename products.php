@@ -62,28 +62,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <p>Price: <?= htmlspecialchars($product['price']) ?></p>
                 <p>Stock: <?= htmlspecialchars($product['stock']) ?> units</p>
 
-                <!-- Display average rating -->
-                <?php 
-                $rating = getProductRating($conn, $product['product_id']);
-                $stars = str_repeat('⭐', (int)$rating['average_rating']);
-                $stars .= str_repeat('☆', 5 - (int)$rating['average_rating']);
-                ?>
-                <div class="product-rating">
-                    <span class="stars"><?= $stars ?></span>
-                    <span class="rating-count"><?= $rating['review_count'] ?> reviews</span>
-                </div>
-
-                <!-- Wishlist Button -->
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    <?php 
-                    $inWishlist = isProductInWishlist($conn, $_SESSION['user_id'], $product['product_id']);
-                    $wishlistClass = $inWishlist ? 'btn-danger' : 'btn-primary';
-                    $wishlistText = $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist';
-                    $wishlistAction = $inWishlist ? 'remove' : 'add';
-                    ?>
-                    <a href="wishlist.php?action=<?= htmlspecialchars($wishlistAction) ?>&product_id=<?= htmlspecialchars($product['product_id']) ?>" class="btn <?= $wishlistClass ?>"><?= htmlspecialchars($wishlistText) ?></a>
-                <?php endif; ?>
-
                 <!-- Add to Cart Form -->
                 <form method="POST" action="mem_order/add_to_cart.php">
                     <input type="hidden" name="product_id" value="<?= htmlspecialchars($product['product_id']) ?>">
@@ -96,32 +74,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endforeach; ?>
     <?php endif; ?>
 </div>
-
-<!-- Review Form for logged in users -->
-<?php if (isset($_SESSION['user_id'])): ?>
-    <div class="review-form">
-        <h3>Leave a Review</h3>
-        <form method="POST" action="add_review.php">
-            <input type="hidden" name="product_id" value="<?= htmlspecialchars($product['product_id']) ?>">
-            <div class="rating-select">
-                <label>Rating:</label>
-                <select name="rating" required>
-                    <option value="">Select rating</option>
-                    <option value="1">1 star</option>
-                    <option value="2">2 stars</option>
-                    <option value="3">3 stars</option>
-                    <option value="4">4 stars</option>
-                    <option value="5">5 stars</option>
-                </select>
-            </div>
-            <div class="comment-box">
-                <label>Comment:</label>
-                <textarea name="comment" placeholder="Share your thoughts about this product..." rows="3"></textarea>
-            </div>
-            <button type="submit" class="btn">Submit Review</button>
-        </form>
-    </div>
-<?php endif; ?>
 
 <?php
 include 'includes/footer.php';
