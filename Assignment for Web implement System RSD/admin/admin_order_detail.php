@@ -10,6 +10,19 @@ include 'db.php';
 include '../base.php';
 
 $order_id = $_GET['id'];
+$message = '';
+
+// Handle status update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+    $new_status = $_POST['status'] ?? '';
+    $notes = $_POST['notes'] ?? '';
+    
+    if ($new_status && updateOrderStatus($conn, $order_id, $new_status, $notes)) {
+        $message = '<div class="success">Order status updated successfully.</div>';
+    } else {
+        $message = '<div class="error">Failed to update order status.</div>';
+    }
+}
 
 // Fetch order details
 $order = getOrderDetails($conn, $order_id);
@@ -23,14 +36,66 @@ if (!$order) {
 
 // Fetch order items
 $order_items = getOrderItems($conn, $order_id);
+
+// Get order history
+$order_history = getOrderHistory($conn, $order_id);
 ?>
 
 <h2>Order Details (Admin)</h2>
-<p><strong>Order ID:</strong> <?php echo $order['order_id']; ?></p>
-<p><strong>User:</strong> <?php echo htmlspecialchars($order['username']); ?></p>
-<p><strong>Total Amount:</strong> $<?php echo number_format($order['total_amount'], 2); ?></p>
-<p><strong>Status:</strong> <?php echo $order['order_status']; ?></p>
-<p><strong>Date:</strong> <?php echo $order['created_at']; ?></p>
+<?php echo $message; ?>
+
+<div class="order-info">
+    <p><strong>Order ID:</strong> <?php echo $order['order_id']; ?></p>
+    <p><strong>User:</strong> <?php echo htmlspecialchars($order['username']); ?></p>
+    <p><strong>Total Amount:</strong> $<?php echo number_format($order['total_amount'], 2); ?></p>
+    <p><strong>Status:</strong> <?php echo $order['order_status']; ?></p>
+    <p><strong>Date:</strong> <?php echo $order['created_at']; ?></p>
+</div>
+
+<!-- Status Update Form -->
+<h3>Update Order Status</h3>
+<form method="POST" action="">
+    <label for="status">New Status:</label>
+    <select name="status" id="status" required>
+        <option value="">Select Status</option>
+        <option value="Pending" <?php echo $order['status'] === 'Pending' ? 'selected' : ''; ?>>Pending</option>
+        <option value="Processing" <?php echo $order['status'] === 'Processing' ? 'selected' : ''; ?>>Processing</option>
+        <option value="Shipped" <?php echo $order['status'] === 'Shipped' ? 'selected' : ''; ?>>Shipped</option>
+        <option value="Completed" <?php echo $order['status'] === 'Completed' ? 'selected' : ''; ?>>Completed</option>
+        <option value="Cancelled" <?php echo $order['status'] === 'Cancelled' ? 'selected' : ''; ?>>Cancelled</option>
+    </select>
+    
+    <label for="notes">Notes:</label>
+    <textarea name="notes" id="notes" placeholder="Optional notes about the status change"></textarea>
+    
+    <button type="submit" name="update_status">Update Status</button>
+</form>
+
+<!-- Order History -->
+<h3>Order History</h3>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Updated By</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($order_history as $history): ?>
+            <tr>
+                <td><?php echo $history['updated_at']; ?></td>
+                <td><?php echo $history['status']; ?></td>
+                <td><?php echo htmlspecialchars($history['updated_by']); ?></td>
+                <td><?php echo htmlspecialchars($history['notes']); ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<h3>Order Items</h3>
+<table border="1">
 
 <h3>Order Items</h3>
 <table border="1">

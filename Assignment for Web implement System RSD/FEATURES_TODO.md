@@ -3,8 +3,8 @@
 This file contains feature plans and /TODOs for advanced functionality. Each section notes what needs to be done in SQL (database), PHP, or other layers.
 
 ---
-
-## 1. Category Maintenance + Filtering
+✅
+## 1. Category Maintenance + Filtering(half)
 - /TODO (SQL): Create `categories` table (`category_id`, `category_name`)
 - /TODO (SQL): Add `category_id` FK to `products` table
 - /TODO (PHP): Add CRUD functions for categories in `functions.php`
@@ -14,18 +14,18 @@ This file contains feature plans and /TODOs for advanced functionality. Each sec
 
 ---
 
-## 2. Product Stock Handling & Low-In-Stock Alert
+## 2. Product Stock Handling & Low-In-Stock Alert✅
 - /TODO (SQL): Add `stock` INT column to `products` table
 - /TODO (PHP): Update product add/edit forms to manage stock
 - /TODO (PHP): Deduct stock on successful order/checkout
-- /TODO (PHP): Show “Low Stock” alert to admin if stock < threshold
+- /TODO (PHP): Show "Low Stock" alert to admin if stock < threshold
 
 ---
 
 ## 3. Order Status Update (Admin) & Order Cancellation (Member)
 - /TODO (SQL): Add `status` column to `orders` table (e.g., Pending, Processing, Shipped, Cancelled)
 - /TODO (PHP): Admin: Add UI to update order status
-- /TODO (PHP): Member: Add “Cancel Order” option for eligible orders
+- /TODO (PHP): Member: Add "Cancel Order" option for eligible orders
 
 ---
 

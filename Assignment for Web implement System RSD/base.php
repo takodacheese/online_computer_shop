@@ -718,12 +718,146 @@ function sanitizeInput($input) {
 
 /**
  * Get featured products (limit default: 4)
+ * 
+ * @param PDO $conn Database connection
+ * @param int $limit Number of products to fetch
+ * @return array Array of featured products
  */
 function getFeaturedProducts($conn, $limit = 4) {
-    $stmt = $conn->prepare("SELECT * FROM products LIMIT ?");
-    $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $conn->prepare("SELECT * FROM products WHERE featured = 1 ORDER BY created_at DESC LIMIT ?");
+    $stmt->execute([$limit]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// ------------------------
+// 📦 ORDER STATUS MANAGEMENT
+// ------------------------
+
+/**
+ * Update order status
+ * 
+ * @param PDO $conn Database connection
+ * @param int $order_id Order ID
+ * @param string $status New status
+ * @param string|null $notes Optional notes
+ * @return bool Success status
+ */
+function updateOrderStatus($conn, $order_id, $status, $notes = null) {
+    // Update order status
+    $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?");
+    $success = $stmt->execute([$status, $order_id]);
+    
+    // Add to order history
+    if ($success) {
+        $updated_by = $_SESSION['user_id'] ?? null;
+        $stmt = $conn->prepare("INSERT INTO order_history (order_id, status, updated_by, notes) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$order_id, $status, $updated_by, $notes]);
+    }
+    
+    return $success;
+}
+
+/**
+ * Cancel an order
+ * 
+ * @param PDO $conn Database connection
+ * @param int $order_id Order ID
+ * @param string $reason Cancellation reason
+ * @param bool $admin_approval Required for 'Processing' status
+ * @return bool Success status
+ */
+function cancelOrder($conn, $order_id, $reason, $admin_approval = false) {
+    // Get current order status
+    $stmt = $conn->prepare("SELECT status FROM orders WHERE order_id = ?");
+    $stmt->execute([$order_id]);
+    $order = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$order) {
+        return false;
+    }
+    
+    // Check if cancellation is allowed
+    if ($order['status'] === 'Pending') {
+        // Pending orders can be cancelled directly
+        $success = updateOrderStatus($conn, $order_id, 'Cancelled', $reason);
+    } elseif ($order['status'] === 'Processing' && $admin_approval) {
+        // Processing orders require admin approval
+        $success = updateOrderStatus($conn, $order_id, 'Cancelled', $reason);
+    } else {
+        return false;
+    }
+    
+    // If successful, restore stock for all order items
+    if ($success) {
+        $stmt = $conn->prepare("
+            UPDATE products p
+            JOIN order_items oi ON p.product_id = oi.product_id
+            SET p.stock = p.stock + oi.quantity
+            WHERE oi.order_id = ?
+        ");
+        $stmt->execute([$order_id]);
+    }
+    
+    return $success;
+}
+
+/**
+ * Get pending cancellation requests
+ * 
+ * @param PDO $conn Database connection
+ * @return array Array of pending cancellation requests
+ */
+function getPendingCancellationRequests($conn) {
+    // /TODO: Implement query to get pending cancellation requests
+    // Need to join order_cancellation_requests with orders and users tables
+    // Return array with request details, order info, and user info
+    return [];
+}
+
+/**
+ * Get order history
+ * 
+ * @param PDO $conn Database connection
+ * @param int $order_id Order ID
+ * @return array Array of order history entries
+ */
+function getOrderHistory($conn, $order_id) {
+    $stmt = $conn->prepare("
+        SELECT 
+            oh.history_id,
+            oh.status,
+            oh.updated_at,
+            oh.notes,
+            u.username as updated_by
+        FROM order_history oh
+        LEFT JOIN users u ON oh.updated_by = u.user_id
+        WHERE oh.order_id = ?
+        ORDER BY oh.updated_at DESC
+    ");
+    $stmt->execute([$order_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Check if order is eligible for cancellation
+ * 
+ * @param array $order Order data
+ * @return array Array with 'eligible' and 'requires_approval' flags
+ */
+function isOrderEligibleForCancellation($order) {
+    $result = [
+        'eligible' => false,
+        'requires_approval' => false
+    ];
+    
+    if ($order['status'] === 'Pending') {
+        $result['eligible'] = true;
+    } elseif ($order['status'] === 'Processing') {
+        $result['eligible'] = true;
+        $result['requires_approval'] = true;
+    }
+    
+    return $result;
 }
 
 ?>
