@@ -6,12 +6,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 include 'includes/header.php';
-include 'db.php';
 include '../base.php';
+include 'db.php';
 
 // Fetch all orders
 $orders = getAllOrders($conn);
-
 ?>
 
 <h2>Order List (Admin)</h2>

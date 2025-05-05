@@ -1,4 +1,5 @@
 <?php
+// admin_edit_product.php
 session_start();
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
@@ -7,7 +8,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 include 'includes/header.php';
 include 'db.php';
-include '../base.php';
+include '../base.php'; 
 
 $product_id = $_GET['id'];
 $product = getProductById($conn, $product_id);
@@ -22,13 +23,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $description = $_POST['description'];
     $price = $_POST['price'];
+    $imagePath = $product['image']; // Keep existing image by default
 
-    $image = null;
+    // Handle new image upload if provided
     if ($_FILES['image']['size'] > 0) {
-        $image = handleImageUpload($_FILES['image']);
+        $uploadResult = handleImageUpload($_FILES['image'], "uploads/products/");
+        
+        if ($uploadResult['success']) {
+            $imagePath = $uploadResult['path'];
+        } else {
+            echo "<p>" . $uploadResult['error'] . "</p>";
+            include 'includes/footer.php';
+            exit();
+        }
     }
 
-    if (updateProduct($conn, $product_id, $name, $description, $price, $image)) {
+    // Update product using reusable function
+    if (updateProduct($conn, $product_id, $name, $description, $price, $imagePath)) {
         echo "<p>Product updated successfully.</p>";
     } else {
         echo "<p>Error updating product.</p>";

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'includes/header.php';
+include '../includes/header.php';
 require_once '../base.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
