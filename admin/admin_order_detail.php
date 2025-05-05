@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 include '../includes/header.php';
-include 'db.php';
+include '../db.php';
 include '../base.php';
 
 $order_id = $_GET['id'];

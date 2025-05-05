@@ -4,7 +4,7 @@ require_once '../base.php';
 require_admin(); // Session + role check
 
 include '../includes/header.php';
-include 'db.php';
+include '../db.php';
 
 // Handle search
 $search = $_GET['search'] ?? '';
@@ -24,7 +24,7 @@ $recent_orders = get_recent_orders($conn);
 <!-- Order Maintenance Section -->
 <h3>Order Maintenance</h3>
 <p><a href="admin_orders.php">View All Orders</a></p>
-<p><a href="order_history.php">View Member Order History</a></p>
+<p><a href="../mem_order/order_history.php">View Member Order History</a></p>
 
 <!-- Quick Stats -->
 <h3>Quick Stats</h3>
@@ -68,7 +68,7 @@ $recent_orders = get_recent_orders($conn);
 <ul>
     <li><a href="admin_products.php">Manage Products</a></li>
     <li><a href="members.php">Manage Members</a></li>
-    <li><a href="profile.php">Your Profile</a></li>
+    <li><a href="../member/profile.php">Your Profile</a></li>
 </ul>
 
 <!-- Product Section -->

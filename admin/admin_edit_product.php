@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 include '../includes/header.php';
-include 'db.php';
+include '../db.php';
 
 $product_id = $_GET['id'];
 $stmt = $conn->prepare("SELECT * FROM products WHERE product_id = ?");

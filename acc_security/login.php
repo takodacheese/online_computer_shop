@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $role = loginUser($conn,$email, $password);
     
     if ($role) {
-        header("Location: " . ($role === 'admin' ? "../admin_products.php" : "../index.php"));
+        header("Location: " . ($role === 'admin' ? "../admin/admin_products.php" : "../index.php"));
         exit();
     } else {
         echo "<p>Invalid email or password.</p>";

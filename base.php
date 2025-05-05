@@ -571,13 +571,12 @@ function get_recent_orders($conn, $limit = 5) {
 /**
  * Fetch all products
  */
-function search_products($conn, $search) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE name LIKE ? OR description LIKE ?");
-    $likeSearch = '%' . $search . '%';
-    $stmt->bind_param("ss", $likeSearch, $likeSearch);
+function search_products(PDO $conn, string $search) {
+    $stmt = $conn->prepare("SELECT * FROM products WHERE name LIKE :search OR description LIKE :search");
+    $searchTerm = '%' . $search . '%';
+    $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
     $stmt->execute();
-    $result = $stmt->get_result();
-    return $result->fetch_all(MYSQLI_ASSOC);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 // ------------------------
 // 🛠️ CUSTOM PC BUILDER
