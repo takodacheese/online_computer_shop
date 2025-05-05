@@ -6,7 +6,10 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-include 'db.php';
+// Add Stripe autoloader
+require_once '../vendor/autoload.php';
+
+include '../db.php';
 include '../base.php';
 
 $user_id = $_SESSION['user_id'];
@@ -24,13 +27,48 @@ $total_amount = array_sum(array_map(function($item) {
     return $item['price'] * $item['quantity'];
 }, $cart_items));
 
-// Create order + insert order items
-$order_id = createOrder($conn, $user_id, $total_amount);
-addOrderItems($conn, $order_id, $cart_items);
+// Store total amount in session
+$_SESSION['total_amount'] = $total_amount;
 
-// Clear cart
-clearCart($conn, $user_id);
+try {
+    // Create order
+    $order_id = createOrder($conn, $user_id, $total_amount);
+    $_SESSION['order_id'] = $order_id;
 
-header("Location: order_detail.php?id=$order_id");
-exit();
+    // Create Stripe Checkout Session for GrabPay and FPX
+    $stripe = new \Stripe\StripeClient(STRIPE_SECRET_KEY);
+    $checkout_session = $stripe->checkout->sessions->create([
+        'payment_method_types' => ['grabpay', 'fpx'],
+        'line_items' => [[
+            'price_data' => [
+                'currency' => 'myr',
+                'product_data' => [
+                    'name' => 'Order #' . $order_id,
+                ],
+                'unit_amount' => $total_amount * 100, // in cents
+            ],
+            'quantity' => 1,
+        ]],
+        'mode' => 'payment',
+        'success_url' => 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/payment_success.php?session_id={CHECKOUT_SESSION_ID}',
+        'cancel_url' => 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/payment_cancel.php',
+        'metadata' => [
+            'order_id' => $order_id,
+            'user_id' => $user_id
+        ],
+    ]);
+
+    // Redirect to Stripe Checkout
+    header('Location: ' . $checkout_session->url);
+    exit();
+} catch (Exception $e) {
+    error_log("Payment error: " . $e->getMessage());
+    if (isset($order_id)) {
+        $stmt = $conn->prepare("DELETE FROM orders WHERE order_id = ?");
+        $stmt->execute([$order_id]);
+    }
+    $_SESSION['error'] = "Failed to process payment: " . $e->getMessage();
+    header("Location: cart.php");
+    exit();
+}
 ?>

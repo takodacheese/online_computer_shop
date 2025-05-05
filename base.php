@@ -692,7 +692,7 @@ function createPaypalPayment($conn, $order_id, $total_amount) {
             throw new Exception('PayPal API error: ' . ($order->details ?? 'Unknown error'));
         }
         
-        return $order->id;
+        return $order;
     } catch (Exception $e) {
         logError('Failed to create PayPal payment: ' . $e->getMessage());
         throw new Exception('Failed to create PayPal payment. Please try again later.');
@@ -921,14 +921,18 @@ function getOrderHistory($conn, $order_id) {
  * @return array Array with 'eligible' and 'requires_approval' flags
  */
 function isOrderEligibleForCancellation($order) {
+    // Initialize result array
     $result = [
         'eligible' => false,
         'requires_approval' => false
     ];
     
-    if ($order['status'] === 'Pending') {
+    // Check if order has a status and it's either 'Pending' or 'Processing'
+    $status = isset($order['status']) ? $order['status'] : '';
+    
+    if ($status === 'Pending') {
         $result['eligible'] = true;
-    } elseif ($order['status'] === 'Processing') {
+    } elseif ($status === 'Processing') {
         $result['eligible'] = true;
         $result['requires_approval'] = true;
     }

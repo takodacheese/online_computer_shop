@@ -1,0 +1,11 @@
+[2025-05-05 10:23:08] Failed to create PayPal payment: PayPal API error: Array
+[2025-05-05 10:23:11] Failed to create PayPal payment: PayPal API error: Array
+[2025-05-05 10:23:14] Failed to create PayPal payment: PayPal API error: Array
+[2025-05-05 10:49:30] Payment processing failed: Order not found or payment not processed
+[2025-05-05 10:54:34] Payment processing failed: Order not found or payment not processed
+[2025-05-05 10:54:49] Payment processing failed: Order not found or payment not processed
+[2025-05-05 10:55:11] Payment processing failed: Order not found or payment not processed
+[2025-05-05 10:55:16] Payment processing failed: Order not found or payment not processed
+[2025-05-05 10:55:32] Payment processing failed: Order not found or payment not processed
+[2025-05-05 10:55:43] Payment processing failed: Order not found or payment not processed
+[2025-05-05 10:56:00] Payment processing failed: Order not found or payment not processed
