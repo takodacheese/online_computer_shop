@@ -71,5 +71,38 @@ This file contains feature plans and /TODOs for advanced functionality. Each sec
 
 ---
 
+## 10. Enhanced Authentication & User Features
+- /TODO (SQL): Add password strength requirements table
+- /TODO (JS): Implement password strength indicator using jQuery
+- /TODO (AJAX): Add real-time email uniqueness check during registration
+- /TODO (PHP): Implement session flash messages system
+- /TODO (PHP): Add secure file upload validation
+
+---
+
+## 11. Custom PC Builder Enhancements
+- /TODO (JS): Implement real-time compatibility checking
+- /TODO (PHP): Add validation for CPU + motherboard compatibility
+- /TODO (UI): Add warning indicators for incompatible components
+
+---
+
+## 12. Admin Dashboard Enhancements
+- /TODO (PHP): Add interactive sales charts (Chart.js)
+- /TODO (PHP): Implement user activity logging
+- /TODO (PHP): Add top-selling products widget
+- /TODO (PHP): Add order status summary
+
+---
+
+## 13. UX Improvements
+- /TODO (JS): Add confirmation modal for deletions
+- /TODO (JS): Implement expandable order detail rows
+- /TODO (HTML5): Add form autofill suggestions
+- /TODO (JS): Add "Back to Top" button
+- /TODO (CSS): Implement dark mode toggle with localStorage
+
+---
+
 > For each feature, implement the SQL/database changes first, then update PHP logic and UI as needed.
 > Use these /TODOs as a checklist as you build out your advanced shop features.
