@@ -19,7 +19,7 @@
             <a href="../index.php" class="nav-link">Home</a>
             <?php if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin'): ?>
                 <!-- Display Admin Dashboard button for admin users -->
-                <a href="../admin_products.php" class="nav-link">Admin</a>
+                <a href="../admin/admin_products.php" class="nav-link">Admin</a>
             <?php endif; ?>
             <a href="../products.php" class="nav-link">Products</a>
 

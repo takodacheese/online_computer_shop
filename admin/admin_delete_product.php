@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-include 'db.php';
+include '../db.php';
 
 $product_id = $_GET['id'];
 

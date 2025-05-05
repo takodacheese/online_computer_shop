@@ -24,10 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $description = $_POST['description'];
     $price = $_POST['price'];
-
+    $stock = $_POST['stock'];
     // Handle file upload if a new image is provided
     if ($_FILES['image']['size'] > 0) {
-        $target_dir = "uploads/products/";
+        $target_dir = "../uploads/products/";
         $target_file = $target_dir . basename($_FILES['image']['name']);
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
@@ -47,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     // Upload the file
                     if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
                         // Update product with new image
-                        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ?, image = ? WHERE product_id = ?");
-                        $stmt->execute([$name, $description, $price, $target_file, $product_id]);
+                        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ?, stock = ?, image = ? WHERE product_id = ?");
+                        $stmt->execute([$name, $description, $price, $stock, $target_file, $product_id]);
                         echo "<p>Product updated successfully.</p>";
                     } else {
                         echo "<p>Error uploading file.</p>";
@@ -69,12 +69,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <form method="POST" action="admin_edit_product.php?id=<?php echo $product_id; ?>" enctype="multipart/form-data">
     <label for="name">Name:</label>
     <input type="text" name="name" value="<?php echo htmlspecialchars($product['name']); ?>" required><br>
+
     <label for="description">Description:</label>
     <textarea name="description" required><?php echo htmlspecialchars($product['description']); ?></textarea><br>
+
     <label for="price">Price:</label>
     <input type="number" step="0.01" name="price" value="<?php echo $product['price']; ?>" required><br>
+
+    <label for="stock">Stock:</label>
+    <input type="number" name="stock" value="<?php echo $product['stock']; ?>" required><br>
+
     <label for="image">Image:</label>
     <input type="file" name="image" accept="image/*"><br>
+
     <button type="submit">Update Product</button>
 </form>
 
