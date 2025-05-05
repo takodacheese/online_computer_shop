@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-
+<section class=login>
 <h2>Login</h2>
 <form method="POST" action="login.php">
     <label for="email">Email:</label>
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </form>
 
 <p>Forgot your password? <a href="forgot_password.php">Reset it here</a>.</p>
-
+</section>
 <?php
 include '../includes/footer.php';
 ?>

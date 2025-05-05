@@ -18,7 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-
+    
+<section class=register>
 <h2>Register</h2>
 <form method="POST" action="register.php">
     <label for="username">Username:</label>
@@ -29,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <input type="password" name="password" required><br>
     <button type="submit">Register</button>
 </form>
-
+</section>
 <?php
 include '../includes/footer.php';
 ?>
