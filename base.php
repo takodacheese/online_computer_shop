@@ -32,8 +32,13 @@ function getUserByEmail(PDO $conn, string $email) {
 
 /**
  * Verify login credentials. Sets session on success.
+ *
+ * @param PDO $conn Database connection
+ * @param string $email User email
+ * @param string $password User password
+ * @return string|false Role on success, false on failure
  */
-function loginUser($email, $password) {
+function loginUser(PDO $conn, $email, $password) {
     $user = getUserByEmail($conn, $email);
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['user_id'];
@@ -46,8 +51,8 @@ function loginUser($email, $password) {
 /**
  * Check if email is already registered
  */
-function emailExists($email) {
-    return getUserByEmail($email) !== false;
+function emailExists(PDO $conn, $email) {
+    return getUserByEmail($conn, $email) !== false;
 }
 
 /**
@@ -1178,29 +1183,6 @@ function updateOrderStatus($conn, $order_id, $status, $notes = null) {
 // ------------------------
 // 📦 STOCK MANAGEMENT
 // ------------------------
-/**
- * Deduct stock for a product
- * 
- * @param PDO $conn Database connection
- * @param int $productId Product ID
- * @param int $quantity Quantity to deduct
- */
-function deductStock(PDO $conn, int $productId, int $quantity): void {
-    $stmt = $conn->prepare("UPDATE products SET stock = stock - ? WHERE product_id = ?");
-    $stmt->execute([$quantity, $productId]);
-}
-
- // Get low stock products (below threshold)
- // @param PDO $conn Database connection
- // @param int $threshold Stock threshold (default: 5)
- //@return array Array of low stock products
- 
-function getLowStockProducts(PDO $conn, $threshold = 5) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE stock <= ?");
-    $stmt->execute([$threshold]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
 /**
  * Cancel an order
  * 
