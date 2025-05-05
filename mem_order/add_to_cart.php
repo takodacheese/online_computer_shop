@@ -2,7 +2,7 @@
 // add_to_cart.php
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: /acc_security/login.php");
     exit();
 }
 
