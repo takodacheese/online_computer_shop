@@ -277,6 +277,17 @@ function getFeaturedProducts($conn, $limit = 4) {
 
 // Get models by selected part (for dynamic dropdowns)
 
+
+function getModelsByPartId($conn, $part_id) {
+    $stmt = $conn->prepare("SELECT model_id, model_name, price FROM models WHERE part_id = ?");
+    $stmt->bind_param("i", $part_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $models = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    return $models;
+}
+
 // ------------------------
 // 🧼 UTILITIES
 // ------------------------
