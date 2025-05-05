@@ -6,7 +6,7 @@ require_once 'base.php';
 
 // Get low stock products for admin alert
 $lowStockProducts = [];
-if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin') {
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
     $lowStockProducts = getLowStockProducts($conn);
 }
 

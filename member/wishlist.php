@@ -8,7 +8,7 @@ $product_id = $_GET['product_id'] ?? null;
 
 if ($action && $product_id) {
     try {
-        $conn = getDbConnection();
+        global $conn;
         
         if ($action === 'add') {
             addToWishlist($conn, $_SESSION['user_id'], $product_id);
