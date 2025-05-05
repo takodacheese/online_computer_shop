@@ -194,7 +194,7 @@ function getCartItems($conn, $user_id) {
  */
 function calculateCartTotal($cart_items) {
     return array_sum(array_map(function($item) {
-        return $item['price'] * $item['quantity'];
+        return $item['Product_Price'] * $item['Quantity'];
     }, $cart_items));
 }
 
@@ -202,21 +202,52 @@ function calculateCartTotal($cart_items) {
  * Add to cart (or update quantity if already exists)
  */
 function addToCart($conn, $user_id, $product_id, $quantity) {
+    // First check if item already exists in cart
     $stmt = $conn->prepare("
-        INSERT INTO Cart (Cart_ID, User_ID, Product_ID, Quantity, Total_Price_Cart, Added_Date)
-        VALUES (?, ?, ?, ?, (SELECT Product_Price FROM product WHERE Product_ID = ?) * ?, NOW())
+        SELECT Cart_ID, Quantity 
+        FROM Cart 
+        WHERE User_ID = ? AND Product_ID = ?
     ");
-    
-    // Generate Cart_ID (e.g., C00001)
-    $stmt->execute([
-        'C' . str_pad($conn->query("SELECT COUNT(*) FROM Cart")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
-        $user_id,
-        $product_id,
-        $quantity,
-        $product_id,
-        $quantity
-    ]);
-    return $stmt->rowCount();
+    $stmt->execute([$user_id, $product_id]);
+    $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($existing) {
+        // Get the product price first
+        $priceStmt = $conn->prepare("SELECT Product_Price FROM product WHERE Product_ID = ?");
+        $priceStmt->execute([$product_id]);
+        $product = $priceStmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Update existing cart item
+        $stmt = $conn->prepare("
+            UPDATE Cart 
+            SET Quantity = Quantity + ?, 
+                Total_Price_Cart = ? * (Quantity + ?)
+            WHERE Cart_ID = ?
+        ");
+        return $stmt->execute([$quantity, $product['Product_Price'], $quantity, $existing['Cart_ID']]);
+    } else {
+        // Get the product price first
+        $priceStmt = $conn->prepare("SELECT Product_Price FROM product WHERE Product_ID = ?");
+        $priceStmt->execute([$product_id]);
+        $product = $priceStmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Insert new cart item
+        $stmt = $conn->prepare("
+            INSERT INTO Cart (Cart_ID, User_ID, Product_ID, Quantity, Total_Price_Cart, Added_Date)
+            VALUES (?, ?, ?, ?, ? * ?, NOW())
+        ");
+        
+        // Generate Cart_ID (e.g., C00001)
+        $stmt->execute([
+            'C' . str_pad($conn->query("SELECT COUNT(*) FROM Cart")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
+            $user_id,
+            $product_id,
+            $quantity,
+            $product['Product_Price'],
+            $quantity
+        ]);
+        return $stmt->rowCount();
+    }
 }
 
 /**
@@ -826,7 +857,7 @@ function sanitizeInput($input) {
  */
 function getFeaturedProducts($conn, $limit = 4) {
     $stmt = $conn->prepare("
-        SELECT 
+        SELECT DISTINCT
             p.Product_ID,
             p.Product_Name as name,
             p.Product_Description as description,
@@ -837,12 +868,122 @@ function getFeaturedProducts($conn, $limit = 4) {
         FROM product p
         LEFT JOIN category c ON p.Category_ID = c.Category_ID
         LEFT JOIN Brand b ON c.Brand_ID = b.Brand_ID
-        ORDER BY p.Rating_Avg DESC
+        ORDER BY RAND()
         LIMIT :limit
     ");
     $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Get components for PC Builder
+function getPCBuilderComponents($conn) {
+    // Get CPUs
+    $stmt = $conn->prepare("
+        SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
+        FROM product p
+        JOIN category c ON p.Category_ID = c.Category_ID
+        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        WHERE c.Category_Name = 'Processors'
+        ORDER BY p.Product_Price ASC
+    ");
+    $stmt->execute();
+    $cpus = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get GPUs
+    $stmt = $conn->prepare("
+        SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
+        FROM product p
+        JOIN category c ON p.Category_ID = c.Category_ID
+        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        WHERE c.Category_Name = 'Graphics Cards'
+        ORDER BY p.Product_Price ASC
+    ");
+    $stmt->execute();
+    $gpus = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get Motherboards
+    $stmt = $conn->prepare("
+        SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
+        FROM product p
+        JOIN category c ON p.Category_ID = c.Category_ID
+        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        WHERE c.Category_Name = 'Motherboards'
+        ORDER BY p.Product_Price ASC
+    ");
+    $stmt->execute();
+    $motherboards = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get RAM
+    $stmt = $conn->prepare("
+        SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
+        FROM product p
+        JOIN category c ON p.Category_ID = c.Category_ID
+        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        WHERE c.Category_Name = 'Memory'
+        ORDER BY p.Product_Price ASC
+    ");
+    $stmt->execute();
+    $ram = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get Storage
+    $stmt = $conn->prepare("
+        SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
+        FROM product p
+        JOIN category c ON p.Category_ID = c.Category_ID
+        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        WHERE c.Category_Name = 'Storage'
+        ORDER BY p.Product_Price ASC
+    ");
+    $stmt->execute();
+    $storage = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get Power Supplies
+    $stmt = $conn->prepare("
+        SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
+        FROM product p
+        JOIN category c ON p.Category_ID = c.Category_ID
+        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        WHERE c.Category_Name = 'Power Supplies'
+        ORDER BY p.Product_Price ASC
+    ");
+    $stmt->execute();
+    $power_supplies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get Cases
+    $stmt = $conn->prepare("
+        SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
+        FROM product p
+        JOIN category c ON p.Category_ID = c.Category_ID
+        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        WHERE c.Category_Name = 'Cases'
+        ORDER BY p.Product_Price ASC
+    ");
+    $stmt->execute();
+    $cases = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get Cooling
+    $stmt = $conn->prepare("
+        SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
+        FROM product p
+        JOIN category c ON p.Category_ID = c.Category_ID
+        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        WHERE c.Category_Name = 'Cooling'
+        ORDER BY p.Product_Price ASC
+    ");
+    $stmt->execute();
+    $cooling = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        'cpus' => $cpus,
+        'gpus' => $gpus,
+        'motherboards' => $motherboards,
+        'ram' => $ram,
+        'storage' => $storage,
+        'power_supplies' => $power_supplies,
+        'cases' => $cases,
+        'cooling' => $cooling
+    ];
 }
 
 // ------------------------

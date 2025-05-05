@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Computer Shop</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="../js/main.js"></script>
@@ -25,6 +26,7 @@
                 <a href="../admin/admin_products.php" class="nav-link">Admin</a>
             <?php endif; ?>
             <a href="../products.php" class="nav-link">Products</a>
+            <a href="../mem_order/cart.php" class="nav-link">Cart</a>
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <!-- Display Profile and Logout links if the user is logged in -->
@@ -64,5 +66,3 @@
             });
         });
     </script>
-
-

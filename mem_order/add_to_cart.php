@@ -6,14 +6,23 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-include 'db.php';
+require_once '../db.php';
 include '../base.php';
 
-$product_id = $_POST['product_id'];
+$product_id = $_POST['Product_ID'];
 $quantity = $_POST['quantity'];
 
 if (addToCart($conn, $_SESSION['user_id'], $product_id, $quantity)) {
-    header("Location: cart.php");
+    // Get product name for success message
+    $stmt = $conn->prepare("SELECT Product_Name FROM product WHERE Product_ID = ?");
+    $stmt->execute([$product_id]);
+    $product = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Store success message in session
+    $_SESSION['success_message'] = "Successfully added {$product['Product_Name']} to cart!";
+    
+    // Redirect back to products page
+    header("Location: ../products.php");
     exit();
 } else {
     echo "Failed to add item to cart.";

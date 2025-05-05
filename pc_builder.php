@@ -1,5 +1,4 @@
 <?php
-// cart.php
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -8,23 +7,27 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once 'includes/header.php';
 require_once 'db.php';
+require_once 'base.php';
 
-// TODO: Fetch component options from database (CPU, GPU, RAM, etc.)
-//The option group data should be taken from database instead of hardcoding
+// Get components from database
+$components = getPCBuilderComponents($conn);
 ?>
 
 <link rel="stylesheet" href="css/pc_build.css">
 
 <h2>🛠️ Build Your Custom PC</h2>
 
-<form action="pc_build_submit.php" method="POST" class="pc-build-form">
+<form action="mem_order/add_to_cart.php" method="POST" class="pc-build-form">
 
     <div class="component-group">
         <label for="cpu">CPU:</label>
         <select name="cpu" id="cpu" required>
             <option value="">-- Select CPU --</option>
-            <option value="cpu1">Intel Core i5 (Example)</option>
-            <option value="cpu2">AMD Ryzen 5 (Example)</option>
+            <?php foreach ($components['cpus'] as $cpu): ?>
+                <option value="<?= htmlspecialchars($cpu['Product_ID']) ?>">
+                    <?= htmlspecialchars($cpu['Product_Name']) ?> (<?= $cpu['Brand_Name'] ?>)
+                </option>
+            <?php endforeach; ?>
         </select>
     </div>
 
@@ -32,8 +35,11 @@ require_once 'db.php';
         <label for="cpu_cooler">CPU Cooler:</label>
         <select name="cpu_cooler" id="cpu_cooler" required>
             <option value="">-- Select CPU Cooler --</option>
-            <option value="cooler1">Cooler Master Hyper 212</option>
-            <option value="cooler2">Noctua NH-D15</option>
+            <?php foreach ($components['cooling'] as $cooler): ?>
+                <option value="<?= htmlspecialchars($cooler['Product_ID']) ?>">
+                    <?= htmlspecialchars($cooler['Product_Name']) ?> (<?= $cooler['Brand_Name'] ?>)
+                </option>
+            <?php endforeach; ?>
         </select>
     </div>
 
@@ -41,8 +47,11 @@ require_once 'db.php';
         <label for="motherboard">Motherboard:</label>
         <select name="motherboard" id="motherboard" required>
             <option value="">-- Select Motherboard --</option>
-            <option value="mb1">ASUS Prime B550M</option>
-            <option value="mb2">Gigabyte Z590 AORUS</option>
+            <?php foreach ($components['motherboards'] as $motherboard): ?>
+                <option value="<?= htmlspecialchars($motherboard['Product_ID']) ?>">
+                    <?= htmlspecialchars($motherboard['Product_Name']) ?> (<?= $motherboard['Brand_Name'] ?>)
+                </option>
+            <?php endforeach; ?>
         </select>
     </div>
 
@@ -50,8 +59,11 @@ require_once 'db.php';
         <label for="gpu">GPU:</label>
         <select name="gpu" id="gpu" required>
             <option value="">-- Select GPU --</option>
-            <option value="gpu1">NVIDIA RTX 3060</option>
-            <option value="gpu2">AMD Radeon RX 6700 XT</option>
+            <?php foreach ($components['gpus'] as $gpu): ?>
+                <option value="<?= htmlspecialchars($gpu['Product_ID']) ?>">
+                    <?= htmlspecialchars($gpu['Product_Name']) ?> (<?= $gpu['Brand_Name'] ?>)
+                </option>
+            <?php endforeach; ?>
         </select>
     </div>
 
@@ -59,8 +71,11 @@ require_once 'db.php';
         <label for="ram">RAM:</label>
         <select name="ram" id="ram" required>
             <option value="">-- Select RAM --</option>
-            <option value="ram1">16GB (Kingston)</option>
-            <option value="ram2">32GB (Corsair)</option>
+            <?php foreach ($components['ram'] as $ram): ?>
+                <option value="<?= htmlspecialchars($ram['Product_ID']) ?>">
+                    <?= htmlspecialchars($ram['Product_Name']) ?> (<?= $ram['Brand_Name'] ?>)
+                </option>
+            <?php endforeach; ?>
         </select>
     </div>
 
@@ -68,8 +83,11 @@ require_once 'db.php';
         <label for="storage">Primary Storage:</label>
         <select name="storage" id="storage" required>
             <option value="">-- Select Storage --</option>
-            <option value="ssd1">512GB SSD (Samsung)</option>
-            <option value="hdd1">1TB HDD (WD)</option>
+            <?php foreach ($components['storage'] as $storage): ?>
+                <option value="<?= htmlspecialchars($storage['Product_ID']) ?>">
+                    <?= htmlspecialchars($storage['Product_Name']) ?> (<?= $storage['Brand_Name'] ?>)
+                </option>
+            <?php endforeach; ?>
         </select>
     </div>
 
@@ -77,8 +95,11 @@ require_once 'db.php';
         <label for="second_storage">Second Storage (Optional):</label>
         <select name="second_storage" id="second_storage">
             <option value="">-- Select Second Storage --</option>
-            <option value="ssd2">1TB SSD (Crucial)</option>
-            <option value="hdd2">2TB HDD (Seagate)</option>
+            <?php foreach ($components['storage'] as $storage): ?>
+                <option value="<?= htmlspecialchars($storage['Product_ID']) ?>">
+                    <?= htmlspecialchars($storage['Product_Name']) ?> (<?= $storage['Brand_Name'] ?>)
+                </option>
+            <?php endforeach; ?>
         </select>
     </div>
 
@@ -123,7 +144,28 @@ require_once 'db.php';
         <input type="number" name="quantity" id="quantity" value="1" min="1" required>
     </div>
 
-    <button type="submit" class="submit-btn">🛒 Add to Cart</button>
+    <input type="hidden" name="product_id" id="selected_product_id" value="">
+    <button type="submit" class="submit-btn" onclick="submitForm()">🛒 Add to Cart</button>
 </form>
 
+<script>
+function submitForm() {
+    // Get the selected product ID from one of the required fields
+    const cpu = document.getElementById('cpu').value;
+    const gpu = document.getElementById('gpu').value;
+    const motherboard = document.getElementById('motherboard').value;
+    
+    // If CPU is selected, use that as the product ID
+    if (cpu) {
+        document.getElementById('selected_product_id').value = cpu;
+    } else if (gpu) {
+        document.getElementById('selected_product_id').value = gpu;
+    } else if (motherboard) {
+        document.getElementById('selected_product_id').value = motherboard;
+    }
+    
+    // Submit the form
+    document.querySelector('.pc-build-form').submit();
+}
+</script>
 <?php include 'includes/footer.php'; ?>

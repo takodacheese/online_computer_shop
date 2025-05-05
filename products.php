@@ -1,8 +1,11 @@
 <?php
+// products.php
 session_start();
-include 'includes/header.php';
-require_once 'db.php';
 require_once 'base.php';
+require_login();
+
+require_once 'includes/header.php';
+require_once 'db.php';
 
 // Get low stock products for admin alert
 $lowStockProducts = [];
@@ -43,42 +46,67 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <h1>All Products</h1>
 
-<!-- Category Filter Dropdown -->
-<form method="GET" action="products.php" class="category-filter-form">
-    <label for="category_id">Filter by Category:</label>
-    <select name="category_id" id="category_id" onchange="this.form.submit()">
-        <option value="">All Categories</option>
-        <?php foreach ($categories as $cat): ?>
-            <option value="<?= htmlspecialchars($cat['Category_ID']) ?>" <?= $selected_category == $cat['Category_ID'] ? 'selected' : '' ?>>
-                <?= htmlspecialchars($cat['Category_Name']) ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</form>
+<!-- Display success message if exists -->
+<?php if (isset($_SESSION['success_message'])): ?>
+    <script>
+        // Create a temporary popup message
+        const message = "<?= htmlspecialchars($_SESSION['success_message']) ?>";
+        const popup = document.createElement('div');
+        popup.className = 'success-popup';
+        popup.textContent = message;
+        document.body.appendChild(popup);
 
-<div class="product-list">
-    <?php if (empty($products)): ?>
-        <p>No products found.</p>
-    <?php else: ?>
-        <?php foreach ($products as $product): ?>
-            <div class="product">
-                <img src="images/products/<?= htmlspecialchars($product['Product_ID']) ?>.jpg" alt="<?= htmlspecialchars($product['Product_Name']) ?>">
-                <h3><?= htmlspecialchars($product['Product_Name']) ?></h3>
-                <p><?= htmlspecialchars($product['Product_Description']) ?></p>
-                <p>Price: <?= number_format($product['Product_Price'], 2) ?></p>
-                <p>Stock: <?= htmlspecialchars($product['Stock_Quantity']) ?> units</p>
+        // Add active class to trigger animation
+        popup.classList.add('active');
 
-                <!-- Add to Cart Form -->
-                <form method="POST" action="mem_order/add_to_cart.php">
-                    <input type="hidden" name="Product_ID" value="<?= htmlspecialchars($product['Product_ID']) ?>">
-                    <label for="quantity">Quantity:</label>
-                    <input type="number" name="quantity" value="1" min="1" required>
-                    <button type="submit" class="btn">Add to Cart</button>
-                </form>
+        // Remove after 3 seconds
+        setTimeout(() => {
+            popup.classList.remove('active');
+            popup.classList.add('fade-out');
+            setTimeout(() => popup.remove(), 200);
+        }, 3000);
+    </script>
+    <?php unset($_SESSION['success_message']); ?>
+<?php endif; ?>
 
-            </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
+<div class="products-bg">
+    <!-- Category Filter Dropdown -->
+    <form method="GET" action="products.php" class="category-filter-form">
+        <label for="category_id">Filter by Category:</label>
+        <select name="category_id" id="category_id" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            <?php foreach ($categories as $cat): ?>
+                <option value="<?= htmlspecialchars($cat['Category_ID']) ?>" <?= $selected_category == $cat['Category_ID'] ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($cat['Category_Name']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </form>
+
+    <div class="product-grid">
+        <?php if (empty($products)): ?>
+            <p>No products found.</p>
+        <?php else: ?>
+            <?php foreach ($products as $product): ?>
+                <div class="product-card">
+                    <img src="images/products/<?= htmlspecialchars($product['Product_ID']) ?>.jpg" alt="<?= htmlspecialchars($product['Product_Name']) ?>">
+                    <h3><?= htmlspecialchars($product['Product_Name']) ?></h3>
+                    <p><?= htmlspecialchars($product['Product_Description']) ?></p>
+                    <p class="price">Price: <?= number_format($product['Product_Price'], 2) ?></p>
+                    <p>Stock: <?= htmlspecialchars($product['Stock_Quantity']) ?> units</p>
+
+                    <!-- Add to Cart Form -->
+                    <form method="POST" action="mem_order/add_to_cart.php">
+                        <input type="hidden" name="Product_ID" value="<?= htmlspecialchars($product['Product_ID']) ?>">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" name="quantity" value="1" min="1" required>
+                        <button type="submit" class="add-to-cart">Add to Cart</button>
+                    </form>
+
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
 </div>
 
 <?php

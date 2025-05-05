@@ -13,7 +13,10 @@ require_once 'base.php';
     <div class="title-content">
         <h1>Shop the Latest Computers and Accessories</h1>
         <p>Find the best deals on laptops, desktops, and more.</p>
-        <a href="products.php" class="btn">Shop Now</a>
+        <div class="action-buttons">
+            <a href="products.php" class="btn">Shop Now</a>
+            <a href="pc_builder.php" class="btn btn-secondary">Build Your PC</a>
+        </div>
     </div>
 </section>
 
