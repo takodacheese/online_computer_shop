@@ -33,8 +33,8 @@ function getUserByEmail(PDO $conn, string $email) {
 /**
  * Verify login credentials. Sets session on success.
  */
-function loginUser($email, $password) {
-    $user = getUserByEmail($conn, $email);
+function loginUser(PDO $conn, string $email, string $password) {
+    $user = getUserByEmail($conn,$email);
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['role'] = $user['role'];
