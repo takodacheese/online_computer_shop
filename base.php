@@ -35,12 +35,29 @@ function getUserByEmail(PDO $conn, string $email) {
  */
 function loginUser(PDO $conn, string $email, string $password) {
     $user = getUserByEmail($conn,$email);
-    if ($user && password_verify($password, $user['password'])) {
+    if (!$user) {
+        return false;
+    }
+
+    // Check if password is hashed (starts with $2y$)
+    $is_hashed = strpos($user['password'], '$2y$') === 0;
+    
+    // Verify password based on whether it's hashed or plain text
+    $password_matches = $is_hashed 
+        ? password_verify($password, $user['password'])
+        : $password === $user['password'];
+    
+    if ($password_matches) {
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['role'] = $user['role'];
-        return $user['role']; // Return role for redirection
+        return $user['role'];
+        error_log("Login failed: User is not admin for email: $email");
+        return false;
     }
-    return false;
+    
+    $_SESSION['user_id'] = $user['user_id'];
+    $_SESSION['role'] = $user['role'];
+    return $user['role'];
 }
 
 /**
