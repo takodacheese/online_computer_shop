@@ -22,21 +22,21 @@ This file contains feature plans and /TODOs for advanced functionality. Each sec
 
 ---
 
-## 3. Order Status Update (Admin) & Order Cancellation (Member)
+## 3. Order Status Update (Admin) & Order Cancellation (Member)✅
 - /TODO (SQL): Add `status` column to `orders` table (e.g., Pending, Processing, Shipped, Cancelled)
 - /TODO (PHP): Admin: Add UI to update order status
 - /TODO (PHP): Member: Add "Cancel Order" option for eligible orders
 
 ---
 
-## 4. Product Reviews/Ratings
+## 4. Product Reviews/Ratings✅
 - /TODO (SQL): Create `reviews` table (`review_id`, `product_id`, `user_id`, `rating`, `comment`, `created_at`)
 - /TODO (PHP): Add form for members to submit reviews/ratings on product detail page
 - /TODO (PHP): Display reviews/ratings on product detail page
 
 ---
 
-## 5. Multiple Product Photos & Sliders
+## 5. Multiple Product Photos & Sliders✅
 - /TODO (SQL): Create `product_photos` table (`photo_id`, `product_id`, `photo_path`)
 - /TODO (PHP): Update product add/edit forms to allow multiple photo uploads
 - /TODO (PHP): Display product photos as a slider/gallery on product detail page
@@ -68,6 +68,39 @@ This file contains feature plans and /TODOs for advanced functionality. Each sec
   - Filtering by category and price
   - Sorting (e.g., price, newest)
   - Paging (pagination controls)
+
+---
+
+## 10. Enhanced Authentication & User Features
+- /TODO (SQL): Add password strength requirements table
+- /TODO (JS): Implement password strength indicator using jQuery
+- /TODO (AJAX): Add real-time email uniqueness check during registration
+- /TODO (PHP): Implement session flash messages system
+- /TODO (PHP): Add secure file upload validation
+
+---
+
+## 11. Custom PC Builder Enhancements
+- /TODO (JS): Implement real-time compatibility checking
+- /TODO (PHP): Add validation for CPU + motherboard compatibility
+- /TODO (UI): Add warning indicators for incompatible components
+
+---
+
+## 12. Admin Dashboard Enhancements
+- /TODO (PHP): Add interactive sales charts (Chart.js)
+- /TODO (PHP): Implement user activity logging
+- /TODO (PHP): Add top-selling products widget
+- /TODO (PHP): Add order status summary
+
+---
+
+## 13. UX Improvements
+- /TODO (JS): Add confirmation modal for deletions
+- /TODO (JS): Implement expandable order detail rows
+- /TODO (HTML5): Add form autofill suggestions
+- /TODO (JS): Add "Back to Top" button
+- /TODO (CSS): Implement dark mode toggle with localStorage
 
 ---
 
