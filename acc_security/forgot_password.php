@@ -31,12 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-
+    
+<section class="forgot-password">
 <h2>Forgot Password</h2>
 <form method="POST" action="forgot_password.php">
     <label for="email">Email:</label>
     <input type="email" name="email" required><br>
     <button type="submit">Reset Password</button>
 </form>
-
+</section>
 <?php require_once '../includes/footer.php'; ?>
