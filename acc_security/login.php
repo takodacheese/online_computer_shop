@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    $role = loginUser($email, $password);
+    $role = loginUser($conn,$email, $password);
     
     if ($role) {
         header("Location: " . ($role === 'admin' ? "../admin_products.php" : "../index.php"));
