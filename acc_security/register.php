@@ -1,7 +1,7 @@
 <?php
 // register.php
 session_start();
-include 'includes/header.php';
+include '../includes/header.php';
 include '../base.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -31,5 +31,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </form>
 
 <?php
-include 'includes/footer.php';
+include '../includes/footer.php';
 ?>

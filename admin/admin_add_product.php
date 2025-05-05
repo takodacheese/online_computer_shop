@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-include 'includes/header.php';
+include '../includes/header.php';
 include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -67,5 +67,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <a href="admin_products.php">Back to Product List</a>
 
 <?php
-include 'includes/footer.php';
+include '../includes/footer.php';
 ?>

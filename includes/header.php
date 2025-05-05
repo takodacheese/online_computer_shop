@@ -26,12 +26,12 @@
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <!-- Display Profile and Logout links if the user is logged in -->
-                <a href="../profile.php" class="nav-link">Profile</a>
-                <a href="../logout.php" class="nav-link" id="logout-link">Logout</a>
+                <a href="../acc_security/profile.php" class="nav-link">Profile</a>
+                <a href="../acc_security/logout.php" class="nav-link" id="logout-link">Logout</a>
             <?php else: ?>
                 <!-- Display Login and Register links if the user is not logged in -->
-                <a href="../login.php" class="nav-link">Login</a>
-                <a href="../register.php" class="nav-link">Register</a>
+                <a href="../acc_security/login.php" class="nav-link">Login</a>
+                <a href="../acc_security/register.php" class="nav-link">Register</a>
             <?php endif; ?>
         </nav>
     </header>

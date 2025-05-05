@@ -3,7 +3,7 @@
 require_once '../base.php';
 require_admin(); // Session + role check
 
-include 'includes/header.php';
+include '../includes/header.php';
 include 'db.php';
 
 // Handle search
@@ -116,4 +116,4 @@ $recent_orders = get_recent_orders($conn);
 
 <p><a href="admin_add_product.php">Add New Product</a></p>
 
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>

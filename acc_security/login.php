@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'includes/header.php';
+include '../includes/header.php';
 require_once '../base.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -30,5 +30,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <p>Forgot your password? <a href="forgot_password.php">Reset it here</a>.</p>
 
 <?php
-include 'includes/footer.php';
+include '../includes/footer.php';
 ?>

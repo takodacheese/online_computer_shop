@@ -2,7 +2,7 @@
 // reset_password.php
 session_start();
 
-require_once 'includes/header.php';
+require_once '../includes/header.php';
 require_once 'db.php';
 require_once '../base.php';
 
@@ -49,5 +49,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php endif; ?>
 
 <?php
-require_once 'includes/footer.php';
+require_once '../includes/footer.php';
 ?>

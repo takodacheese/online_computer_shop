@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-include 'includes/header.php';
+include '../includes/header.php';
 include 'db.php';
 
 $product_id = $_GET['id'];
@@ -16,7 +16,7 @@ $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$product) {
     echo "<p>Product not found.</p>";
-    include 'includes/footer.php';
+    include '../includes/footer.php';
     exit();
 }
 
@@ -81,5 +81,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <a href="admin_products.php">Back to Product List</a>
 
 <?php
-include 'includes/footer.php';
+include '../includes/footer.php';
 ?>

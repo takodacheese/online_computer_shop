@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-include 'includes/header.php';
+include '../includes/header.php';
 ?>
 
 <h2>Admin Dashboard</h2>
@@ -17,5 +17,5 @@ include 'includes/header.php';
 </ul>
 
 <?php
-include 'includes/footer.php';
+include '../includes/footer.php';
 ?>

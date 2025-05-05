@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-include 'includes/header.php';
+include '../includes/header.php';
 include 'db.php';
 include '../base.php';
 
@@ -17,7 +17,7 @@ $order = getOrderDetails($conn, $order_id);
 // If order not found, display an error and stop the script
 if (!$order) {
     echo "<p>Order not found.</p>";
-    include 'includes/footer.php';
+    include '../includes/footer.php';
     exit();
 }
 
@@ -57,5 +57,5 @@ $order_items = getOrderItems($conn, $order_id);
 <a href="admin_orders.php">Back to Order List</a>
 
 <?php
-include 'includes/footer.php';
+include '../includes/footer.php';
 ?>
