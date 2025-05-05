@@ -8,6 +8,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 include '../includes/header.php';
 include 'db.php';
 include '../base.php';
+include 'db.php';
 
 $product_id = $_GET['id'];
 $product = getProductById($conn, $product_id);
@@ -37,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <h2>Edit Product (Admin)</h2>
-<form method="POST" action="admin_edit_product.php?id=<?php echo $product_id; ?>" enctype="multipart/form-data">
+<form method="POST" action="admin_product_detail.php?id=<?php echo $product_id; ?>" enctype="multipart/form-data">
     <label for="name">Name:</label>
     <input type="text" name="name" value="<?php echo htmlspecialchars($product['name']); ?>" required><br>
     <label for="description">Description:</label>

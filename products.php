@@ -1,9 +1,24 @@
 <?php
-// products.php
 session_start();
 include 'includes/header.php';
 require_once 'db.php';
 require_once 'base.php';
+require_once 'functions.php';
+
+// Get low stock products for admin alert
+$lowStockProducts = [];
+if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin') {
+    $lowStockProducts = getLowStockProducts($conn);
+}
+
+// Check if stock needs to be deducted from a successful order
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'])) {
+    $productId = $_POST['product_id'] ?? null;
+    $quantity = $_POST['quantity'] ?? 1;
+    if ($productId) {
+        deductStock($conn, $productId, $quantity);
+    }
+}
 
 // /TODO (SQL): Ensure 'category_id' column exists in 'products' table and is populated correctly.
 $categories = getAllCategories($conn);
@@ -46,6 +61,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h3><?= htmlspecialchars($product['name']) ?></h3>
                 <p><?= htmlspecialchars($product['description']) ?></p>
                 <p>Price: <?= htmlspecialchars($product['price']) ?></p>
+                <p>Stock: <?= htmlspecialchars($product['stock']) ?> units</p>
 
                 <!-- Add to Cart Form -->
                 <form method="POST" action="add_to_cart.php">

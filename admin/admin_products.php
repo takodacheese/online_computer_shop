@@ -1,5 +1,5 @@
 <?php
-// admin_dashboard.php
+// admin_products.php
 require_once '../base.php';
 require_admin(); // Session + role check
 

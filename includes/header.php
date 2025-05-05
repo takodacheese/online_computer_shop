@@ -1,6 +1,5 @@
 <?php
 // header.php
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
