@@ -17,7 +17,10 @@
         <h1>Online Computer Shop</h1>
         <nav>
             <a href="../index.php" class="nav-link">Home</a>
-            <?php if (isset($_SESSION['user_id']) && $_SESSION['role'] === 'admin'): ?>
+            <?php 
+            // Check if we're in admin directory
+            $is_admin = strpos($_SERVER['PHP_SELF'], '/admin/') !== false;
+            if ($is_admin): ?>
                 <!-- Display Admin Dashboard button for admin users -->
                 <a href="../admin/admin_products.php" class="nav-link">Admin</a>
             <?php endif; ?>

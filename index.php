@@ -30,14 +30,16 @@ require_once 'base.php';
         } else {
             foreach ($products as $product) {
                 echo "<div class='product'>";
-                echo "<img src='images/{$product['image']}' alt='{$product['name']}'>";
+                echo "<img src='images/products/{$product['Product_ID']}.jpg' alt='{$product['name']}'>";
                 echo "<h3>{$product['name']}</h3>";
                 echo "<p>{$product['description']}</p>";
-                echo "<p>Price: {$product['price']}</p>";
-                 // Add to Cart button
-                 echo "<button class='btn'>Add to Cart</button>";
-
-        echo "</div>";
+                echo "<p>Price: ".number_format($product['price'], 2)."</p>";
+                echo "<form action='cart.php' method='POST'>";
+                echo "<input type='hidden' name='product_id' value='{$product['Product_ID']}'>";
+                echo "<input type='hidden' name='quantity' value='1'>";
+                echo "<button type='submit' class='btn'>Add to Cart</button>";
+                echo "</form>";
+                echo "</div>";
             }
         }
         ?>

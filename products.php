@@ -12,8 +12,8 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
 
 // Check if stock needs to be deducted from a successful order
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'])) {
-    $productId = $_POST['product_id'] ?? null;
-    $quantity = $_POST['quantity'] ?? 1;
+    $productId = $_POST['Product_ID'] ?? null;
+    $quantity = (int)($_POST['quantity'] ?? 1);
     if ($productId) {
         deductStock($conn, $productId, $quantity);
     }
@@ -27,10 +27,16 @@ $selected_category = $_GET['category_id'] ?? '';
 $where = '';
 $params = [];
 if ($selected_category) {
-    $where = "WHERE category_id = ?";
+    $where = "WHERE p.Category_ID = ?";
     $params[] = $selected_category;
 }
-$stmt = $conn->prepare("SELECT * FROM products $where ORDER BY name ASC");
+$stmt = $conn->prepare("
+        SELECT DISTINCT p.*
+        FROM product p
+        LEFT JOIN category c ON p.Category_ID = c.Category_ID
+        $where
+        ORDER BY p.Product_Name ASC
+    ");
 $stmt->execute($params);
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -43,8 +49,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <select name="category_id" id="category_id" onchange="this.form.submit()">
         <option value="">All Categories</option>
         <?php foreach ($categories as $cat): ?>
-            <option value="<?= htmlspecialchars($cat['category_id']) ?>" <?= $selected_category == $cat['category_id'] ? 'selected' : '' ?>>
-                <?= htmlspecialchars($cat['category_name']) ?>
+            <option value="<?= htmlspecialchars($cat['Category_ID']) ?>" <?= $selected_category == $cat['Category_ID'] ? 'selected' : '' ?>>
+                <?= htmlspecialchars($cat['Category_Name']) ?>
             </option>
         <?php endforeach; ?>
     </select>
@@ -56,15 +62,15 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php else: ?>
         <?php foreach ($products as $product): ?>
             <div class="product">
-                <img src="images/<?= htmlspecialchars($product['image']) ?>" alt="<?= htmlspecialchars($product['name']) ?>">
-                <h3><?= htmlspecialchars($product['name']) ?></h3>
-                <p><?= htmlspecialchars($product['description']) ?></p>
-                <p>Price: <?= htmlspecialchars($product['price']) ?></p>
-                <p>Stock: <?= htmlspecialchars($product['stock']) ?> units</p>
+                <img src="images/products/<?= htmlspecialchars($product['Product_ID']) ?>.jpg" alt="<?= htmlspecialchars($product['Product_Name']) ?>">
+                <h3><?= htmlspecialchars($product['Product_Name']) ?></h3>
+                <p><?= htmlspecialchars($product['Product_Description']) ?></p>
+                <p>Price: <?= number_format($product['Product_Price'], 2) ?></p>
+                <p>Stock: <?= htmlspecialchars($product['Stock_Quantity']) ?> units</p>
 
                 <!-- Add to Cart Form -->
                 <form method="POST" action="mem_order/add_to_cart.php">
-                    <input type="hidden" name="product_id" value="<?= htmlspecialchars($product['product_id']) ?>">
+                    <input type="hidden" name="Product_ID" value="<?= htmlspecialchars($product['Product_ID']) ?>">
                     <label for="quantity">Quantity:</label>
                     <input type="number" name="quantity" value="1" min="1" required>
                     <button type="submit" class="btn">Add to Cart</button>

@@ -43,7 +43,7 @@ This file contains feature plans and /TODOs for advanced functionality. Each sec
 
 ---
 
-## 6. Favorites/Wishlist
+## 6. Favorites/Wishlist ✅
 - /TODO (SQL): Create `wishlists` table (`wishlist_id`, `user_id`, `product_id`)
 - /TODO (PHP): Add “Add to Wishlist” button on product pages
 - /TODO (PHP): Add member page to view/manage wishlist

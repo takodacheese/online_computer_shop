@@ -1,9 +1,9 @@
 <?php
 // Database configuration
 $host = "localhost";
-$dbname = "your_database";
-$username = "your_username";
-$password = "your_password";
+$dbname = "db_online_computer_shop";
+$username = "root";
+$password = "";
 
 // PayPal Sandbox Configuration
 define('PAYPAL_CLIENT_ID', 'AYIvCaUm3MGG172UaKlrA6VWmvm8gJFZu1bBw0rn2srfgPPIJNxwlSkWvYJnBvYlmAQw6FILdTGOtIIt');

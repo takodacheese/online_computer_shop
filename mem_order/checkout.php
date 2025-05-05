@@ -11,6 +11,7 @@ require_once '../vendor/autoload.php';
 
 include '../db.php';
 include '../base.php';
+include 'voucher.php';
 
 $user_id = $_SESSION['user_id'];
 
@@ -22,10 +23,34 @@ if (empty($cart_items)) {
     exit();
 }
 
+// Handle voucher submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['voucher_code'])) {
+    $voucher_code = trim($_POST['voucher_code']);
+    
+    $voucher_result = validateVoucher($conn, $voucher_code, $user_id);
+    
+    if ($voucher_result['valid']) {
+        $_SESSION['voucher_discount'] = $voucher_result['discount_amount'];
+        $_SESSION['voucher_id'] = $voucher_result['voucher_id'];
+        $_SESSION['success_message'] = "Voucher applied successfully!";
+    } else {
+        $_SESSION['error_message'] = $voucher_result['message'];
+    }
+    
+    header("Location: checkout.php");
+    exit();
+}
+
 // Calculate total
 $total_amount = array_sum(array_map(function($item) {
     return $item['price'] * $item['quantity'];
 }, $cart_items));
+
+// Apply voucher discount if present
+if (isset($_SESSION['voucher_discount'])) {
+    $total_amount -= $_SESSION['voucher_discount'];
+    if ($total_amount < 0) $total_amount = 0;
+}
 
 // Store total amount in session
 $_SESSION['total_amount'] = $total_amount;
@@ -33,6 +58,12 @@ $_SESSION['total_amount'] = $total_amount;
 try {
     // Create order
     $order_id = createOrder($conn, $user_id, $total_amount);
+    
+    // Record voucher usage if applicable
+    if (isset($_SESSION['voucher_id'])) {
+        recordVoucherUsage($conn, $_SESSION['voucher_id'], $user_id);
+    }
+    
     $_SESSION['order_id'] = $order_id;
 
     // Create Stripe Checkout Session for GrabPay and FPX

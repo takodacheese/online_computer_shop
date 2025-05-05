@@ -1,14 +1,14 @@
 <?php
 // profile.php
 session_start();
-require_once '../base.php';
-require_login();
-
 require_once '../includes/header.php';
 require_once '../db.php';
 require_once '../base.php';
+require_login();
+?>
+<link rel="stylesheet" href="../css/profile.css">
 
-
+<?php
 $user_id = $_SESSION['user_id'];
 $user = getUserById($conn, $user_id); // Fetch user details
 $message = "";
@@ -18,7 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['update_profile'])) {
         $username = sanitizeInput($_POST['username']);
         $email = sanitizeInput($_POST['email']);
-        $message = updateUserProfile($conn, $user_id, $username, $email);
+        $address = sanitizeInput($_POST['address']);
+        $birthdate = sanitizeInput($_POST['birthdate']);
+        $gender = sanitizeInput($_POST['gender']);
+        $message = updateUserProfile($conn, $user_id, $username, $email, $address, $birthdate, $gender);
         $user = getUserById($conn, $user_id); // Refresh user details
     }
 
@@ -40,15 +43,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <?php endif; ?>
 
 <!-- Profile Update Form -->
-<form method="POST" action="profile.php">
-    <label for="username">Username:</label>
-    <input type="text" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required><br>
+<div class="profile-form">
+    <form method="POST" action="profile.php">
+        <label for="username">Username:</label>
+        <input type="text" name="username" value="<?php echo isset($user['Username']) ? htmlspecialchars($user['Username']) : ''; ?>" required>
 
-    <label for="email">Email:</label>
-    <input type="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required><br>
+        <label for="email">Email:</label>
+        <input type="email" name="email" value="<?php echo isset($user['Email']) ? htmlspecialchars($user['Email']) : ''; ?>" required>
 
-    <button type="submit" name="update_profile">Update Profile</button>
-</form>
+        <label for="address">Address:</label>
+        <textarea name="address" rows="5" required><?php echo isset($user['Address']) ? htmlspecialchars($user['Address']) : ''; ?></textarea>
+
+        <label for="birthdate">Birthdate:</label>
+        <input type="date" name="birthdate" value="<?php echo isset($user['Birthdate']) ? htmlspecialchars($user['Birthdate']) : ''; ?>" required>
+
+        <div class="gender-group">
+            <label for="gender">Gender:</label>
+            <select name="gender" required>
+                <option value="" disabled selected>Select your gender</option>
+                <option value="Male" <?php echo isset($user['Gender']) && $user['Gender'] == 'Male' ? 'selected' : ''; ?>>Male</option>
+                <option value="Female" <?php echo isset($user['Gender']) && $user['Gender'] == 'Female' ? 'selected' : ''; ?>>Female</option>
+                <option value="Other" <?php echo isset($user['Gender']) && $user['Gender'] == 'Other' ? 'selected' : ''; ?>>Other</option>
+            </select>
+        </div>
+
+        <button type="submit" name="update_profile">Update Profile</button>
+    </form>
+</div>
 
 <!-- Order History and Shopping Cart Links -->
 <h3>Order History</h3>
@@ -86,4 +107,6 @@ if (!empty($user['profile_photo'])) {
 }
 ?>
 </div>
-<?php require_once '../includes/footer.php'; ?>
+<?php
+require_once '../includes/footer.php';
+?>

@@ -1,7 +1,7 @@
 <?php
 // db.php
 $host = 'localhost';
-$dbname = 'computer_shop';
+$dbname = 'db_online_computer_shop';
 $username = 'root';
 $password = '';
 

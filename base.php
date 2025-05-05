@@ -11,60 +11,67 @@ require_once 'db.php'; // Database connection
 /**
  * Register new user (with hashed password)
  */
-function registerUser($username, $email, $password) {
-    global $conn;
-    $username = sanitizeInput($username);
-    $email = sanitizeInput($email);
+function registerUser($conn, $username, $email, $password, $gender, $birthday, $address) {
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-    $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-    return $stmt->execute([$username, $email, $hashedPassword]);
+    $stmt = $conn->prepare("
+        INSERT INTO User (User_ID, Username, Gender, Password, Birthday, Register_Date, Email, Address)
+        VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)
+    ");
+    
+    // Generate User_ID (e.g., U00001)
+    $stmt->execute([
+        'U' . str_pad($conn->query("SELECT COUNT(*) FROM User")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
+        $username,
+        $gender,
+        $hashedPassword,
+        $birthday,
+        $email,
+        $address
+    ]);
+    
+    return $conn->lastInsertId();
 }
 
 /**
  * Get user by email
  */
-function getUserByEmail(PDO $conn, string $email) {
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
-    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-    $stmt->execute();
+function getUserByEmail($conn, $email) {
+    $stmt = $conn->prepare("
+        SELECT User_ID, Username, Email, Password 
+        FROM User 
+        WHERE Email = ?
+    ");
+    $stmt->execute([$email]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 /**
  * Verify login credentials. Sets session on success.
  */
-function loginUser(PDO $conn, string $email, string $password) {
-    $user = getUserByEmail($conn,$email);
-    if (!$user) {
-        return false;
-    }
-
+function loginUser($conn, $email, $password) {
+    $user = getUserByEmail($conn, $email);
+    if (!$user) return false;
+    
     // Check if password is hashed (starts with $2y$)
-    $is_hashed = strpos($user['password'], '$2y$') === 0;
+    $is_hashed = strpos($user['Password'], '$2y$') === 0;
     
     // Verify password based on whether it's hashed or plain text
     $password_matches = $is_hashed 
-        ? password_verify($password, $user['password'])
-        : $password === $user['password'];
+        ? password_verify($password, $user['Password'])
+        : $password === $user['Password'];
     
     if ($password_matches) {
-        $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['role'] = $user['role'];
-        return $user['role'];
-        error_log("Login failed: User is not admin for email: $email");
-        return false;
+        $_SESSION['user_id'] = $user['User_ID'];
+        return true;
     }
-    
-    $_SESSION['user_id'] = $user['user_id'];
-    $_SESSION['role'] = $user['role'];
-    return $user['role'];
+    return false;
 }
 
 /**
  * Check if email is already registered
  */
-function emailExists($email) {
-    return getUserByEmail($email) !== false;
+function emailExists($conn, $email) {
+    return getUserByEmail($conn, $email) !== false;
 }
 
 /**
@@ -103,7 +110,7 @@ function checkLogin() {
  * Get user by ID
  */
 function getUserById($conn, $user_id) {
-    $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
+    $stmt = $conn->prepare("SELECT * FROM User WHERE User_ID = ?");
     $stmt->execute([$user_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
@@ -111,16 +118,27 @@ function getUserById($conn, $user_id) {
 /**
  * Update username and email
  */
-function updateUserProfile($conn, $user_id, $username, $email) {
+function updateUserProfile($conn, $user_id, $username, $email, $address, $birthdate, $gender) {
     $username = sanitizeInput($username);
     $email = sanitizeInput($email);
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? AND user_id != ?");
+    $address = sanitizeInput($address);
+    $birthdate = sanitizeInput($birthdate);
+    $gender = sanitizeInput($gender);
+    
+    $stmt = $conn->prepare("SELECT * FROM User WHERE Email = ? AND User_ID != ?");
     $stmt->execute([$email, $user_id]);
     if ($stmt->fetch()) {
         return "Error: Email is already in use.";
     }
-    $stmt = $conn->prepare("UPDATE users SET username = ?, email = ? WHERE user_id = ?");
-    return $stmt->execute([$username, $email, $user_id]) ? "Profile updated successfully." : "Error: Unable to update profile.";
+    
+    $stmt = $conn->prepare("
+        UPDATE User 
+        SET Username = ?, Email = ?, Address = ?, Birthday = ?, Gender = ? 
+        WHERE User_ID = ?
+    ");
+    return $stmt->execute([$username, $email, $address, $birthdate, $gender, $user_id]) 
+        ? "Profile updated successfully." 
+        : "Error: Unable to update profile.";
 }
 
 /**
@@ -161,10 +179,12 @@ function uploadProfilePhoto($conn, $user_id, $file) {
  * Get all cart items with product details for a user
  */
 function getCartItems($conn, $user_id) {
-    $stmt = $conn->prepare("SELECT cart.*, products.name, products.price, products.image 
-                            FROM cart 
-                            JOIN products ON cart.product_id = products.product_id 
-                            WHERE cart.user_id = ?");
+    $stmt = $conn->prepare("
+        SELECT c.*, p.Product_Name, p.Product_Price, p.Product_Description
+        FROM Cart c
+        JOIN product p ON c.Product_ID = p.Product_ID
+        WHERE c.User_ID = ?
+    ");
     $stmt->execute([$user_id]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -182,17 +202,21 @@ function calculateCartTotal($cart_items) {
  * Add to cart (or update quantity if already exists)
  */
 function addToCart($conn, $user_id, $product_id, $quantity) {
-    $stmt = $conn->prepare("SELECT * FROM cart WHERE user_id = ? AND product_id = ?");
-    $stmt->execute([$user_id, $product_id]);
-    $existing_item = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($existing_item) {
-        $new_quantity = $existing_item['quantity'] + $quantity;
-        $stmt = $conn->prepare("UPDATE cart SET quantity = ? WHERE cart_id = ?");
-        return $stmt->execute([$new_quantity, $existing_item['cart_id']]);
-    } else {
-        $stmt = $conn->prepare("INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)");
-        return $stmt->execute([$user_id, $product_id, $quantity]);
-    }
+    $stmt = $conn->prepare("
+        INSERT INTO Cart (Cart_ID, User_ID, Product_ID, Quantity, Total_Price_Cart, Added_Date)
+        VALUES (?, ?, ?, ?, (SELECT Product_Price FROM product WHERE Product_ID = ?) * ?, NOW())
+    ");
+    
+    // Generate Cart_ID (e.g., C00001)
+    $stmt->execute([
+        'C' . str_pad($conn->query("SELECT COUNT(*) FROM Cart")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
+        $user_id,
+        $product_id,
+        $quantity,
+        $product_id,
+        $quantity
+    ]);
+    return $stmt->rowCount();
 }
 
 /**
@@ -227,8 +251,18 @@ function clearCart($conn, $user_id) {
  * Create order and return new order ID
  */
 function createOrder($conn, $user_id, $total_amount) {
-    $stmt = $conn->prepare("INSERT INTO orders (user_id, total_amount) VALUES (?, ?)");
-    $stmt->execute([$user_id, $total_amount]);
+    $stmt = $conn->prepare("
+        INSERT INTO Orders (Order_ID, User_ID, Total_Price, Status, Shipping_Cost, Order_Quantity, tax_amount, subtotal)
+        VALUES (?, ?, ?, 'Pending', 0, 1, 0, ?)
+    ");
+    
+    // Generate Order_ID (e.g., O00001)
+    $stmt->execute([
+        'O' . str_pad($conn->query("SELECT COUNT(*) FROM Orders")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
+        $user_id,
+        $total_amount,
+        $total_amount
+    ]);
     return $conn->lastInsertId();
 }
 
@@ -236,10 +270,21 @@ function createOrder($conn, $user_id, $total_amount) {
  * Insert all cart items into order_items table
  */
 function addOrderItems($conn, $order_id, $cart_items) {
+    $stmt = $conn->prepare("
+        INSERT INTO Order_Details (Order_Detail_ID, Order_ID, Product_ID, Quantity, Price)
+        VALUES (?, ?, ?, ?, ?)
+    ");
+    
     foreach ($cart_items as $item) {
-        $stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$order_id, $item['product_id'], $item['quantity'], $item['price']]);
+        $stmt->execute([
+            'OD' . str_pad($conn->query("SELECT COUNT(*) FROM Order_Details")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
+            $order_id,
+            $item['Product_ID'],
+            $item['Quantity'],
+            $item['Product_Price']
+        ]);
     }
+    return true;
 }
 
 // ------------------------
@@ -437,7 +482,7 @@ function getOrderItems($conn, $order_id) {
  * Get all categories
  */
 function getAllCategories($conn) {
-    $stmt = $conn->query("SELECT * FROM categories ORDER BY category_name ASC");
+    $stmt = $conn->query("SELECT * FROM category ORDER BY Category_Name ASC");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -445,7 +490,7 @@ function getAllCategories($conn) {
  * Get category by ID
  */
 function getCategoryById($conn, $category_id) {
-    $stmt = $conn->prepare("SELECT * FROM categories WHERE category_id = ?");
+    $stmt = $conn->prepare("SELECT * FROM category WHERE Category_ID = ?");
     $stmt->execute([$category_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
@@ -454,7 +499,7 @@ function getCategoryById($conn, $category_id) {
  * Add new category
  */
 function addCategory($conn, $category_name) {
-    $stmt = $conn->prepare("INSERT INTO categories (category_name) VALUES (?)");
+    $stmt = $conn->prepare("INSERT INTO category (Category_Name) VALUES (?)");
     return $stmt->execute([$category_name]);
 }
 
@@ -462,7 +507,7 @@ function addCategory($conn, $category_name) {
  * Update category name
  */
 function updateCategory($conn, $category_id, $category_name) {
-    $stmt = $conn->prepare("UPDATE categories SET category_name = ? WHERE category_id = ?");
+    $stmt = $conn->prepare("UPDATE category SET Category_Name = ? WHERE Category_ID = ?");
     return $stmt->execute([$category_name, $category_id]);
 }
 
@@ -470,7 +515,7 @@ function updateCategory($conn, $category_id, $category_name) {
  * Delete category
  */
 function deleteCategory($conn, $category_id) {
-    $stmt = $conn->prepare("DELETE FROM categories WHERE category_id = ?");
+    $stmt = $conn->prepare("DELETE FROM category WHERE Category_ID = ?");
     return $stmt->execute([$category_id]);
 }
 
@@ -606,13 +651,19 @@ function getModelsByPartId($conn, $part_id) {
  * Get product by ID
  */
 function getProductById($conn, $product_id) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE product_id = ?");
+    $stmt = $conn->prepare("
+        SELECT p.*, c.Category_Name, b.Brand_Name
+        FROM products p
+        LEFT JOIN category c ON p.Category_ID = c.Category_ID
+        LEFT JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        WHERE p.Product_ID = ?
+    ");
     $stmt->execute([$product_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 // ------------------------
-// 🏦 PAYPAL INTEGRATION
+// PAYPAL INTEGRATION
 // ------------------------
 
 /**
@@ -735,7 +786,7 @@ function capturePaypalPayment($paypal_order_id) {
 }
 
 // ------------------------
-// 🧼 UTILITIES
+// UTILITIES
 // ------------------------
 
 /**
@@ -763,7 +814,7 @@ function sanitizeInput($input) {
 }
 
 // ------------------------
-// 📊 FEATURED PRODUCTS
+// FEATURED PRODUCTS
 // ------------------------
 
 /**
@@ -773,15 +824,29 @@ function sanitizeInput($input) {
  * @param int $limit Number of products to fetch
  * @return array Array of featured products
  */
-function getFeaturedProducts($conn, $limit) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE is_featured = 1 LIMIT :limit");
-    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+function getFeaturedProducts($conn, $limit = 4) {
+    $stmt = $conn->prepare("
+        SELECT 
+            p.Product_ID,
+            p.Product_Name as name,
+            p.Product_Description as description,
+            p.Product_Price as price,
+            c.Category_Name,
+            b.Brand_Name,
+            p.Rating_Avg
+        FROM product p
+        LEFT JOIN category c ON p.Category_ID = c.Category_ID
+        LEFT JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        ORDER BY p.Rating_Avg DESC
+        LIMIT :limit
+    ");
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // ------------------------
-// 📦 ORDER STATUS MANAGEMENT
+// ORDER STATUS MANAGEMENT
 // ------------------------
 
 /**
@@ -808,7 +873,7 @@ function updateOrderStatus($conn, $order_id, $status, $notes = null) {
     return $success;
 }
 // ------------------------
-// 📦 STOCK MANAGEMENT
+// STOCK MANAGEMENT
 // ------------------------
 /**
  * Deduct stock for a product
