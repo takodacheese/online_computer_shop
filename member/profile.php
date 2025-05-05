@@ -4,9 +4,10 @@ session_start();
 require_once '../base.php';
 require_login();
 
-require_once 'includes/header.php';
-require_once 'db.php';
-require_once 'base.php';
+require_once '../includes/header.php';
+require_once '../db.php';
+require_once '../base.php';
+
 
 $user_id = $_SESSION['user_id'];
 $user = getUserById($conn, $user_id); // Fetch user details
@@ -31,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-
+<div class="profile">
 <h2>Profile</h2>
 
 <?php if ($message): ?>
@@ -51,10 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!-- Order History and Shopping Cart Links -->
 <h3>Order History</h3>
-<p><a href="order_history.php">View Your Order History</a></p>
+<p><a href="../mem_order/order_history.php">View Your Order History</a></p>
 
 <h3>Shopping Cart</h3>
-<p><a href="cart.php">View Your Shopping Cart</a></p>
+<p><a href="../mem_order/cart.php">View Your Shopping Cart</a></p>
 
 <!-- Password Update Form -->
 <h3>Update Password</h3>
@@ -84,5 +85,5 @@ if (!empty($user['profile_photo'])) {
     echo "<img src='{$user['profile_photo']}' alt='Profile Photo' width='200'>";
 }
 ?>
-
-<?php require_once 'includes/footer.php'; ?>
+</div>
+<?php require_once '../includes/footer.php'; ?>

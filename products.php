@@ -3,7 +3,6 @@ session_start();
 include 'includes/header.php';
 require_once 'db.php';
 require_once 'base.php';
-require_once 'functions.php';
 
 // Get low stock products for admin alert
 $lowStockProducts = [];
@@ -64,7 +63,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <p>Stock: <?= htmlspecialchars($product['stock']) ?> units</p>
 
                 <!-- Add to Cart Form -->
-                <form method="POST" action="add_to_cart.php">
+                <form method="POST" action="mem_order/add_to_cart.php">
                     <input type="hidden" name="product_id" value="<?= htmlspecialchars($product['product_id']) ?>">
                     <label for="quantity">Quantity:</label>
                     <input type="number" name="quantity" value="1" min="1" required>

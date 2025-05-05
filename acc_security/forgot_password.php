@@ -2,8 +2,8 @@
 // forgot_password.php
 session_start();
 
-require_once 'includes/header.php';
-require_once 'db.php';
+require_once '../includes/header.php';
+require_once '../db.php';
 require_once '../base.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -39,4 +39,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <button type="submit">Reset Password</button>
 </form>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once '../includes/footer.php'; ?>

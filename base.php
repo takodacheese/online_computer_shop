@@ -23,10 +23,10 @@ function registerUser($username, $email, $password) {
 /**
  * Get user by email
  */
-function getUserByEmail($email) {
-    global $conn;
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]);
+function getUserByEmail(PDO $conn, string $email) {
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
@@ -34,7 +34,7 @@ function getUserByEmail($email) {
  * Verify login credentials. Sets session on success.
  */
 function loginUser($email, $password) {
-    $user = getUserByEmail($email);
+    $user = getUserByEmail($conn, $email);
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['role'] = $user['role'];
@@ -54,9 +54,11 @@ function emailExists($email) {
  * Logout user and destroy session
  */
 function logoutUser() {
+    session_start();
     session_unset();
     session_destroy();
-    header("Location: index.php?logout=success");
+    // Redirect to the login page or home page
+    header("Location: ../index.php?logout=success");
     exit();
 }
 
@@ -69,7 +71,13 @@ function require_login() {
         exit();
     }
 }
-
+function checkLogin() {
+    if (!isset($_SESSION['user_id'])) {
+        echo "<script>window.location.href = 'acc_security/login.php';</script>";
+        return false;
+    }
+    return true; // Allow form submission if logged in
+}
 // ------------------------
 // 👤 USER PROFILE
 // ------------------------
@@ -543,6 +551,17 @@ function get_recent_orders($conn, $limit = 5) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/**
+ * Fetch all products
+ */
+function search_products($conn, $search) {
+    $stmt = $conn->prepare("SELECT * FROM products WHERE name LIKE ? OR description LIKE ?");
+    $likeSearch = '%' . $search . '%';
+    $stmt->bind_param("ss", $likeSearch, $likeSearch);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
 // ------------------------
 // 🛠️ CUSTOM PC BUILDER
 // ------------------------
@@ -738,9 +757,10 @@ function sanitizeInput($input) {
  * @param int $limit Number of products to fetch
  * @return array Array of featured products
  */
-function getFeaturedProducts($conn, $limit = 4) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE featured = 1 ORDER BY created_at DESC LIMIT ?");
-    $stmt->execute([$limit]);
+function getFeaturedProducts($conn, $limit) {
+    $stmt = $conn->prepare("SELECT * FROM products WHERE is_featured = 1 LIMIT :limit");
+    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+    $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -770,6 +790,31 @@ function updateOrderStatus($conn, $order_id, $status, $notes = null) {
     }
     
     return $success;
+}
+// ------------------------
+// 📦 STOCK MANAGEMENT
+// ------------------------
+/**
+ * Deduct stock for a product
+ * 
+ * @param PDO $conn Database connection
+ * @param int $productId Product ID
+ * @param int $quantity Quantity to deduct
+ */
+function deductStock(PDO $conn, int $productId, int $quantity): void {
+    $stmt = $conn->prepare("UPDATE products SET stock = stock - ? WHERE product_id = ?");
+    $stmt->execute([$quantity, $productId]);
+}
+
+ // Get low stock products (below threshold)
+ // @param PDO $conn Database connection
+ // @param int $threshold Stock threshold (default: 5)
+ //@return array Array of low stock products
+ 
+function getLowStockProducts(PDO $conn, $threshold = 5) {
+    $stmt = $conn->prepare("SELECT * FROM products WHERE stock <= ?");
+    $stmt->execute([$threshold]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 /**

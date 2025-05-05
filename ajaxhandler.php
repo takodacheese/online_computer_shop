@@ -1,6 +1,6 @@
 <?php
 // ajaxhandler.php - Handles AJAX requests for dynamic dropdowns
-// /TODO: Implement getModelsByPartId($conn, $part_id) in functions.php to fetch models from the database
+// /TODO: Implement getModelsByPartId($conn, $part_id) in bases.php to fetch models from the database
 // /TODO: Create and populate 'parts' and 'models' tables in the database
 // /TODO: Integrate AJAX call on the frontend (e.g., pc_builder.php) to use this handler
 // /TODO: Add user authentication/authorization if needed for security

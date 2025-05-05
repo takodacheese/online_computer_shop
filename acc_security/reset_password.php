@@ -3,7 +3,7 @@
 session_start();
 
 require_once '../includes/header.php';
-require_once 'db.php';
+require_once '../db.php';
 require_once '../base.php';
 
 // /TODO (SQL): Ensure 'reset_token_expiry' column exists in 'password_resets' table

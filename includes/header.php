@@ -25,7 +25,7 @@
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <!-- Display Profile and Logout links if the user is logged in -->
-                <a href="../acc_security/profile.php" class="nav-link">Profile</a>
+                <a href="../member/profile.php" class="nav-link">Profile</a>
                 <a href="../acc_security/logout.php" class="nav-link" id="logout-link">Logout</a>
             <?php else: ?>
                 <!-- Display Login and Register links if the user is not logged in -->

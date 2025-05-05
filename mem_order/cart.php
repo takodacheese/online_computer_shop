@@ -4,8 +4,8 @@ session_start();
 require_once '../base.php';
 require_login();
 
-require_once 'includes/header.php';
-require_once 'db.php';
+require_once '../includes/header.php';
+require_once '../db.php';
 
 $user_id = $_SESSION['user_id'];
 $cart_items = getCartItems($conn, $user_id);
@@ -46,4 +46,4 @@ $cart_items = getCartItems($conn, $user_id);
     <a href="checkout.php">Proceed to Checkout</a>
 <?php endif; ?>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once '../includes/footer.php'; ?>

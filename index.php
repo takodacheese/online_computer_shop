@@ -8,9 +8,9 @@ include 'db.php';
 require_once 'base.php';
 ?>
 
-<!-- Hero Section -->
-<section class="hero">
-    <div class="hero-content">
+<!-- title Section -->
+<section class="title">
+    <div class="title-content">
         <h1>Shop the Latest Computers and Accessories</h1>
         <p>Find the best deals on laptops, desktops, and more.</p>
         <a href="products.php" class="btn">Shop Now</a>
@@ -34,8 +34,10 @@ require_once 'base.php';
                 echo "<h3>{$product['name']}</h3>";
                 echo "<p>{$product['description']}</p>";
                 echo "<p>Price: {$product['price']}</p>";
-                echo "<button class='btn'>Add to Cart</button>";
-                echo "</div>";
+                 // Add to Cart button
+                 echo "<button class='btn'>Add to Cart</button>";
+
+        echo "</div>";
             }
         }
         ?>

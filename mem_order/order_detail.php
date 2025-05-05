@@ -6,8 +6,8 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-include 'includes/header.php';
-include 'db.php';
+include '../includes/header.php';
+include '../db.php';
 include '../base.php';
 
 $order_id = $_GET['id'];
@@ -48,7 +48,7 @@ $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$order) {
     echo "<p>Order not found.</p>";
-    include 'includes/footer.php';
+    include '../includes/footer.php';
     exit();
 }
 
@@ -133,5 +133,5 @@ endif; ?>
 <a href="order_history.php">Back to Order History</a>
 
 <?php
-include 'includes/footer.php';
+include '../includes/footer.php';
 ?>

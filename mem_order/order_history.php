@@ -6,8 +6,8 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-include 'includes/header.php';
-include 'db.php';
+include '../includes/header.php';
+include '../db.php';
 
 // Fetch orders
 $stmt = $conn->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
@@ -46,5 +46,5 @@ $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php endif; ?>
 
 <?php
-include 'includes/footer.php';
+include '../includes/footer.php';
 ?>
