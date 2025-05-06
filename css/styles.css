@@ -50,6 +50,10 @@ a:hover {
     text-decoration: underline;
 }
 
+.btn:not(:last-child) {
+    margin-right: 20px;
+}
+
 button, .btn {
     background: var(--accent-color);
     border: none;
@@ -57,6 +61,13 @@ button, .btn {
     border-radius: 4px;
     color: white;
     cursor: pointer;
+    border: 1px solid rgb(255, 255, 255);
+    box-shadow: 
+        0 -3px 3px rgba(73, 0, 255, 10),
+        0 3px 3px rgba(73, 0, 255, 10),
+        -3px 0 3px rgba(73, 0, 255, 10),
+        3px 0 3px rgba(73, 0, 255, 10);
+
 }
 
 button:hover, .btn:hover {
@@ -919,6 +930,7 @@ header {
     padding: 2rem;
     border-radius: 8px;
     background-color: black;
+    color: white;
     box-shadow: 
     0 -3px 3px rgba(73, 0, 255, 10),    /* Top shadow */
     0 3px 3px rgba(73, 0, 255, 10),      /* bottom shadow */
@@ -1092,6 +1104,19 @@ header nav ul li a {
 header nav ul li a:hover {
     background-color: #110f12ce;
 }
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-logo {
+    height: 50px; /* Adjust based on your logo proportions */
+    width: auto;
+    object-fit: contain;
+}
+
 
 footer p {
     margin: 0;

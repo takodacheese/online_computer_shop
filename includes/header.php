@@ -15,7 +15,10 @@
 </head>
 <body>
     <header>
+        <div class="header-brand">
+        <img src="../images/logo.png" alt="Shop Logo" class="header-logo">
         <h1>Online Computer Shop</h1>
+        </div>
         <nav>
             <a href="../index.php" class="nav-link">Home</a>
             <?php 
