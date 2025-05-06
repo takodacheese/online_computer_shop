@@ -1,5 +1,7 @@
 <?php
 // db.php
+const STRIPE_SECRET_KEY = '';
+
 $host = 'localhost';
 $dbname = 'db_online_computer_shop';
 $username = 'root';
