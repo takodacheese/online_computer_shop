@@ -38,17 +38,6 @@ function registerUser($conn, $Username, $Email, $password, $gender, $birthday, $
     ]);
     
     return $stmt->rowCount() > 0; // Return true if registration was successful
-    $stmt->execute([
-        'U' . str_pad($conn->query("SELECT COUNT(*) FROM User")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
-        $Username,
-        $gender,
-        $hashedPassword,
-        $birthday,
-        $Email,
-        $address
-    ]);
-    
-    return $conn->lastInsertId();
 }
 
 /**
@@ -531,147 +520,199 @@ function getOrderItems($conn, $Order_ID) {
  * Get all categories
  */
 function getAllCategories($conn) {
-    $stmt = $conn->query("SELECT * FROM category ORDER BY Category_Name ASC");
+    $stmt = $conn->prepare("SELECT * FROM categories");
+    $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-/**
- * Get category by ID
- */
 function getCategoryById($conn, $category_id) {
-    $stmt = $conn->prepare("SELECT * FROM category WHERE Category_ID = ?");
+    $stmt = $conn->prepare("SELECT * FROM categories WHERE category_id = ?");
     $stmt->execute([$category_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
-
-/**
- * Add new category
- */
 function addCategory($conn, $category_name) {
-    $stmt = $conn->prepare("INSERT INTO category (Category_Name) VALUES (?)");
+    $stmt = $conn->prepare("INSERT INTO categories (category_name) VALUES (?)");
     return $stmt->execute([$category_name]);
 }
-
-/**
- * Update category name
- */
 function updateCategory($conn, $category_id, $category_name) {
-    $stmt = $conn->prepare("UPDATE category SET Category_Name = ? WHERE Category_ID = ?");
+    $stmt = $conn->prepare("UPDATE categories SET category_name = ? WHERE category_id = ?");
     return $stmt->execute([$category_name, $category_id]);
 }
-
-/**
- * Delete category
- */
 function deleteCategory($conn, $category_id) {
-    $stmt = $conn->prepare("DELETE FROM category WHERE Category_ID = ?");
+    $stmt = $conn->prepare("DELETE FROM categories WHERE category_id = ?");
     return $stmt->execute([$category_id]);
 }
 
 // ------------------------
 // 📦 PRODUCT STOCK HANDLING
 // ------------------------
-
-/**
- * Deduct product stock after successful order/checkout
- * @param PDO $conn
- * @param int $product_id
- * @param int $quantity
- * @return bool
- */
 function deductProductStock($conn, $product_id, $quantity) {
-    // TODO: Update the products table to reduce stock by $quantity for $product_id
-    // Example: UPDATE products SET stock = stock - ? WHERE product_id = ?
-    // $stmt = $conn->prepare("UPDATE products SET stock = stock - ? WHERE product_id = ?");
-    // return $stmt->execute([$quantity, $product_id]);
-    return true; // Placeholder
+    $stmt = $conn->prepare("UPDATE products SET stock = stock - ? WHERE product_id = ?");
+    return $stmt->execute([$quantity, $product_id]);
 }
-
-/**
- * Check if product stock is below threshold and alert admin if so
- * @param PDO $conn
- * @param int $product_id
- * @param int $threshold (default 5)
- * @return bool True if low stock, false otherwise
- */
 function checkLowStockAndAlert($conn, $product_id, $threshold = 5) {
-    // TODO: Query the products table for current stock of $product_id
-    // Example: SELECT stock FROM products WHERE product_id = ?
-    // $stmt = $conn->prepare("SELECT stock FROM products WHERE product_id = ?");
-    // $stmt->execute([$product_id]);
-    // $stock = $stmt->fetchColumn();
-    $stock = 10; // Placeholder
-    if ($stock < $threshold) {
-        // TODO: Implement alert logic (e.g., send Email to admin, show dashboard alert, etc.)
-        // Example: sendLowStockAlert($product_id, $stock);
-        return true;
-    }
-    return false;
+    $stmt = $conn->prepare("SELECT stock FROM products WHERE product_id = ?");
+    $stmt->execute([$product_id]);
+    $stock = $stmt->fetchColumn();
+    return $stock !== false && $stock < $threshold;
 }
 
 // ------------------------
-// ⚙️ ADMIN 
+// STOCK MANAGEMENT
 // ------------------------
-
 /**
- * Require admin access
+ * Get low stock products (below threshold)
+ * 
+ * @param PDO $conn Database connection
+ * @param int $threshold Stock threshold (default: 5)
+ * @return array Array of low stock products
  */
-function require_admin() {
-    session_start();
-    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-        header("Location: login.php");
-        exit();
-    }
-}
-
-/**
- * Fetch total number of orders
- */
-function get_total_orders($conn) {
-    $stmt = $conn->query("SELECT COUNT(*) AS total_orders FROM orders");
-    return $stmt->fetch(PDO::FETCH_ASSOC)['total_orders'];
-}
-
-/**
- * Fetch total revenue
- */
-function get_total_revenue($conn) {
-    $stmt = $conn->query("SELECT SUM(Total_Price) AS total_revenue FROM orders");
-    return $stmt->fetch(PDO::FETCH_ASSOC)['total_revenue'];
-}
-
-/**
- * Fetch number of pending orders
- */
-function get_pending_orders($conn) {
-    $stmt = $conn->query("SELECT COUNT(*) AS pending_orders FROM Orders WHERE Status = 'pending'");
-    return $stmt->fetch(PDO::FETCH_ASSOC)['pending_orders'];
-}
-
-/**
- * Fetch recent orders with user info
- */
-function get_recent_orders($conn, $limit = 5) {
-    $stmt = $conn->prepare("SELECT Orders.*, User.Username 
-                            FROM Orders 
-                            JOIN User ON Orders.User_ID = User.User_ID 
-                            ORDER BY Orders.Order_ID DESC 
-                            LIMIT ?");
-    $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
-    $stmt->execute();
+function getLowStockProducts(PDO $conn, $threshold = 5) {
+    $stmt = $conn->prepare("SELECT * FROM product WHERE Stock_Quantity <= ?");
+    $stmt->execute([$threshold]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 /**
- * Fetch all products
+ * Deduct stock for a product
+ * 
+ * @param PDO $conn Database connection
+ * @param int $productId Product ID
+ * @param int $quantity Quantity to deduct
  */
-function search_products(PDO $conn, string $search) {
-    $stmt = $conn->prepare("SELECT * FROM product WHERE Product_Name LIKE :search OR Product_Description LIKE :search");
-    $searchTerm = '%' . $search . '%';
-    $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
-    $stmt->execute();
+function deductStock(PDO $conn, int $productId, int $quantity): void {
+    $stmt = $conn->prepare("UPDATE products SET stock = stock - ? WHERE product_id = ?");
+    $stmt->execute([$quantity, $productId]);
+}
+
+// ------------------------
+// ORDER STATUS MANAGEMENT
+// ------------------------
+
+/**
+ * Update order status
+ */
+function updateOrderStatus($conn, $Order_ID, $status, $notes = null) {
+    // Update order status
+    $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE Order_ID = ?");
+    $success = $stmt->execute([$status, $Order_ID]);
+    
+    // Add to order history
+    if ($success) {
+        $updated_by = $_SESSION['user_id'] ?? null;
+        $stmt = $conn->prepare("INSERT INTO order_history (Order_ID, status, updated_by, notes) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$Order_ID, $status, $updated_by, $notes]);
+    }
+    
+    return $success;
+}
+
+/**
+ * Cancel an order
+ * 
+ * @param PDO $conn Database connection
+ * @param int $Order_ID Order ID
+ * @param string $reason Cancellation reason
+ * @param bool $admin_approval Required for 'Processing' status
+ * @return bool Success status
+ */
+function cancelOrder($conn, $Order_ID, $reason, $admin_approval = false) {
+    // Get current order status
+    $stmt = $conn->prepare("SELECT status FROM orders WHERE Order_ID = ?");
+    $stmt->execute([$Order_ID]);
+    $order = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$order) {
+        return false;
+    }
+    
+    // Check if cancellation is allowed
+    if ($order['status'] === 'Pending') {
+        // Pending orders can be cancelled directly
+        $success = updateOrderStatus($conn, $Order_ID, 'Cancelled', $reason);
+    } elseif ($order['status'] === 'Processing' && $admin_approval) {
+        // Processing orders require admin approval
+        $success = updateOrderStatus($conn, $Order_ID, 'Cancelled', $reason);
+    } else {
+        return false;
+    }
+    
+    // If successful, restore stock for all order items
+    if ($success) {
+        $stmt = $conn->prepare("
+            UPDATE products p
+            JOIN order_items oi ON p.product_id = oi.product_id
+            SET p.stock = p.stock + oi.quantity
+            WHERE oi.Order_ID = ?
+        ");
+        $stmt->execute([$Order_ID]);
+    }
+    
+    return $success;
+}
+
+/**
+ * Get pending cancellation requests
+ * 
+ * @param PDO $conn Database connection
+ * @return array Array of pending cancellation requests
+ */
+function getPendingCancellationRequests($conn) {
+    // /TODO: Implement query to get pending cancellation requests
+    // Need to join order_cancellation_requests with orders and users tables
+    // Return array with request details, order info, and user info
+    return [];
+}
+
+/**
+ * Get order history
+ * 
+ * @param PDO $conn Database connection
+ * @param int $Order_ID Order ID
+ * @return array Array of order history entries
+ */
+function getOrderHistory($conn, $Order_ID) {
+    $stmt = $conn->prepare("
+        SELECT 
+            oh.history_id,
+            oh.status,
+            oh.updated_at,
+            oh.notes,
+            u.Username as updated_by
+        FROM order_history oh
+        LEFT JOIN users u ON oh.updated_by = u.user_id
+        WHERE oh.Order_ID = ?
+        ORDER BY oh.updated_at DESC
+    ");
+    $stmt->execute([$Order_ID]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+/**
+ * Check if order is eligible for cancellation
+ * 
+ * @param array $order Order data
+ * @return array Array with 'eligible' and 'requires_approval' flags
+ */
+function isOrderEligibleForCancellation($order) {
+    // Initialize result array
+    $result = [
+        'eligible' => false,
+        'requires_approval' => false
+    ];
+    
+    // Check if order has a status and it's either 'Pending' or 'Processing'
+    $status = isset($order['status']) ? $order['status'] : '';
+    
+    if ($status === 'Pending') {
+        $result['eligible'] = true;
+    } elseif ($status === 'Processing') {
+        $result['eligible'] = true;
+        $result['requires_approval'] = true;
+    }
+    
+    return $result;
+}
+
 // ------------------------
 // 📝 PRODUCT REVIEWS
 // ------------------------
@@ -728,9 +769,10 @@ function addReview($conn, $product_id, $user_id, $rating, $comment) {
 // ------------------------
 // 🛠️ CUSTOM PC BUILDER
 // ------------------------
-// Get models by selected part (for dynamic dropdowns)
 
-
+/**
+ * Get models by selected part (for dynamic dropdowns)
+ */
 function getModelsByPartId($conn, $part_id) {
     $stmt = $conn->prepare("SELECT model_id, model_name, price FROM models WHERE part_id = ?");
     $stmt->bind_param("i", $part_id);
@@ -740,13 +782,6 @@ function getModelsByPartId($conn, $part_id) {
     $stmt->close();
     return $models;
 }
-
-// ------------------------
-// 🧼 UTILITIES
-// ------------------------
-
-// Log error to file
-// (This function is already defined earlier in the file, so this duplicate declaration is removed.)
 
 /**
  * Get product by ID
@@ -758,7 +793,7 @@ function getProductById($conn, $product_id) {
 }
 
 // ------------------------
-// UTILITIES
+// 🧠 UTILITIES
 // ------------------------
 
 /**
@@ -928,163 +963,28 @@ function getPCBuilderComponents($conn) {
 }
 
 // ------------------------
-// ORDER STATUS MANAGEMENT
+// ⚙️ ADMIN DASHBOARD
 // ------------------------
-
-/**
- * Update order status
- * 
- * @param PDO $conn Database connection
- * @param int $Order_ID Order ID
- * @param string $status New status
- * @param string|null $notes Optional notes
- * @return bool Success status
- */
-function updateOrderStatus($conn, $Order_ID, $status, $notes = null) {
-    // Update order status
-    $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE Order_ID = ?");
-    $success = $stmt->execute([$status, $Order_ID]);
-    
-    // Add to order history
-    if ($success) {
-        $updated_by = $_SESSION['user_id'] ?? null;
-        $stmt = $conn->prepare("INSERT INTO order_history (Order_ID, status, updated_by, notes) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$Order_ID, $status, $updated_by, $notes]);
-    }
-    
-    return $success;
+function get_total_orders($conn) {
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM orders");
+    $stmt->execute();
+    return $stmt->fetchColumn();
 }
-// ------------------------
-// STOCK MANAGEMENT
-// ------------------------
-/**
- * Deduct stock for a product
- * 
- * @param PDO $conn Database connection
- * @param int $productId Product ID
- * @param int $quantity Quantity to deduct
- */
-function deductStock(PDO $conn, int $productId, int $quantity): void {
-    $stmt = $conn->prepare("UPDATE products SET stock = stock - ? WHERE product_id = ?");
-    $stmt->execute([$quantity, $productId]);
+function get_total_revenue($conn) {
+    $stmt = $conn->prepare("SELECT SUM(Total_Price) FROM orders WHERE status = 'Completed'");
+    $stmt->execute();
+    return $stmt->fetchColumn();
 }
-
- // Get low stock products (below threshold)
- // @param PDO $conn Database connection
- // @param int $threshold Stock threshold (default: 5)
- //@return array Array of low stock products
- 
-function getLowStockProducts(PDO $conn, $threshold = 5) {
-    $stmt = $conn->prepare("SELECT * FROM product WHERE Stock_Quantity <= ?");
-    $stmt->execute([$threshold]);
+function get_pending_orders($conn) {
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM orders WHERE status = 'Pending'");
+    $stmt->execute();
+    return $stmt->fetchColumn();
+}
+function get_recent_orders($conn, $limit = 5) {
+    $stmt = $conn->prepare("SELECT * FROM orders ORDER BY order_date DESC LIMIT ?");
+    $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-/**
- * Cancel an order
- * 
- * @param PDO $conn Database connection
- * @param int $Order_ID Order ID
- * @param string $reason Cancellation reason
- * @param bool $admin_approval Required for 'Processing' status
- * @return bool Success status
- */
-function cancelOrder($conn, $Order_ID, $reason, $admin_approval = false) {
-    // Get current order status
-    $stmt = $conn->prepare("SELECT status FROM orders WHERE Order_ID = ?");
-    $stmt->execute([$Order_ID]);
-    $order = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$order) {
-        return false;
-    }
-    
-    // Check if cancellation is allowed
-    if ($order['status'] === 'Pending') {
-        // Pending orders can be cancelled directly
-        $success = updateOrderStatus($conn, $Order_ID, 'Cancelled', $reason);
-    } elseif ($order['status'] === 'Processing' && $admin_approval) {
-        // Processing orders require admin approval
-        $success = updateOrderStatus($conn, $Order_ID, 'Cancelled', $reason);
-    } else {
-        return false;
-    }
-    
-    // If successful, restore stock for all order items
-    if ($success) {
-        $stmt = $conn->prepare("
-            UPDATE products p
-            JOIN order_items oi ON p.product_id = oi.product_id
-            SET p.stock = p.stock + oi.quantity
-            WHERE oi.Order_ID = ?
-        ");
-        $stmt->execute([$Order_ID]);
-    }
-    
-    return $success;
-}
-
-/**
- * Get pending cancellation requests
- * 
- * @param PDO $conn Database connection
- * @return array Array of pending cancellation requests
- */
-function getPendingCancellationRequests($conn) {
-    // /TODO: Implement query to get pending cancellation requests
-    // Need to join order_cancellation_requests with orders and users tables
-    // Return array with request details, order info, and user info
-    return [];
-}
-
-/**
- * Get order history
- * 
- * @param PDO $conn Database connection
- * @param int $Order_ID Order ID
- * @return array Array of order history entries
- */
-function getOrderHistory($conn, $Order_ID) {
-    $stmt = $conn->prepare("
-        SELECT 
-            oh.history_id,
-            oh.status,
-            oh.updated_at,
-            oh.notes,
-            u.Username as updated_by
-        FROM order_history oh
-        LEFT JOIN users u ON oh.updated_by = u.user_id
-        WHERE oh.Order_ID = ?
-        ORDER BY oh.updated_at DESC
-    ");
-    $stmt->execute([$Order_ID]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-/**
- * Check if order is eligible for cancellation
- * 
- * @param array $order Order data
- * @return array Array with 'eligible' and 'requires_approval' flags
- */
-function isOrderEligibleForCancellation($order) {
-    // Initialize result array
-    $result = [
-        'eligible' => false,
-        'requires_approval' => false
-    ];
-    
-    // Check if order has a status and it's either 'Pending' or 'Processing'
-    $status = isset($order['status']) ? $order['status'] : '';
-    
-    if ($status === 'Pending') {
-        $result['eligible'] = true;
-    } elseif ($status === 'Processing') {
-        $result['eligible'] = true;
-        $result['requires_approval'] = true;
-    }
-    
-    return $result;
 }
 
 ?>

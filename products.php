@@ -30,15 +30,15 @@ $params = [];
 $where = [];
 
 if ($selected_category !== '') {
-    $where[] = 'Category_ID = ?';
+    $where[] = 'p.Category_ID = ?';
     $params[] = $selected_category;
 }
 if ($selected_brand !== '') {
-    $where[] = 'Brand_Name = ?';
+    $where[] = 'b.Brand_Name = ?';
     $params[] = $selected_brand;
 }
 if ($selected_price !== '') {
-    $where[] = 'Product_Price <= ?';
+    $where[] = 'p.Product_Price <= ?';
     $params[] = $selected_price;
 }
 $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -47,8 +47,9 @@ $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 $categories = $conn->query('SELECT * FROM category')->fetchAll(PDO::FETCH_ASSOC);
 $brands = $conn->query('SELECT DISTINCT Brand_Name FROM Brand')->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch products with filter
-$stmt = $conn->prepare("SELECT * FROM product $whereClause ORDER BY Product_Name ASC");
+// Fetch products with filter (JOIN Brand and Category)
+$sql = "SELECT p.* FROM product p JOIN category c ON p.Category_ID = c.Category_ID JOIN Brand b ON c.Brand_ID = b.Brand_ID $whereClause ORDER BY p.Product_Name ASC";
+$stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>

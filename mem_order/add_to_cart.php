@@ -9,13 +9,20 @@ if (!isset($_SESSION['user_id'])) {
 require_once '../db.php';
 include '../base.php';
 
-$Product_ID = $_POST['Product_ID'];
-$quantity = $_POST['quantity'];
+$product_id = $_POST['Product_ID'] ?? null;
+$quantity = $_POST['quantity'] ?? 1;
 
-if (addToCart($conn, $_SESSION['user_id'], $Product_ID, $quantity)) {
+if (!$product_id) {
+    // Defensive: show error and stop if Product_ID is missing
+    $_SESSION['error_message'] = "Product ID missing. Please try again.";
+    header("Location: ../products.php");
+    exit();
+}
+
+if (addToCart($conn, $_SESSION['user_id'], $product_id, $quantity)) {
     // Get product name for success message
     $stmt = $conn->prepare("SELECT Product_Name FROM product WHERE Product_ID = ?");
-    $stmt->execute([$Product_ID]);
+    $stmt->execute([$product_id]);
     $product = $stmt->fetch(PDO::FETCH_ASSOC);
     
     // Store success message in session

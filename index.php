@@ -26,7 +26,7 @@ require_once 'base.php';
     <div class="product-list">
         <?php
         // Get featured products
-        $products = getFeaturedProducts($conn, 6);
+        $products = getFeaturedProducts($conn, 4);
 
         if (empty($products)) {
             echo "<p>No featured products found.</p>";
