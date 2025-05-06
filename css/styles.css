@@ -684,6 +684,7 @@ header {
     color: #00bfff;
     font-weight: 600;
     text-shadow: 0 1px 4px #000;
+    margin-right: 20px;
     transition: color 0.2s, text-shadow 0.2s;
 }
 
