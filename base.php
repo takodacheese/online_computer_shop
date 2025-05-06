@@ -204,7 +204,7 @@ function uploadProfilePhoto($conn, $user_id, $file) {
  */
 function getCartItems($conn, $user_id) {
     $stmt = $conn->prepare("
-        SELECT c.*, c.Quantity as quantity, p.Product_Name as product_name, p.Product_Price as price, p.Product_Description
+        SELECT c.*, p.Product_Name, p.Product_Price, p.Product_Description
         FROM Cart c
         JOIN product p ON c.Product_ID = p.Product_ID
         WHERE c.User_ID = ?
@@ -218,7 +218,7 @@ function getCartItems($conn, $user_id) {
  */
 function calculateCartTotal($cart_items) {
     return array_sum(array_map(function($item) {
-        return $item['price'] * $item['quantity'];
+        return $item['Product_Price'] * $item['Quantity'];
     }, $cart_items));
 }
 
@@ -256,17 +256,19 @@ function addToCart($conn, $user_id, $product_id, $quantity) {
         $product = $priceStmt->fetch(PDO::FETCH_ASSOC);
         
         // Insert new cart item
-        $total_price = $product['Product_Price'] * $quantity;
         $stmt = $conn->prepare("
             INSERT INTO Cart (Cart_ID, User_ID, Product_ID, Quantity, Total_Price_Cart, Added_Date)
-            VALUES (?, ?, ?, ?, ?, NOW())
+            VALUES (?, ?, ?, ?, ? * ?, NOW())
         ");
+        
+        // Generate Cart_ID (e.g., C00001)
         $stmt->execute([
             'C' . str_pad($conn->query("SELECT COUNT(*) FROM Cart")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
             $user_id,
             $product_id,
             $quantity,
-            $total_price
+            $product['Product_Price'],
+            $quantity
         ]);
         return $stmt->rowCount();
     }
@@ -305,10 +307,13 @@ function clearCart($conn, $user_id) {
  */
 function createOrder($conn, $user_id, $total_amount) {
     $stmt = $conn->prepare("
-        INSERT INTO Orders (User_ID, Total_Price, Status, Shipping_Cost, Order_Quantity, tax_amount, subtotal, created_at)
-        VALUES (?, ?, 'Pending', 0, 1, 0, ?, NOW())
+        INSERT INTO Orders (Order_ID, User_ID, Total_Price, Status, Shipping_Cost, Order_Quantity, tax_amount, subtotal)
+        VALUES (?, ?, ?, 'Pending', 0, 1, 0, ?)
     ");
+    
+    // Generate Order_ID (e.g., O00001)
     $stmt->execute([
+        'O' . str_pad($conn->query("SELECT COUNT(*) FROM Orders")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
         $user_id,
         $total_amount,
         $total_amount
@@ -331,7 +336,7 @@ function addOrderItems($conn, $order_id, $cart_items) {
             $order_id,
             $item['Product_ID'],
             $item['Quantity'],
-            $item['price'] // Changed from $item['Product_Price'] to $item['price']
+            $item['Product_Price']
         ]);
     }
     return true;
@@ -729,6 +734,7 @@ function addReview($conn, $product_id, $user_id, $rating, $comment) {
 // ------------------------
 // 🛠️ CUSTOM PC BUILDER
 // ------------------------
+
 // Get models by selected part (for dynamic dropdowns)
 
 
@@ -762,6 +768,129 @@ function getProductById($conn, $product_id) {
     ");
     $stmt->execute([$product_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// ------------------------
+// PAYPAL INTEGRATION
+// ------------------------
+
+/**
+ * Get PayPal access token with error handling
+ */
+function getPaypalAccessToken() {
+    try {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, PAYPAL_API_URL . '/v1/oauth2/token');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERPWD, PAYPAL_CLIENT_ID . ':' . PAYPAL_CLIENT_SECRET);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, 'grant_type=client_credentials');
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($response === false) {
+            throw new Exception('CURL error: ' . curl_error($ch));
+        }
+        
+        $token = json_decode($response);
+        
+        if ($http_code !== 200) {
+            throw new Exception('PayPal API error: ' . $token->error_description ?? 'Unknown error');
+        }
+        
+        return $token->access_token;
+    } catch (Exception $e) {
+        logError('Failed to get PayPal access token: ' . $e->getMessage());
+        throw new Exception('Failed to get PayPal access token. Please try again later.');
+    }
+}
+
+/**
+ * Create PayPal payment with error handling
+ */
+function createPaypalPayment($conn, $order_id, $total_amount) {
+    try {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, PAYPAL_API_URL . '/v2/checkout/orders');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . getPaypalAccessToken()
+        ]);
+        
+        $data = [
+            'intent' => 'CAPTURE',
+            'purchase_units' => [[
+                'amount' => [
+                    'currency_code' => 'USD',
+                    'value' => $total_amount
+                ]
+            ]],
+            'application_context' => [
+                'return_url' => PAYPAL_RETURN_URL,
+                'cancel_url' => PAYPAL_CANCEL_URL
+            ]
+        ];
+        
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($response === false) {
+            throw new Exception('CURL error: ' . curl_error($ch));
+        }
+        
+        $order = json_decode($response);
+        
+        if ($http_code !== 201) {
+            throw new Exception('PayPal API error: ' . ($order->details ?? 'Unknown error'));
+        }
+        
+        return $order;
+    } catch (Exception $e) {
+        logError('Failed to create PayPal payment: ' . $e->getMessage());
+        throw new Exception('Failed to create PayPal payment. Please try again later.');
+    }
+}
+
+/**
+ * Capture PayPal payment with error handling
+ */
+function capturePaypalPayment($paypal_order_id) {
+    try {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, PAYPAL_API_URL . '/v2/checkout/orders/' . $paypal_order_id . '/capture');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . getPaypalAccessToken()
+        ]);
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($response === false) {
+            throw new Exception('CURL error: ' . curl_error($ch));
+        }
+        
+        $capture = json_decode($response);
+        
+        if ($http_code !== 201) {
+            throw new Exception('PayPal API error: ' . ($capture->details ?? 'Unknown error'));
+        }
+        
+        return $capture;
+    } catch (Exception $e) {
+        logError('Failed to capture PayPal payment: ' . $e->getMessage());
+        throw new Exception('Failed to capture PayPal payment. Please try again later.');
+    }
 }
 
 // ------------------------
