@@ -80,43 +80,42 @@ CREATE TABLE `product` (
   `Product_Description` text DEFAULT NULL,
   `Product_Price` decimal(10,2) NOT NULL,
   `Stock_Quantity` int(11) NOT NULL,
-  `Rating_Avg` decimal(3,2) DEFAULT 0.00,
   `Category_ID` char(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table `product`
-INSERT INTO `product` (`Product_ID`, `Product_Name`, `Product_Description`, `Product_Price`, `Stock_Quantity`, `Rating_Avg`, `Category_ID`) VALUES
-('P001', 'NVIDIA RTX 4090', 'Flagship 24GB GDDR6X GPU with DLSS 3.0', 1599.99, 15, 4.8, 'C001'),
-('P002', 'AMD RX 7900 XTX', '24GB GDDR6 RDNA 3 architecture', 999.99, 12, 4.7, 'C001'),
-('P003', 'NVIDIA RTX 4070 Ti', '12GB GDDR6X 7680 CUDA cores', 799.99, 18, 4.6, 'C001'),
-('P004', 'Intel Core i9-13900K', '24-core (8P+16E) 5.8GHz boost', 589.99, 20, 4.7, 'C002'),
-('P005', 'AMD Ryzen 9 7950X', '16-core 5.7GHz Zen 4 processor', 699.99, 15, 4.8, 'C002'),
-('P006', 'Intel Core i5-13600K', '14-core (6P+8E) 5.1GHz boost', 329.99, 25, 4.5, 'C002'),
-('P007', 'Corsair Vengeance 32GB DDR5', '5600MHz CL36 (2x16GB)', 129.99, 30, 4.6, 'C003'),
-('P008', 'G.Skill Trident Z 64GB DDR4', '3600MHz CL16 (2x32GB)', 249.99, 15, 4.7, 'C003'),
-('P009', 'Kingston Fury 16GB DDR4', '3200MHz CL16 (2x8GB)', 59.99, 40, 4.4, 'C003'),
-('P010', 'Samsung 980 Pro 1TB', 'PCIe 4.0 NVMe SSD 7000MB/s', 129.99, 25, 4.8, 'C004'),
-('P011', 'WD Black SN850X 2TB', 'PCIe 4.0 NVMe SSD 7300MB/s', 229.99, 10, 4.7, 'C004'),
-('P012', 'Crucial MX500 1TB', 'SATA III SSD 560MB/s', 69.99, 35, 4.5, 'C004'),
-('P013', 'ASUS ROG Strix Z790-E', 'LGA1700 DDR5 WiFi 6E', 399.99, 8, 4.6, 'C005'),
-('P014', 'MSI MAG B650 Tomahawk', 'AM5 DDR5 PCIe 5.0', 219.99, 12, 4.5, 'C005'),
-('P015', 'Gigabyte B660 AORUS Pro', 'LGA1700 DDR4 12+1+1 phase', 189.99, 15, 4.4, 'C005'),
-('P016', 'Corsair RM850x', '850W 80+ Gold fully modular', 149.99, 20, 4.7, 'C006'),
-('P017', 'EVGA SuperNOVA 1000W', '80+ Platinum fully modular', 249.99, 5, 4.8, 'C006'),
-('P018', 'Lian Li PC-O11 Dynamic', 'Mid-tower tempered glass', 149.99, 10, 4.7, 'C007'),
-('P019', 'Fractal Design Meshify C', 'Compact ATX airflow case', 99.99, 15, 4.6, 'C007'),
-('P020', 'Noctua NH-D15', 'Dual-tower air cooler', 109.99, 12, 4.9, 'C008'),
-('P021', 'Corsair iCUE H150i', '360mm RGB liquid cooler', 179.99, 8, 4.7, 'C008'),
-('P022', 'Arctic Freezer 34', 'Budget air cooler', 39.99, 25, 4.3, 'C008'),
-('P023', 'Logitech G Pro X Keyboard', 'Mechanical gaming keyboard with GX switches', 149.99, 25, 4.7, 'C009'),
-('P024', 'Razer DeathAdder V2 Mouse', 'Ergonomic gaming mouse with 20K DPI', 69.99, 30, 4.6, 'C009'),
-('P025', 'SteelSeries Arctis Pro Headset', 'High-fidelity gaming headset with DTS', 179.99, 15, 4.8, 'C009'),
-('P026', 'ASUS RT-AX86U Router', 'WiFi 6 gaming router (5700Mbps)', 249.99, 10, 4.6, 'C010'),
-('P027', 'TP-Link Archer AX50', 'WiFi 6 router with Intel chipset', 129.99, 18, 4.4, 'C010'),
-('P028', 'NETGEAR Nighthawk S8000', '8-port gaming switch with QoS', 99.99, 12, 4.3, 'C010'),
-('P029', 'HyperX Cloud II Headset', '7.1 virtual surround sound gaming headset', 99.99, 20, 4.5, 'C009'),
-('P030', 'Corsair K100 RGB Keyboard', 'Mechanical keyboard with OPX switches', 199.99, 8, 4.7, 'C009'),
-('P031', 'Ubiquiti UniFi U6-Pro', 'WiFi 6 access point for prosumers', 179.99, 5, 4.8, 'C010');
+INSERT INTO `product` (`Product_ID`, `Product_Name`, `Product_Description`, `Product_Price`, `Stock_Quantity`, `Category_ID`) VALUES
+('P001', 'NVIDIA RTX 4090', 'Flagship 24GB GDDR6X GPU with DLSS 3.0', 1599.99, 15, 'C001'),
+('P002', 'AMD RX 7900 XTX', '24GB GDDR6 RDNA 3 architecture', 999.99, 12, 'C001'),
+('P003', 'NVIDIA RTX 4070 Ti', '12GB GDDR6X 7680 CUDA cores', 799.99, 18, 'C001'),
+('P004', 'Intel Core i9-13900K', '24-core (8P+16E) 5.8GHz boost', 589.99, 20, 'C002'),
+('P005', 'AMD Ryzen 9 7950X', '16-core 5.7GHz Zen 4 processor', 699.99, 15, 'C002'),
+('P006', 'Intel Core i5-13600K', '14-core (6P+8E) 5.1GHz boost', 329.99, 25, 'C002'),
+('P007', 'Corsair Vengeance 32GB DDR5', '5600MHz CL36 (2x16GB)', 129.99, 30, 'C003'),
+('P008', 'G.Skill Trident Z 64GB DDR4', '3600MHz CL16 (2x32GB)', 249.99, 15, 'C003'),
+('P009', 'Kingston Fury 16GB DDR4', '3200MHz CL16 (2x8GB)', 59.99, 40, 'C003'),
+('P010', 'Samsung 980 Pro 1TB', 'PCIe 4.0 NVMe SSD 7000MB/s', 129.99, 25, 'C004'),
+('P011', 'WD Black SN850X 2TB', 'PCIe 4.0 NVMe SSD 7300MB/s', 229.99, 10, 'C004'),
+('P012', 'Crucial MX500 1TB', 'SATA III SSD 560MB/s', 69.99, 35, 'C004'),
+('P013', 'ASUS ROG Strix Z790-E', 'LGA1700 DDR5 WiFi 6E', 399.99, 8, 'C005'),
+('P014', 'MSI MAG B650 Tomahawk', 'AM5 DDR5 PCIe 5.0', 219.99, 12, 'C005'),
+('P015', 'Gigabyte B660 AORUS Pro', 'LGA1700 DDR4 12+1+1 phase', 189.99, 15, 'C005'),
+('P016', 'Corsair RM850x', '850W 80+ Gold fully modular', 149.99, 20, 'C006'),
+('P017', 'EVGA SuperNOVA 1000W', '80+ Platinum fully modular', 249.99, 5, 'C006'),
+('P018', 'Lian Li PC-O11 Dynamic', 'Mid-tower tempered glass', 149.99, 10, 'C007'),
+('P019', 'Fractal Design Meshify C', 'Compact ATX airflow case', 99.99, 15, 'C007'),
+('P020', 'Noctua NH-D15', 'Dual-tower air cooler', 109.99, 12, 'C008'),
+('P021', 'Corsair iCUE H150i', '360mm RGB liquid cooler', 179.99, 8, 'C008'),
+('P022', 'Arctic Freezer 34', 'Budget air cooler', 39.99, 25, 'C008'),
+('P023', 'Logitech G Pro X Keyboard', 'Mechanical gaming keyboard with GX switches', 149.99, 25, 'C009'),
+('P024', 'Razer DeathAdder V2 Mouse', 'Ergonomic gaming mouse with 20K DPI', 69.99, 30, 'C009'),
+('P025', 'SteelSeries Arctis Pro Headset', 'High-fidelity gaming headset with DTS', 179.99, 15, 'C009'),
+('P026', 'ASUS RT-AX86U Router', 'WiFi 6 gaming router (5700Mbps)', 249.99, 10, 'C010'),
+('P027', 'TP-Link Archer AX50', 'WiFi 6 router with Intel chipset', 129.99, 18, 'C010'),
+('P028', 'NETGEAR Nighthawk S8000', '8-port gaming switch with QoS', 99.99, 12, 'C010'),
+('P029', 'HyperX Cloud II Headset', '7.1 virtual surround sound gaming headset', 99.99, 20, 'C009'),
+('P030', 'Corsair K100 RGB Keyboard', 'Mechanical keyboard with OPX switches', 199.99, 8, 'C009'),
+('P031', 'Ubiquiti UniFi U6-Pro', 'WiFi 6 access point for prosumers', 179.99, 5, 'C010');
 
 CREATE TABLE `Admin` (
   `Admin_ID` char(6) NOT NULL,
@@ -174,10 +173,10 @@ CREATE TABLE `Cart` (
   `Added_Date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-DROP TABLE IF EXISTS `Product_Review`;
 CREATE TABLE `Product_Review` (
   `Review_ID` char(6) NOT NULL,
   `Order_ID` char(6) NOT NULL,
+  `Product_ID` char(4) NOT NULL,
   `Rating` decimal(2,1) NOT NULL,
   `Comment` text DEFAULT NULL,
   `Review_Date` datetime NOT NULL

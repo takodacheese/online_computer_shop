@@ -655,6 +655,59 @@ function search_products(PDO $conn, string $search) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 // ------------------------
+// 📝 PRODUCT REVIEWS
+// ------------------------
+
+/**
+ * Get reviews for a product
+ */
+function getReviewsByProductId($conn, $product_id) {
+    $stmt = $conn->prepare("
+        SELECT r.*, u.Username 
+        FROM Product_Review r
+        JOIN Orders o ON r.Order_ID = o.Order_ID
+        JOIN User u ON o.User_ID = u.User_ID
+        WHERE r.Product_ID = ?
+        ORDER BY r.Review_Date DESC
+    ");
+    $stmt->execute([$product_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Add a new review
+ */
+function addReview($conn, $product_id, $user_id, $rating, $comment) {
+    // First, get the latest order for this user and product
+    $stmt = $conn->prepare("
+        SELECT o.Order_ID 
+        FROM Orders o
+        JOIN Order_Details od ON o.Order_ID = od.Order_ID
+        WHERE o.User_ID = ? AND od.Product_ID = ?
+        ORDER BY o.Order_ID DESC
+        LIMIT 1
+    ");
+    $stmt->execute([$user_id, $product_id]);
+    $order = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$order) {
+        return false; // User hasn't purchased this product
+    }
+
+    // Generate a unique Review_ID
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM Product_Review");
+    $stmt->execute();
+    $review_count = $stmt->fetchColumn();
+    $review_id = 'RV' . str_pad($review_count + 1, 4, '0', STR_PAD_LEFT);
+
+    $stmt = $conn->prepare("
+        INSERT INTO Product_Review (Review_ID, Order_ID, Product_ID, Rating, Comment, Review_Date)
+        VALUES (?, ?, ?, ?, ?, NOW())
+    ");
+    return $stmt->execute([$review_id, $order['Order_ID'], $product_id, $rating, $comment]);
+}
+
+// ------------------------
 // 🛠️ CUSTOM PC BUILDER
 // ------------------------
 
@@ -684,7 +737,7 @@ function getModelsByPartId($conn, $part_id) {
 function getProductById($conn, $product_id) {
     $stmt = $conn->prepare("
         SELECT p.*, c.Category_Name, b.Brand_Name
-        FROM products p
+        FROM product p
         LEFT JOIN category c ON p.Category_ID = c.Category_ID
         LEFT JOIN Brand b ON c.Brand_ID = b.Brand_ID
         WHERE p.Product_ID = ?

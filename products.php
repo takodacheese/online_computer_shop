@@ -89,19 +89,37 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php else: ?>
             <?php foreach ($products as $product): ?>
                 <div class="product-card">
-                    <img src="images/products/<?= htmlspecialchars($product['Product_ID']) ?>.jpg" alt="<?= htmlspecialchars($product['Product_Name']) ?>">
+                    <?php
+                    $baseName = preg_replace('/[\\/\:\*\?"<>\|]/', '', $product['Product_Name']);
+                    $imageExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+                    $imagePath = '';
+                    foreach ($imageExtensions as $ext) {
+                        $tryPath = "images/{$baseName}.{$ext}";
+                        if (file_exists($tryPath)) {
+                            $imagePath = $tryPath;
+                            break;
+                        }
+                    }
+                    if ($imagePath) {
+                        echo '<img src="' . htmlspecialchars($imagePath) . '" alt="' . htmlspecialchars($product['Product_Name']) . '" class="product-main-image">';
+                    } else {
+                        echo '<img src="images/no-image.png" alt="No Image Available" class="product-main-image">';
+                    }
+                    ?>
                     <h3><?= htmlspecialchars($product['Product_Name']) ?></h3>
                     <p><?= htmlspecialchars($product['Product_Description']) ?></p>
                     <p class="price">Price: <?= number_format($product['Product_Price'], 2) ?></p>
                     <p>Stock: <?= htmlspecialchars($product['Stock_Quantity']) ?> units</p>
-
-                    <!-- Add to Cart Form -->
-                    <form method="POST" action="mem_order/add_to_cart.php">
-                        <input type="hidden" name="Product_ID" value="<?= htmlspecialchars($product['Product_ID']) ?>">
-                        <label for="quantity">Quantity:</label>
-                        <input type="number" name="quantity" value="1" min="1" required>
-                        <button type="submit" class="add-to-cart">Add to Cart</button>
-                    </form>
+                    <div class="product-actions">
+                        <!-- Add to Cart Form -->
+                        <form method="POST" action="mem_order/add_to_cart.php" class="add-to-cart-form">
+                            <input type="hidden" name="Product_ID" value="<?= htmlspecialchars($product['Product_ID']) ?>">
+                            <label for="quantity">Quantity:</label>
+                            <input type="number" name="quantity" value="1" min="1" required>
+                            <button type="submit" class="add-to-cart">Add to Cart</button>
+                        </form>
+                        <a href="product_detail.php?id=<?= htmlspecialchars($product['Product_ID']) ?>" class="view-details-btn">View Details</a>
+                    </div>
 
                 </div>
             <?php endforeach; ?>
