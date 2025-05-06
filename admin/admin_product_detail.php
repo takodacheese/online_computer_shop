@@ -23,13 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $description = $_POST['description'];
     $price = $_POST['price'];
+    $stock = $_POST['stock'];   
 
-    $image = null;
-    if ($_FILES['image']['size'] > 0) {
-        $image = handleImageUpload($_FILES['image']);
-    }
-
-    if (updateProduct($conn, $product_id, $name, $description, $price, $image)) {
+    if (updateProduct($conn, $product_id, $name, $description, $price, $stock)) {
         echo "<p>Product updated successfully.</p>";
     } else {
         echo "<p>Error updating product.</p>";
@@ -38,15 +34,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <h2>Edit Product (Admin)</h2>
-<form method="POST" action="admin_product_detail.php?id=<?php echo $product_id; ?>" enctype="multipart/form-data">
+<form method="POST" action="admin_product_detail.php?id=<?php echo $product_id; ?>" enctype="multipart/form-data" class="edit-product-form">
     <label for="name">Name:</label>
     <input type="text" name="name" value="<?php echo htmlspecialchars($product['name']); ?>" required><br>
     <label for="description">Description:</label>
-    <textarea name="description" required><?php echo htmlspecialchars($product['description']); ?></textarea><br>
+    <textarea name="description" required><?php echo htmlspecialchars($product['description'] ?? ''); ?></textarea><br>
     <label for="price">Price:</label>
     <input type="number" step="0.01" name="price" value="<?php echo $product['price']; ?>" required><br>
-    <label for="image">Image:</label>
-    <input type="file" name="image" accept="image/*"><br>
+    <label for="stock">Stock Quantity:</label>
+    <input type="number" name="stock" id="stock" value="<?php echo $product['stock']; ?>" required>
+
+
     <button type="submit">Update Product</button>
 </form>
 

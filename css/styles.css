@@ -2626,6 +2626,89 @@ nav a:hover, .navbar a:hover, header a:hover {
 .admin-actions .btn-primary:hover {
     background-color: #0056b3;
 }
+
+/* Admin edit  Product Detail Styles */
+.edit-product-form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #1b0526;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+.edit-product-form h2 {
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.edit-product-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.edit-product-form input[type="text"],
+.edit-product-form input[type="number"],
+.edit-product-form textarea,
+.edit-product-form input[type="file"] {
+    width: 96%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #ece3e3;
+}
+
+.edit-product-form textarea {
+    resize: vertical;
+    height: 100px;
+}
+
+.edit-product-form input:focus,
+.edit-product-form textarea:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.edit-product-form button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.edit-product-form button:hover {
+    background-color: #0056b3;
+}
+
+.edit-product-form a {
+    display: inline-block;
+    margin-top: 15px;
+    text-align: center;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.edit-product-form a:hover {
+    text-decoration: underline;
+}
+
 /* Member List Table Styles */
 .member-table {
     width: 100%;

@@ -477,14 +477,11 @@ function handleImageUpload($file) {
 /**
  * Update product details
  */
-function updateProduct($conn, $product_id, $name, $description, $price, $image = null) {
-    if ($image) {
-        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ?, image = ? WHERE product_id = ?");
-        return $stmt->execute([$name, $description, $price, $image, $product_id]);
-    } else {
-        $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, price = ? WHERE product_id = ?");
-        return $stmt->execute([$name, $description, $price, $product_id]);
-    }
+function updateProduct($conn, $product_id, $name, $description, $price, $stock) {
+   
+        $stmt = $conn->prepare("UPDATE Product SET Product_Name = ?, Product_Description = ?, Product_Price = ?, Stock_Quantity = ? WHERE Product_ID = ?");
+        return $stmt->execute([$name, $description, $price, $stock, $product_id]);
+    
 }
 
 /**
@@ -755,13 +752,7 @@ function getModelsByPartId($conn, $part_id) {
  * Get product by ID
  */
 function getProductById($conn, $product_id) {
-    $stmt = $conn->prepare("
-        SELECT p.*, c.Category_Name, b.Brand_Name
-        FROM product p
-        LEFT JOIN category c ON p.Category_ID = c.Category_ID
-        LEFT JOIN Brand b ON c.Brand_ID = b.Brand_ID
-        WHERE p.Product_ID = ?
-    ");
+    $stmt = $conn->prepare("SELECT Product_ID, Product_Name AS name, Product_Description AS description, Product_Price AS price, Stock_Quantity AS stock FROM product WHERE Product_ID = ?");
     $stmt->execute([$product_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
