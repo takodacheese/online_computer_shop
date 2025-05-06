@@ -144,7 +144,7 @@ $components = getPCBuilderComponents($conn);
         <input type="number" name="quantity" id="quantity" value="1" min="1" required>
     </div>
 
-    <input type="hidden" name="product_id" id="selected_product_id" value="">
+    <input type="hidden" name="Product_ID" id="selected_product_id" value="">
     <button type="submit" class="submit-btn" onclick="submitForm()">🛒 Add to Cart</button>
 </form>
 

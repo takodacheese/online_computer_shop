@@ -9,13 +9,13 @@ if (!isset($_SESSION['user_id'])) {
 require_once '../db.php';
 include '../base.php';
 
-$product_id = $_POST['Product_ID'];
+$Product_ID = $_POST['Product_ID'];
 $quantity = $_POST['quantity'];
 
-if (addToCart($conn, $_SESSION['user_id'], $product_id, $quantity)) {
+if (addToCart($conn, $_SESSION['user_id'], $Product_ID, $quantity)) {
     // Get product name for success message
     $stmt = $conn->prepare("SELECT Product_Name FROM product WHERE Product_ID = ?");
-    $stmt->execute([$product_id]);
+    $stmt->execute([$Product_ID]);
     $product = $stmt->fetch(PDO::FETCH_ASSOC);
     
     // Store success message in session

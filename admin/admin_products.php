@@ -12,9 +12,7 @@ $products = search_products($conn, $search);
 
 // Stats
 $total_orders = get_total_orders($conn);
-//------Remove or replace this line
-// $total_revenue = get_total_revenue($conn);
-//<p><strong>Total Revenue:</strong> $<?= number_format($total_revenue, 2) 
+
 $pending_orders = get_pending_orders($conn);
 
 // Recent orders

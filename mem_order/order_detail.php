@@ -42,12 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order'])) {
 }
 
 // Fetch order details
-$stmt = $conn->prepare("SELECT * FROM orders WHERE Order_ID = ? AND user_id = ?");
-<<<<<<< HEAD
+
+$stmt = $conn->prepare("SELECT * FROM orders WHERE Order_ID = ? AND User_ID = ?");
 $stmt->execute([$Order_ID, $_SESSION['user_id']]);
-=======
-$stmt->execute([$order_id, $_SESSION['user_id']]);
->>>>>>> parent of e496483 (Revert "Merge branch 'main' of https://github.com/takodacheese/online_computer_shop")
 $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$order) {
@@ -61,33 +58,24 @@ $stmt = $conn->prepare("SELECT od.*, p.Product_Name
                         FROM Order_Details od
                         JOIN Product p ON od.Product_ID = p.Product_ID 
                         WHERE od.Order_ID = ?");
-<<<<<<< HEAD
 $stmt->execute([$Order_ID]);
-=======
 $stmt->execute([$order_id]);
->>>>>>> parent of e496483 (Revert "Merge branch 'main' of https://github.com/takodacheese/online_computer_shop")
 $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Check if there's an existing cancellation request
-// Disabled: table does not exist in your DB
+$stmt->execute([$Order_ID]);
 // $stmt = $conn->prepare("
 //     SELECT * FROM order_cancellation_requests 
-<<<<<<< HEAD
+
 //     WHERE Order_ID = ? AND user_id = ? 
 //     ORDER BY created_at DESC LIMIT 1
 // ");
 // $stmt->execute([$Order_ID, $_SESSION['user_id']]);
-=======
+
 //     WHERE order_id = ? AND user_id = ? 
 //     ORDER BY created_at DESC LIMIT 1
 // ");
 // $stmt->execute([$order_id, $_SESSION['user_id']]);
->>>>>>> parent of e496483 (Revert "Merge branch 'main' of https://github.com/takodacheese/online_computer_shop")
-// $cancellation_request = $stmt->fetch(PDO::FETCH_ASSOC);
-$cancellation_request = null; // Table not present, skip cancellation request check
-
-?>
-
+// Disabled: table does not exist in your DB
 <div class="order-detail-container">
     <div class="order-detail-card">
         <h2 class="order-detail-heading">Order Details</h2>

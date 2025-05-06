@@ -753,7 +753,7 @@ input:focus, select:focus, textarea:focus {
 .pc-build-form {
     max-width: 600px;
     margin: 30px auto;
-    background: #fdfdfd;
+    background: #300946;
     padding: 25px;
     border: 1px solid #ddd;
     border-radius: 10px;
