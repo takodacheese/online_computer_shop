@@ -67,22 +67,27 @@ function getUserByEmail($conn, $email) {
 /**
  * Verify login credentials. Sets session on success.
  */
-function loginUser($conn, $email, $password) {
-    $user = getUserByEmail($conn, $email);
-    if (!$user) return false;
-    
-    // Check if password is hashed (starts with $2y$)
-    $is_hashed = strpos($user['Password'], '$2y$') === 0;
-    
-    // Verify password based on whether it's hashed or plain text
-    $password_matches = $is_hashed 
-        ? password_verify($password, $user['Password'])
-        : $password === $user['Password'];
-    
-    if ($password_matches) {
-        $_SESSION['user_id'] = $user['User_ID'];
-        return true;
+function loginUser(PDO $conn, string $email, string $password) {
+    // Check in the User table
+    $stmt = $conn->prepare("SELECT User_ID AS id, Username, Password, 'user' AS role FROM User WHERE Email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check in the Admin table if not found in User table
+    if (!$user) {
+        $stmt = $conn->prepare("SELECT Admin_ID AS id, Username, Password, 'admin' AS role FROM Admin WHERE Email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    // Verify the password and return the role if successful
+    if ($user && $password === $user['Password']) { // Replace with password_verify if passwords are hashed
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['Username'];
+        $_SESSION['role'] = $user['role'];
+        return $user['role'];
+    }
+
     return false;
 }
 
@@ -645,7 +650,7 @@ function get_total_revenue($conn) {
  * Fetch number of pending orders
  */
 function get_pending_orders($conn) {
-    $stmt = $conn->query("SELECT COUNT(*) AS pending_orders FROM orders WHERE order_status = 'pending'");
+    $stmt = $conn->query("SELECT COUNT(*) AS pending_orders FROM Orders WHERE Status = 'pending'");
     return $stmt->fetch(PDO::FETCH_ASSOC)['pending_orders'];
 }
 
@@ -653,10 +658,10 @@ function get_pending_orders($conn) {
  * Fetch recent orders with user info
  */
 function get_recent_orders($conn, $limit = 5) {
-    $stmt = $conn->prepare("SELECT orders.*, users.username 
-                            FROM orders 
-                            JOIN users ON orders.user_id = users.user_id 
-                            ORDER BY orders.created_at DESC 
+    $stmt = $conn->prepare("SELECT Orders.*, User.Username 
+                            FROM Orders 
+                            JOIN User ON Orders.User_ID = User.User_ID 
+                            ORDER BY Orders.Order_ID DESC 
                             LIMIT ?");
     $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
     $stmt->execute();
@@ -667,7 +672,7 @@ function get_recent_orders($conn, $limit = 5) {
  * Fetch all products
  */
 function search_products(PDO $conn, string $search) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE name LIKE :search OR description LIKE :search");
+    $stmt = $conn->prepare("SELECT * FROM product WHERE Product_Name LIKE :search OR Product_Description LIKE :search");
     $searchTerm = '%' . $search . '%';
     $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
     $stmt->execute();
@@ -1106,7 +1111,7 @@ function deductStock(PDO $conn, int $productId, int $quantity): void {
  //@return array Array of low stock products
  
 function getLowStockProducts(PDO $conn, $threshold = 5) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE stock <= ?");
+    $stmt = $conn->prepare("SELECT * FROM product WHERE Stock_Quantity <= ?");
     $stmt->execute([$threshold]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

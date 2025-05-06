@@ -13,7 +13,7 @@ include '../includes/header.php';
 <p>Welcome</p>
 <ul>
     <li><a href="admin_products.php">Manage Products</a></li>
-    <li><a href="members.php">Manage Members</a></li>
+    <li><a href="../member/member.php">Manage Members</a></li>
 </ul>
 
 <?php

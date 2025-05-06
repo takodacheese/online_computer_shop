@@ -12,7 +12,9 @@ $products = search_products($conn, $search);
 
 // Stats
 $total_orders = get_total_orders($conn);
-$total_revenue = get_total_revenue($conn);
+//------Remove or replace this line
+// $total_revenue = get_total_revenue($conn);
+//<p><strong>Total Revenue:</strong> $<?= number_format($total_revenue, 2) 
 $pending_orders = get_pending_orders($conn);
 
 // Recent orders
@@ -29,7 +31,7 @@ $recent_orders = get_recent_orders($conn);
 <!-- Quick Stats -->
 <h3>Quick Stats</h3>
 <p><strong>Total Orders:</strong> <?= $total_orders ?></p>
-<p><strong>Total Revenue:</strong> $<?= number_format($total_revenue, 2) ?></p>
+<!-- get_total_revenue issue-->
 <p><strong>Pending Orders:</strong> <?= $pending_orders ?></p>
 
 <!-- Recent Orders -->
@@ -93,21 +95,21 @@ $recent_orders = get_recent_orders($conn);
     <tbody>
         <?php foreach ($products as $product): ?>
             <tr>
-                <td><?= $product['product_id'] ?></td>
-                <td><?= htmlspecialchars($product['name']) ?></td>
-                <td><?= htmlspecialchars($product['description']) ?></td>
-                <td>$<?= number_format($product['price'], 2) ?></td>
+                <td><?= $product['Product_ID'] ?></td>
+                <td><?= htmlspecialchars($product['Product_Name']) ?></td>
+                <td><?= htmlspecialchars($product['Product_Description']) ?></td>
+                <td>$<?= number_format($product['Product_Price'], 2) ?></td>
                 <td>
-                    <?php if (!empty($product['image'])): ?>
-                        <img src="<?= $product['image'] ?>" alt="Product Image" width="100">
+                    <?php if (!empty($product['Image'])): ?>
+                        <img src="<?= htmlspecialchars($product['Image']) ?>" alt="Product Image" width="100">
                     <?php else: ?>
                         <p>No image</p>
                     <?php endif; ?>
                 </td>
                 <td>
-                    <a href="admin_product_detail.php?id=<?= $product['product_id'] ?>">View</a>
-                    <a href="admin_edit_product.php?id=<?= $product['product_id'] ?>">Edit</a>
-                    <a href="admin_delete_product.php?id=<?= $product['product_id'] ?>" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+                    <a href="admin_product_detail.php?id=<?= $product['Product_ID'] ?>">View</a>
+                    <a href="admin_edit_product.php?id=<?= $product['Product_ID'] ?>">Edit</a>
+                    <a href="admin_delete_product.php?id=<?= $product['Product_ID'] ?>" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
                 </td>
             </tr>
         <?php endforeach; ?>

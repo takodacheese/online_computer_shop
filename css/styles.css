@@ -114,6 +114,10 @@ a:hover {
     text-decoration: underline;
 }
 
+.btn:not(:last-child) {
+    margin-right: 20px;
+}
+
 button, .btn {
     background: var(--accent-color);
     border: none;
@@ -121,6 +125,13 @@ button, .btn {
     border-radius: 4px;
     color: white;
     cursor: pointer;
+    border: 1px solid rgb(255, 255, 255);
+    box-shadow: 
+        0 -3px 3px rgba(73, 0, 255, 10),
+        0 3px 3px rgba(73, 0, 255, 10),
+        -3px 0 3px rgba(73, 0, 255, 10),
+        3px 0 3px rgba(73, 0, 255, 10);
+
 }
 
 button:hover, .btn:hover {
@@ -377,7 +388,6 @@ button:hover, .btn:hover {
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.3);
     background: #23263a;
-    padding: 12px;
     margin: 0 auto;
     transition: transform 0.3s;
 }
@@ -811,6 +821,19 @@ header {
     0 2px 2px rgba(73, 0, 255, 10);      /* bottom shadow */
 }
 
+/* logo */
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-logo {
+    height: 50px; /* Adjust based on your logo proportions */
+    width: auto;
+    object-fit: contain;
+}
+
 /* Navigation */
 .nav-menu {
     display: flex;
@@ -822,6 +845,7 @@ header {
     color: #00bfff;
     font-weight: 600;
     text-shadow: 0 1px 4px #000;
+    margin-right: 20px;
     transition: color 0.2s, text-shadow 0.2s;
 }
 
@@ -1542,6 +1566,19 @@ header nav ul li a {
 header nav ul li a:hover {
     background-color: #110f12ce;
 }
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-logo {
+    height: 50px; /* Adjust based on your logo proportions */
+    width: auto;
+    object-fit: contain;
+}
+
 
 footer p {
     margin: 0;

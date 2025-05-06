@@ -16,6 +16,6 @@ try {
 
 // Stripe configuration
 // Replace these with your actual Stripe credentials
-const STRIPE_SECRET_KEY = '';
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_51RLKMSPuVy5ObELRBVLUQ3UYmtN2V7aHMokiNWNGiLBOCbMKwTniUr2crrwV1BTa7RcYsWNfZyx7UbErsbqCvJvE00NDktQShn';
+//const STRIPE_SECRET_KEY = '';
+//const STRIPE_PUBLISHABLE_KEY = 'pk_test_51RLKMSPuVy5ObELRBVLUQ3UYmtN2V7aHMokiNWNGiLBOCbMKwTniUr2crrwV1BTa7RcYsWNfZyx7UbErsbqCvJvE00NDktQShn';
 ?>

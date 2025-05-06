@@ -17,18 +17,19 @@
 </head>
 <body>
     <header>
+        <div class="header-brand">
+        <img src="../images/logo.png" alt="Shop Logo" class="header-logo">
         <h1>Online Computer Shop</h1>
-        <nav class="header-nav">
-            <a href="../index.php">Home</a>
-            <?php 
-            // Check if we're in admin directory
-            $is_admin = strpos($_SERVER['PHP_SELF'], '/admin/') !== false;
-            if ($is_admin): ?>
-                <!-- Display Admin Dashboard button for admin users -->
-                <a href="../admin/admin_products.php">Admin</a>
+        </div>
+        <nav>
+        <a href="../index.php" class="nav-link">Home</a>
+    <?php 
+    // Check if the user is an admin
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+              <a href="../admin/admin_dashboard.php" class="nav-link">Admin</a>
             <?php endif; ?>
-            <a href="../products.php">Products</a>
-            <a href="../mem_order/cart.php">Cart</a>
+              <a href="../products.php" class="nav-link">Products</a>
+              <a href="../mem_order/cart.php" class="nav-link">Cart</a>
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <!-- Display Profile and Logout links if the user is logged in -->
