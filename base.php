@@ -256,11 +256,7 @@ function addToCart($conn, $user_id, $product_id, $quantity) {
         $product = $priceStmt->fetch(PDO::FETCH_ASSOC);
         
         // Insert new cart item
-<<<<<<< HEAD
         $Total_Price = $product['Product_Price'] * $quantity;
-=======
-        $total_price = $product['Product_Price'] * $quantity;
->>>>>>> parent of e496483 (Revert "Merge branch 'main' of https://github.com/takodacheese/online_computer_shop")
         $stmt = $conn->prepare("
             INSERT INTO Cart (Cart_ID, User_ID, Product_ID, Quantity, Total_Price_Cart, Added_Date)
             VALUES (?, ?, ?, ?, ?, NOW())
@@ -270,11 +266,7 @@ function addToCart($conn, $user_id, $product_id, $quantity) {
             $user_id,
             $product_id,
             $quantity,
-<<<<<<< HEAD
             $Total_Price
-=======
-            $total_price
->>>>>>> parent of e496483 (Revert "Merge branch 'main' of https://github.com/takodacheese/online_computer_shop")
         ]);
         return $stmt->rowCount();
     }
