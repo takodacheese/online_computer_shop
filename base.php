@@ -48,22 +48,27 @@ function getUserByEmail($conn, $email) {
 /**
  * Verify login credentials. Sets session on success.
  */
-function loginUser($conn, $email, $password) {
-    $user = getUserByEmail($conn, $email);
-    if (!$user) return false;
-    
-    // Check if password is hashed (starts with $2y$)
-    $is_hashed = strpos($user['Password'], '$2y$') === 0;
-    
-    // Verify password based on whether it's hashed or plain text
-    $password_matches = $is_hashed 
-        ? password_verify($password, $user['Password'])
-        : $password === $user['Password'];
-    
-    if ($password_matches) {
-        $_SESSION['user_id'] = $user['User_ID'];
-        return true;
+function loginUser(PDO $conn, string $email, string $password) {
+    // Check in the User table
+    $stmt = $conn->prepare("SELECT User_ID AS id, Username, Password, 'user' AS role FROM User WHERE Email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Check in the Admin table if not found in User table
+    if (!$user) {
+        $stmt = $conn->prepare("SELECT Admin_ID AS id, Username, Password, 'admin' AS role FROM Admin WHERE Email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    // Verify the password and return the role if successful
+    if ($user && $password === $user['Password']) { // Replace with password_verify if passwords are hashed
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['Username'];
+        $_SESSION['role'] = $user['role'];
+        return $user['role'];
+    }
+
     return false;
 }
 
@@ -626,7 +631,7 @@ function get_total_revenue($conn) {
  * Fetch number of pending orders
  */
 function get_pending_orders($conn) {
-    $stmt = $conn->query("SELECT COUNT(*) AS pending_orders FROM orders WHERE order_status = 'pending'");
+    $stmt = $conn->query("SELECT COUNT(*) AS pending_orders FROM Orders WHERE Status = 'pending'");
     return $stmt->fetch(PDO::FETCH_ASSOC)['pending_orders'];
 }
 
@@ -634,10 +639,10 @@ function get_pending_orders($conn) {
  * Fetch recent orders with user info
  */
 function get_recent_orders($conn, $limit = 5) {
-    $stmt = $conn->prepare("SELECT orders.*, users.username 
-                            FROM orders 
-                            JOIN users ON orders.user_id = users.user_id 
-                            ORDER BY orders.created_at DESC 
+    $stmt = $conn->prepare("SELECT Orders.*, User.Username 
+                            FROM Orders 
+                            JOIN User ON Orders.User_ID = User.User_ID 
+                            ORDER BY Orders.Order_ID DESC 
                             LIMIT ?");
     $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
     $stmt->execute();
@@ -648,12 +653,65 @@ function get_recent_orders($conn, $limit = 5) {
  * Fetch all products
  */
 function search_products(PDO $conn, string $search) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE name LIKE :search OR description LIKE :search");
+    $stmt = $conn->prepare("SELECT * FROM product WHERE Product_Name LIKE :search OR Product_Description LIKE :search");
     $searchTerm = '%' . $search . '%';
     $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+// ------------------------
+// 📝 PRODUCT REVIEWS
+// ------------------------
+
+/**
+ * Get reviews for a product
+ */
+function getReviewsByProductId($conn, $product_id) {
+    $stmt = $conn->prepare("
+        SELECT r.*, u.Username 
+        FROM Product_Review r
+        JOIN Orders o ON r.Order_ID = o.Order_ID
+        JOIN User u ON o.User_ID = u.User_ID
+        WHERE r.Product_ID = ?
+        ORDER BY r.Review_Date DESC
+    ");
+    $stmt->execute([$product_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Add a new review
+ */
+function addReview($conn, $product_id, $user_id, $rating, $comment) {
+    // First, get the latest order for this user and product
+    $stmt = $conn->prepare("
+        SELECT o.Order_ID 
+        FROM Orders o
+        JOIN Order_Details od ON o.Order_ID = od.Order_ID
+        WHERE o.User_ID = ? AND od.Product_ID = ?
+        ORDER BY o.Order_ID DESC
+        LIMIT 1
+    ");
+    $stmt->execute([$user_id, $product_id]);
+    $order = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$order) {
+        return false; // User hasn't purchased this product
+    }
+
+    // Generate a unique Review_ID
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM Product_Review");
+    $stmt->execute();
+    $review_count = $stmt->fetchColumn();
+    $review_id = 'RV' . str_pad($review_count + 1, 4, '0', STR_PAD_LEFT);
+
+    $stmt = $conn->prepare("
+        INSERT INTO Product_Review (Review_ID, Order_ID, Product_ID, Rating, Comment, Review_Date)
+        VALUES (?, ?, ?, ?, ?, NOW())
+    ");
+    return $stmt->execute([$review_id, $order['Order_ID'], $product_id, $rating, $comment]);
+}
+
 // ------------------------
 // 🛠️ CUSTOM PC BUILDER
 // ------------------------
@@ -684,7 +742,7 @@ function getModelsByPartId($conn, $part_id) {
 function getProductById($conn, $product_id) {
     $stmt = $conn->prepare("
         SELECT p.*, c.Category_Name, b.Brand_Name
-        FROM products p
+        FROM product p
         LEFT JOIN category c ON p.Category_ID = c.Category_ID
         LEFT JOIN Brand b ON c.Brand_ID = b.Brand_ID
         WHERE p.Product_ID = ?
@@ -857,14 +915,13 @@ function sanitizeInput($input) {
  */
 function getFeaturedProducts($conn, $limit = 4) {
     $stmt = $conn->prepare("
-        SELECT DISTINCT
+        SELECT DISTINCT 
             p.Product_ID,
             p.Product_Name as name,
             p.Product_Description as description,
             p.Product_Price as price,
             c.Category_Name,
-            b.Brand_Name,
-            p.Rating_Avg
+            b.Brand_Name
         FROM product p
         LEFT JOIN category c ON p.Category_ID = c.Category_ID
         LEFT JOIN Brand b ON c.Brand_ID = b.Brand_ID
@@ -1034,7 +1091,7 @@ function deductStock(PDO $conn, int $productId, int $quantity): void {
  //@return array Array of low stock products
  
 function getLowStockProducts(PDO $conn, $threshold = 5) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE stock <= ?");
+    $stmt = $conn->prepare("SELECT * FROM product WHERE Stock_Quantity <= ?");
     $stmt->execute([$threshold]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

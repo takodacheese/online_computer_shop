@@ -59,8 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <textarea name="description" required></textarea><br>
     <label for="price">Price:</label>
     <input type="number" step="0.01" name="price" required><br>
-    <label for="image">Image:</label>
-    <input type="file" name="image" accept="image/*" required><br>
+    <label for="images">Images (Upload multiple images):</label>
+    <input type="file" name="images[]" accept="image/*" multiple required><br>
     <button type="submit">Add Product</button>
 </form>
 

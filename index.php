@@ -33,7 +33,21 @@ require_once 'base.php';
         } else {
             foreach ($products as $product) {
                 echo "<div class='product'>";
-                echo "<img src='images/products/{$product['Product_ID']}.jpg' alt='{$product['name']}'>";
+                $baseName = preg_replace('/[\\/\:\*\?"<>\|]/', '', $product['name']);
+                $imageExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+                $imagePath = '';
+                foreach ($imageExtensions as $ext) {
+                    $tryPath = "images/{$baseName}.{$ext}";
+                    if (file_exists($tryPath)) {
+                        $imagePath = $tryPath;
+                        break;
+                    }
+                }
+                if ($imagePath) {
+                    echo '<img src="' . htmlspecialchars($imagePath) . '" alt="' . htmlspecialchars($product['name']) . '" class="product-main-image">';
+                } else {
+                    echo '<img src="images/no-image.png" alt="No Image Available" class="product-main-image">';
+                }
                 echo "<h3>{$product['name']}</h3>";
                 echo "<p>{$product['description']}</p>";
                 echo "<p>Price: ".number_format($product['price'], 2)."</p>";

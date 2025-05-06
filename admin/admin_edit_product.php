@@ -79,8 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <label for="stock">Stock:</label>
     <input type="number" name="stock" value="<?php echo $product['stock']; ?>" required><br>
 
-    <label for="image">Image:</label>
-    <input type="file" name="image" accept="image/*"><br>
+    <label for="images">Images (Upload multiple images):</label>
+    <input type="file" name="images[]" accept="image/*" multiple><br>
 
     <button type="submit">Update Product</button>
 </form>
