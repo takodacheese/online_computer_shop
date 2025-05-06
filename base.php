@@ -910,14 +910,13 @@ function sanitizeInput($input) {
  */
 function getFeaturedProducts($conn, $limit = 4) {
     $stmt = $conn->prepare("
-        SELECT DISTINCT
+        SELECT DISTINCT 
             p.Product_ID,
             p.Product_Name as name,
             p.Product_Description as description,
             p.Product_Price as price,
             c.Category_Name,
-            b.Brand_Name,
-            p.Rating_Avg
+            b.Brand_Name
         FROM product p
         LEFT JOIN category c ON p.Category_ID = c.Category_ID
         LEFT JOIN Brand b ON c.Brand_ID = b.Brand_ID
