@@ -503,10 +503,12 @@ function getAllOrders($conn) {
  * Fetch order details with user information
  */
 function getOrderDetails($conn, $Order_ID) {
-    $stmt = $conn->prepare("SELECT orders.*, users.Username 
-                            FROM orders 
-                            JOIN users ON orders.user_id = users.user_id 
-                            WHERE orders.Order_ID = ?");
+    $stmt = $conn->prepare("
+        SELECT o.*, u.Username, u.Email 
+        FROM orders o
+        JOIN user u ON o.User_ID = u.User_ID
+        WHERE o.Order_ID = ?
+    ");
     $stmt->execute([$Order_ID]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }

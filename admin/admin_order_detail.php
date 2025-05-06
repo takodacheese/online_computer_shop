@@ -22,15 +22,16 @@ if (!$order) {
 }
 
 // Fetch order items
-$order_items = getOrderItems($conn, $Order_ID);
+$order = getOrderDetails($conn, $_GET['id']);
 ?>
 
-<h2>Order Details (Admin)</h2>
-<p><strong>Order ID:</strong> <?php echo $order['Order_ID']; ?></p>
-<p><strong>User:</strong> <?php echo htmlspecialchars($order['username']); ?></p>
-<p><strong>Total Amount:</strong> $<?php echo number_format($order['Total_Price'], 2); ?></p>
-<p><strong>Status:</strong> <?php echo $order['Status']; ?></p>
-<p><strong>Date:</strong> <?php echo $order['created_at']; ?></p>
+<h2>Order Details</h2>
+<p><strong>Order ID:</strong> <?= htmlspecialchars($order['Order_ID']) ?></p>
+<p><strong>User:</strong> <?= htmlspecialchars($order['Username']) ?></p>
+<p><strong>Email:</strong> <?= htmlspecialchars($order['Email']) ?></p>
+<p><strong>Total Price:</strong> $<?= number_format($order['Total_Price'], 2) ?></p>
+<p><strong>Status:</strong> <?= htmlspecialchars($order['Status']) ?></p>
+<p><strong>Date:</strong> <?= htmlspecialchars($order['created_at']) ?></p>
 
 <h3>Order Items</h3>
 <table border="1">
@@ -43,7 +44,7 @@ $order_items = getOrderItems($conn, $Order_ID);
         </tr>
     </thead>
     <tbody>
-        <?php foreach ($order_items as $item): ?>
+        <?php foreach ($order_details as $item): ?>
             <tr>
                 <td><?php echo htmlspecialchars($item['name']); ?></td>
                 <td><?php echo $item['quantity']; ?></td>

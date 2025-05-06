@@ -67,18 +67,9 @@ $recent_orders = get_recent_orders($conn);
 <h3>Quick Links</h3>
 <ul>
     <li><a href="admin_products.php">Manage Products</a></li>
-    <li><a href="members.php">Manage Members</a></li>
+    <li><a href="../member/member.php">Manage Members</a></li>
     <li><a href="../member/profile.php">Your Profile</a></li>
 </ul>
-
-<!-- Product Section -->
-<h2>Product List</h2>
-
-<form method="GET" action="admin_dashboard.php">
-    <input type="text" name="search" placeholder="Search by name or description" value="<?= htmlspecialchars($search) ?>">
-    <button type="submit">Search</button>
-</form>
-
 <table border="1">
     <thead>
         <tr>
