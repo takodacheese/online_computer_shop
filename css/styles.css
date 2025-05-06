@@ -63,6 +63,10 @@ button:hover, .btn:hover {
     background: #0056b3;
 }
 
+.btn:not(:last-child) {
+    margin-right: 20px;
+}
+
 /* Card Styles */
 
 /* Product Grid and Cards */
