@@ -38,16 +38,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['voucher_code'])) {
     exit();
 }
 
-$total_amount = array_sum(array_map(function($item) {
+$Total_Price = array_sum(array_map(function($item) {
     return $item['price'] * $item['quantity'];
 }, $cart_items));
 
 if (isset($_SESSION['voucher_discount'])) {
-    $total_amount -= $_SESSION['voucher_discount'];
-    if ($total_amount < 0) $total_amount = 0;
+    $Total_Price -= $_SESSION['voucher_discount'];
+    if ($Total_Price < 0) $Total_Price = 0;
 }
 
-$_SESSION['total_amount'] = $total_amount;
+$_SESSION['Total_Price'] = $Total_Price;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
     try {
@@ -59,12 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
             exit();
         }
         $payment_method = $_POST['payment_method'];
-        $order_id = createOrder($conn, $user_id, $total_amount);
-        addOrderItems($conn, $order_id, $cart_items);
+        $Order_ID = createOrder($conn, $user_id, $Total_Price);
+        addOrderItems($conn, $Order_ID, $cart_items);
         if (isset($_SESSION['voucher_id'])) {
             recordVoucherUsage($conn, $_SESSION['voucher_id'], $user_id);
         }
-        $_SESSION['order_id'] = $order_id;
+        $_SESSION['Order_ID'] = $Order_ID;
         // Set allowed payment methods based on user selection
         $allowed_methods = [];
         if ($payment_method === 'grabpay') {
@@ -83,19 +83,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
                         'price_data' => [
                             'currency' => 'myr',
                             'product_data' => [
-                                'name' => 'Order #' . $order_id,
+                                'name' => 'Order #' . $Order_ID,
                                 'description' => 'Computer Shop Order',
                             ],
-                            'unit_amount' => round($total_amount * 100),
+                            'unit_amount' => round($Total_Price * 100),
                         ],
                         'quantity' => 1,
                     ]
                 ],
                 'mode' => 'payment',
-                'success_url' => 'http://' . $_SERVER['HTTP_HOST'] . '/mem_order/payment_success.php?order_id=' . $order_id,
+                'success_url' => 'http://' . $_SERVER['HTTP_HOST'] . '/mem_order/payment_success.php?Order_ID=' . $Order_ID,
                 'cancel_url' => 'http://' . $_SERVER['HTTP_HOST'] . '/mem_order/payment_cancel.php',
                 'metadata' => [
-                    'order_id' => $order_id,
+                    'Order_ID' => $Order_ID,
                     'user_id' => $user_id
                 ],
             ]);
@@ -109,9 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
         }
     } catch (Exception $e) {
         error_log("Payment error: " . $e->getMessage());
-        if (isset($order_id)) {
+        if (isset($Order_ID)) {
             $stmt = $conn->prepare("DELETE FROM Orders WHERE Order_ID = ?");
-            $stmt->execute([$order_id]);
+            $stmt->execute([$Order_ID]);
         }
         $_SESSION['error'] = "Failed to process payment: " . $e->getMessage();
         header("Location: cart.php");
@@ -153,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
                 <?php endforeach; ?>
                     <tr class="checkout-total-row">
                         <td colspan="2" class="checkout-total-label">Total:</td>
-                        <td class="checkout-total-value">RM <?= number_format($total_amount, 2) ?></td>
+                        <td class="checkout-total-value">RM <?= number_format($Total_Price, 2) ?></td>
                     </tr>
                 </tbody>
             </table>

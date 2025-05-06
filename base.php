@@ -11,7 +11,7 @@ require_once 'db.php'; // Database connection
 /**
  * Register new user (with hashed password)
  */
-function registerUser($conn, $username, $email, $password, $gender, $birthday, $address) {
+function registerUser($conn, $Username, $Email, $password, $gender, $birthday, $address) {
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
     
     // Generate User_ID (e.g., U00001)
@@ -29,22 +29,22 @@ function registerUser($conn, $username, $email, $password, $gender, $birthday, $
     ");
     $stmt->execute([
         $user_id,         // User_ID
-        $username,       // Username
+        $Username,       // Username
         $gender,         // Gender
         $hashedPassword, // Password
         $birthday,       // Birthday
-        $email,          // Email
+        $Email,          // Email
         $address         // Address
     ]);
     
     return $stmt->rowCount() > 0; // Return true if registration was successful
     $stmt->execute([
         'U' . str_pad($conn->query("SELECT COUNT(*) FROM User")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
-        $username,
+        $Username,
         $gender,
         $hashedPassword,
         $birthday,
-        $email,
+        $Email,
         $address
     ]);
     
@@ -52,38 +52,38 @@ function registerUser($conn, $username, $email, $password, $gender, $birthday, $
 }
 
 /**
- * Get user by email
+ * Get user by Email
  */
-function getUserByEmail($conn, $email) {
+function getUserByEmail($conn, $Email) {
     $stmt = $conn->prepare("
         SELECT User_ID, Username, Email, Password 
         FROM User 
         WHERE Email = ?
     ");
-    $stmt->execute([$email]);
+    $stmt->execute([$Email]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 /**
  * Verify login credentials. Sets session on success.
  */
-function loginUser(PDO $conn, string $email, string $password) {
+function loginUser(PDO $conn, string $Email, string $password) {
     // Check in the User table
     $stmt = $conn->prepare("SELECT User_ID AS id, Username, Password, 'user' AS role FROM User WHERE Email = ?");
-    $stmt->execute([$email]);
+    $stmt->execute([$Email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Check in the Admin table if not found in User table
     if (!$user) {
         $stmt = $conn->prepare("SELECT Admin_ID AS id, Username, Password, 'admin' AS role FROM Admin WHERE Email = ?");
-        $stmt->execute([$email]);
+        $stmt->execute([$Email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     // Verify the password and return the role if successful
     if ($user && $password === $user['Password']) { // Replace with password_verify if passwords are hashed
         $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['Username'];
+        $_SESSION['Username'] = $user['Username'];
         $_SESSION['role'] = $user['role'];
         return $user['role'];
     }
@@ -92,10 +92,10 @@ function loginUser(PDO $conn, string $email, string $password) {
 }
 
 /**
- * Check if email is already registered
+ * Check if Email is already registered
  */
-function emailExists($conn, $email) {
-    return getUserByEmail($conn, $email) !== false;
+function EmailExists($conn, $Email) {
+    return getUserByEmail($conn, $Email) !== false;
 }
 
 /**
@@ -140,17 +140,17 @@ function getUserById($conn, $user_id) {
 }
 
 /**
- * Update username and email
+ * Update Username and Email
  */
-function updateUserProfile($conn, $user_id, $username, $email, $address, $birthdate, $gender) {
-    $username = sanitizeInput($username);
-    $email = sanitizeInput($email);
+function updateUserProfile($conn, $user_id, $Username, $Email, $address, $birthdate, $gender) {
+    $Username = sanitizeInput($Username);
+    $Email = sanitizeInput($Email);
     $address = sanitizeInput($address);
     $birthdate = sanitizeInput($birthdate);
     $gender = sanitizeInput($gender);
     
     $stmt = $conn->prepare("SELECT * FROM User WHERE Email = ? AND User_ID != ?");
-    $stmt->execute([$email, $user_id]);
+    $stmt->execute([$Email, $user_id]);
     if ($stmt->fetch()) {
         return "Error: Email is already in use.";
     }
@@ -160,7 +160,7 @@ function updateUserProfile($conn, $user_id, $username, $email, $address, $birthd
         SET Username = ?, Email = ?, Address = ?, Birthday = ?, Gender = ? 
         WHERE User_ID = ?
     ");
-    return $stmt->execute([$username, $email, $address, $birthdate, $gender, $user_id]) 
+    return $stmt->execute([$Username, $Email, $address, $birthdate, $gender, $user_id]) 
         ? "Profile updated successfully." 
         : "Error: Unable to update profile.";
 }
@@ -256,7 +256,7 @@ function addToCart($conn, $user_id, $product_id, $quantity) {
         $product = $priceStmt->fetch(PDO::FETCH_ASSOC);
         
         // Insert new cart item
-        $total_price = $product['Product_Price'] * $quantity;
+        $Total_Price = $product['Product_Price'] * $quantity;
         $stmt = $conn->prepare("
             INSERT INTO Cart (Cart_ID, User_ID, Product_ID, Quantity, Total_Price_Cart, Added_Date)
             VALUES (?, ?, ?, ?, ?, NOW())
@@ -266,7 +266,7 @@ function addToCart($conn, $user_id, $product_id, $quantity) {
             $user_id,
             $product_id,
             $quantity,
-            $total_price
+            $Total_Price
         ]);
         return $stmt->rowCount();
     }
@@ -303,15 +303,15 @@ function clearCart($conn, $user_id) {
 /**
  * Create order and return new order ID
  */
-function createOrder($conn, $user_id, $total_amount) {
+function createOrder($conn, $user_id, $Total_Price) {
     $stmt = $conn->prepare("
         INSERT INTO Orders (User_ID, Total_Price, Status, Shipping_Cost, Order_Quantity, tax_amount, subtotal, created_at)
         VALUES (?, ?, 'Pending', 0, 1, 0, ?, NOW())
     ");
     $stmt->execute([
         $user_id,
-        $total_amount,
-        $total_amount
+        $Total_Price,
+        $Total_Price
     ]);
     return $conn->lastInsertId();
 }
@@ -319,7 +319,7 @@ function createOrder($conn, $user_id, $total_amount) {
 /**
  * Insert all cart items into order_items table
  */
-function addOrderItems($conn, $order_id, $cart_items) {
+function addOrderItems($conn, $Order_ID, $cart_items) {
     $stmt = $conn->prepare("
         INSERT INTO Order_Details (Order_Detail_ID, Order_ID, Product_ID, Quantity, Price)
         VALUES (?, ?, ?, ?, ?)
@@ -328,7 +328,7 @@ function addOrderItems($conn, $order_id, $cart_items) {
     foreach ($cart_items as $item) {
         $stmt->execute([
             'OD' . str_pad($conn->query("SELECT COUNT(*) FROM Order_Details")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
-            $order_id,
+            $Order_ID,
             $item['Product_ID'],
             $item['Quantity'],
             $item['price'] // Changed from $item['Product_Price'] to $item['price']
@@ -491,7 +491,7 @@ function updateProduct($conn, $product_id, $name, $description, $price, $image =
  * Fetch all orders with user details (admin view)
  */
 function getAllOrders($conn) {
-    $stmt = $conn->prepare("SELECT orders.*, users.username 
+    $stmt = $conn->prepare("SELECT orders.*, users.Username 
                             FROM orders 
                             JOIN users ON orders.user_id = users.user_id 
                             ORDER BY orders.created_at DESC");
@@ -502,24 +502,24 @@ function getAllOrders($conn) {
 /**
  * Fetch order details with user information
  */
-function getOrderDetails($conn, $order_id) {
-    $stmt = $conn->prepare("SELECT orders.*, users.username 
+function getOrderDetails($conn, $Order_ID) {
+    $stmt = $conn->prepare("SELECT orders.*, users.Username 
                             FROM orders 
                             JOIN users ON orders.user_id = users.user_id 
-                            WHERE orders.order_id = ?");
-    $stmt->execute([$order_id]);
+                            WHERE orders.Order_ID = ?");
+    $stmt->execute([$Order_ID]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 /**
  * Fetch order items for a specific order
  */
-function getOrderItems($conn, $order_id) {
+function getOrderItems($conn, $Order_ID) {
     $stmt = $conn->prepare("SELECT order_items.*, products.name 
                             FROM order_items 
                             JOIN products ON order_items.product_id = products.product_id 
-                            WHERE order_items.order_id = ?");
-    $stmt->execute([$order_id]);
+                            WHERE order_items.Order_ID = ?");
+    $stmt->execute([$Order_ID]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -603,7 +603,7 @@ function checkLowStockAndAlert($conn, $product_id, $threshold = 5) {
     // $stock = $stmt->fetchColumn();
     $stock = 10; // Placeholder
     if ($stock < $threshold) {
-        // TODO: Implement alert logic (e.g., send email to admin, show dashboard alert, etc.)
+        // TODO: Implement alert logic (e.g., send Email to admin, show dashboard alert, etc.)
         // Example: sendLowStockAlert($product_id, $stock);
         return true;
     }
@@ -637,7 +637,7 @@ function get_total_orders($conn) {
  * Fetch total revenue
  */
 function get_total_revenue($conn) {
-    $stmt = $conn->query("SELECT SUM(total_amount) AS total_revenue FROM orders");
+    $stmt = $conn->query("SELECT SUM(Total_Price) AS total_revenue FROM orders");
     return $stmt->fetch(PDO::FETCH_ASSOC)['total_revenue'];
 }
 
@@ -942,21 +942,21 @@ function getPCBuilderComponents($conn) {
  * Update order status
  * 
  * @param PDO $conn Database connection
- * @param int $order_id Order ID
+ * @param int $Order_ID Order ID
  * @param string $status New status
  * @param string|null $notes Optional notes
  * @return bool Success status
  */
-function updateOrderStatus($conn, $order_id, $status, $notes = null) {
+function updateOrderStatus($conn, $Order_ID, $status, $notes = null) {
     // Update order status
-    $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?");
-    $success = $stmt->execute([$status, $order_id]);
+    $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE Order_ID = ?");
+    $success = $stmt->execute([$status, $Order_ID]);
     
     // Add to order history
     if ($success) {
         $updated_by = $_SESSION['user_id'] ?? null;
-        $stmt = $conn->prepare("INSERT INTO order_history (order_id, status, updated_by, notes) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$order_id, $status, $updated_by, $notes]);
+        $stmt = $conn->prepare("INSERT INTO order_history (Order_ID, status, updated_by, notes) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$Order_ID, $status, $updated_by, $notes]);
     }
     
     return $success;
@@ -991,15 +991,15 @@ function getLowStockProducts(PDO $conn, $threshold = 5) {
  * Cancel an order
  * 
  * @param PDO $conn Database connection
- * @param int $order_id Order ID
+ * @param int $Order_ID Order ID
  * @param string $reason Cancellation reason
  * @param bool $admin_approval Required for 'Processing' status
  * @return bool Success status
  */
-function cancelOrder($conn, $order_id, $reason, $admin_approval = false) {
+function cancelOrder($conn, $Order_ID, $reason, $admin_approval = false) {
     // Get current order status
-    $stmt = $conn->prepare("SELECT status FROM orders WHERE order_id = ?");
-    $stmt->execute([$order_id]);
+    $stmt = $conn->prepare("SELECT status FROM orders WHERE Order_ID = ?");
+    $stmt->execute([$Order_ID]);
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$order) {
@@ -1009,10 +1009,10 @@ function cancelOrder($conn, $order_id, $reason, $admin_approval = false) {
     // Check if cancellation is allowed
     if ($order['status'] === 'Pending') {
         // Pending orders can be cancelled directly
-        $success = updateOrderStatus($conn, $order_id, 'Cancelled', $reason);
+        $success = updateOrderStatus($conn, $Order_ID, 'Cancelled', $reason);
     } elseif ($order['status'] === 'Processing' && $admin_approval) {
         // Processing orders require admin approval
-        $success = updateOrderStatus($conn, $order_id, 'Cancelled', $reason);
+        $success = updateOrderStatus($conn, $Order_ID, 'Cancelled', $reason);
     } else {
         return false;
     }
@@ -1023,9 +1023,9 @@ function cancelOrder($conn, $order_id, $reason, $admin_approval = false) {
             UPDATE products p
             JOIN order_items oi ON p.product_id = oi.product_id
             SET p.stock = p.stock + oi.quantity
-            WHERE oi.order_id = ?
+            WHERE oi.Order_ID = ?
         ");
-        $stmt->execute([$order_id]);
+        $stmt->execute([$Order_ID]);
     }
     
     return $success;
@@ -1048,23 +1048,23 @@ function getPendingCancellationRequests($conn) {
  * Get order history
  * 
  * @param PDO $conn Database connection
- * @param int $order_id Order ID
+ * @param int $Order_ID Order ID
  * @return array Array of order history entries
  */
-function getOrderHistory($conn, $order_id) {
+function getOrderHistory($conn, $Order_ID) {
     $stmt = $conn->prepare("
         SELECT 
             oh.history_id,
             oh.status,
             oh.updated_at,
             oh.notes,
-            u.username as updated_by
+            u.Username as updated_by
         FROM order_history oh
         LEFT JOIN users u ON oh.updated_by = u.user_id
-        WHERE oh.order_id = ?
+        WHERE oh.Order_ID = ?
         ORDER BY oh.updated_at DESC
     ");
-    $stmt->execute([$order_id]);
+    $stmt->execute([$Order_ID]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 

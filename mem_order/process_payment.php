@@ -36,13 +36,13 @@ try {
 
     if ($paymentIntent->status === 'succeeded') {
         // Get order ID from metadata
-        $order_id = $paymentIntent->metadata->order_id;
+        $Order_ID = $paymentIntent->metadata->Order_ID;
         
         // Update order status to Processing
-        updateOrderStatus($conn, $order_id, 'Processing', 'Payment successfully captured');
+        updateOrderStatus($conn, $Order_ID, 'Processing', 'Payment successfully captured');
 
         // Deduct stock for all order items
-        $order_items = getOrderItems($conn, $order_id);
+        $order_items = getOrderItems($conn, $Order_ID);
         if ($order_items) {
             foreach ($order_items as $item) {
                 deductStock($conn, $item['product_id'], $item['quantity']);
@@ -54,7 +54,7 @@ try {
         clearCart($conn, $_SESSION['user_id']);
 
         // Store order ID in session for success page
-        $_SESSION['success_order_id'] = $order_id;
+        $_SESSION['success_Order_ID'] = $Order_ID;
         
         // Redirect to success page
         header('Location: payment_success.php');

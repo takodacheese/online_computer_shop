@@ -32,12 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // If approved, cancel the order
             if ($action === 'approve') {
-                $stmt = $conn->prepare("SELECT * FROM orders WHERE order_id = ?");
-                $stmt->execute([$request['order_id']]);
+                $stmt = $conn->prepare("SELECT * FROM orders WHERE Order_ID = ?");
+                $stmt->execute([$request['Order_ID']]);
                 $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($order) {
-                    cancelOrder($conn, $request['order_id'], $request['reason'], true);
+                    cancelOrder($conn, $request['Order_ID'], $request['reason'], true);
                     $message = '<div class="success">Cancellation request approved and order cancelled.</div>';
                 }
             } else {
@@ -51,12 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $stmt = $conn->prepare("
     SELECT 
         ocr.*, 
-        o.order_id, 
-        o.total_amount, 
-        o.status as order_status,
+        o.Order_ID, 
+        o.Total_Price, 
+        o.status as Status,
         u.username as user_name
     FROM order_cancellation_requests ocr
-    JOIN orders o ON ocr.order_id = o.order_id
+    JOIN orders o ON ocr.Order_ID = o.Order_ID
     JOIN users u ON ocr.user_id = u.user_id
     WHERE ocr.status = 'Pending'
     ORDER BY ocr.created_at DESC
@@ -85,9 +85,9 @@ $cancellation_requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <tbody>
             <?php foreach ($cancellation_requests as $request): ?>
                 <tr>
-                    <td><?php echo $request['order_id']; ?></td>
+                    <td><?php echo $request['Order_ID']; ?></td>
                     <td><?php echo htmlspecialchars($request['user_name']); ?></td>
-                    <td>$<?php echo number_format($request['total_amount'], 2); ?></td>
+                    <td>$<?php echo number_format($request['Total_Price'], 2); ?></td>
                     <td><?php echo htmlspecialchars($request['reason']); ?></td>
                     <td><?php echo $request['created_at']; ?></td>
                     <td>

@@ -11,7 +11,7 @@ include '../db.php';
 
 // Handle search
 $search = isset($_GET['search']) ? $_GET['search'] : '';
-$stmt = $conn->prepare("SELECT * FROM users WHERE username LIKE ? OR email LIKE ?");
+$stmt = $conn->prepare("SELECT * FROM users WHERE Username LIKE ? OR Email LIKE ?");
 $stmt->execute(["%$search%", "%$search%"]);
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -20,7 +20,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!-- Search Form -->
 <form method="GET" action="members.php">
-    <input type="text" name="search" placeholder="Search by username or email" value="<?php echo htmlspecialchars($search); ?>">
+    <input type="text" name="search" placeholder="Search by Username or Email" value="<?php echo htmlspecialchars($search); ?>">
     <button type="submit">Search</button>
 </form>
 

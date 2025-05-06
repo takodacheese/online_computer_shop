@@ -13,7 +13,7 @@ if (!isset($_GET['paymentIntent'])) {
 $paymentIntentId = $_GET['paymentIntent'];
 
 // Verify session variables
-if (!isset($_SESSION['order_id'])) {
+if (!isset($_SESSION['Order_ID'])) {
     header("Location: cart.php");
     exit();
 }
@@ -53,7 +53,7 @@ try {
                     <div class="card-body">
                         <form id="payment-form">
                             <div class="mb-3">
-                                <h5>Total Amount: RM <?= number_format($_SESSION['total_amount'], 2); ?></h5>
+                                <h5>Total Amount: RM <?= number_format($_SESSION['Total_Price'], 2); ?></h5>
                             </div>
                             <div id="grabpay-element">
                                 <!-- A GrabPay Element will be inserted here. -->
