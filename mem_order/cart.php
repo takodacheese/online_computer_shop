@@ -132,8 +132,11 @@ $cart_items = getCartItems($conn, $user_id);
             <?php endforeach; ?>
         </tbody>
     </table>
-    <p class="cart-total-row">Total: RM <?= number_format(calculateCartTotal($cart_items), 2); ?></p>
-    <a href="checkout.php">Proceed to Checkout</a>
+    <div class="cart-summary-row">
+        <span class="cart-total-label">Total:</span>
+        <span class="cart-total-value">RM <?= number_format(calculateCartTotal($cart_items), 2); ?></span>
+        <a href="checkout.php" class="cart-checkout-btn">Proceed to Checkout</a>
+    </div>
 <?php endif; ?>
 
 <?php require_once '../includes/footer.php'; ?>

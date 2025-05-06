@@ -42,15 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order'])) {
 }
 
 // Fetch order details
-$stmt = $conn->prepare("SELECT * FROM orders WHERE Order_ID = ? AND user_id = ?");
-$stmt->execute([$Order_ID, $_SESSION['user_id']]);
-<<<<<<< HEAD
-$stmt->execute([$order_id, $_SESSION['user_id']]);
-
 $stmt = $conn->prepare("SELECT * FROM orders WHERE Order_ID = ? AND User_ID = ?");
 $stmt->execute([$Order_ID, $_SESSION['user_id']]);
-=======
->>>>>>> parent of 2bfee10 (Merge branch 'main' of https://github.com/takodacheese/online_computer_shop)
 $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$order) {
@@ -65,37 +58,27 @@ $stmt = $conn->prepare("SELECT od.*, p.Product_Name
                         JOIN Product p ON od.Product_ID = p.Product_ID 
                         WHERE od.Order_ID = ?");
 $stmt->execute([$Order_ID]);
-<<<<<<< HEAD
 $stmt->execute([$order_id]);
-=======
->>>>>>> parent of 2bfee10 (Merge branch 'main' of https://github.com/takodacheese/online_computer_shop)
 $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $stmt->execute([$Order_ID]);
 // $stmt = $conn->prepare("
 //     SELECT * FROM order_cancellation_requests 
-<<<<<<< HEAD
 
-=======
->>>>>>> parent of 2bfee10 (Merge branch 'main' of https://github.com/takodacheese/online_computer_shop)
 //     WHERE Order_ID = ? AND user_id = ? 
 //     ORDER BY created_at DESC LIMIT 1
 // ");
 // $stmt->execute([$Order_ID, $_SESSION['user_id']]);
-<<<<<<< HEAD
 
 //     WHERE order_id = ? AND user_id = ? 
 //     ORDER BY created_at DESC LIMIT 1
 // ");
 // $stmt->execute([$order_id, $_SESSION['user_id']]);
-=======
->>>>>>> parent of 2bfee10 (Merge branch 'main' of https://github.com/takodacheese/online_computer_shop)
 // $cancellation_request = $stmt->fetch(PDO::FETCH_ASSOC);
 $cancellation_request = null; // Table not present, skip cancellation request check
 
 ?>
 
-<<<<<<< HEAD
 // Disabled: table does not exist in your DB
 <div class="order-detail-container">
     <div class="order-detail-card">
@@ -106,7 +89,6 @@ $cancellation_request = null; // Table not present, skip cancellation request ch
             <p><strong>Total Amount:</strong> RM <?php echo isset($order['Total_Price']) ? number_format($order['Total_Price'], 2) : '0.00'; ?></p>
             <p><strong>Status:</strong> <?php echo isset($order['Status']) ? $order['Status'] : '-'; ?></p>
             <p><strong>Date:</strong> <?php echo isset($order['created_at']) ? $order['created_at'] : '-'; ?></p>
-=======
 <h2>Order Details</h2>
 <?php echo $message; ?>
 
@@ -133,7 +115,6 @@ if ($eligibility['eligible']):
             <p>Cancellation request submitted. An admin will review your request.</p>
             <p>Reason: <?php echo htmlspecialchars($cancellation_request['reason']); ?></p>
             <p>Submitted: <?php echo $cancellation_request['created_at']; ?></p>
->>>>>>> parent of 2bfee10 (Merge branch 'main' of https://github.com/takodacheese/online_computer_shop)
         </div>
     <?php else: ?>
         <h3>Cancel Order</h3>
