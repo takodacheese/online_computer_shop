@@ -919,6 +919,7 @@ header {
     padding: 2rem;
     border-radius: 8px;
     background-color: black;
+    color: white;
     box-shadow: 
     0 -3px 3px rgba(73, 0, 255, 10),    /* Top shadow */
     0 3px 3px rgba(73, 0, 255, 10),      /* bottom shadow */
