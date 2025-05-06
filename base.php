@@ -13,12 +13,31 @@ require_once 'db.php'; // Database connection
  */
 function registerUser($conn, $username, $email, $password, $gender, $birthday, $address) {
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    
+    // Generate User_ID (e.g., U00001)
+    $stmt = $conn->prepare("SELECT MAX(User_ID) as max_id FROM User");
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $max_id = $result['max_id'] ?? 'U00000';
+    $next_id = str_pad((int)substr($max_id, 1) + 1, 5, '0', STR_PAD_LEFT);
+    $user_id = 'U' . $next_id;
+    
+    // Insert user
     $stmt = $conn->prepare("
         INSERT INTO User (User_ID, Username, Gender, Password, Birthday, Register_Date, Email, Address)
         VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)
     ");
+    $stmt->execute([
+        $user_id,         // User_ID
+        $username,       // Username
+        $gender,         // Gender
+        $hashedPassword, // Password
+        $birthday,       // Birthday
+        $email,          // Email
+        $address         // Address
+    ]);
     
-    // Generate User_ID (e.g., U00001)
+    return $stmt->rowCount() > 0; // Return true if registration was successful
     $stmt->execute([
         'U' . str_pad($conn->query("SELECT COUNT(*) FROM User")->fetchColumn() + 1, 5, '0', STR_PAD_LEFT),
         $username,
@@ -915,6 +934,7 @@ function getFeaturedProducts($conn, $limit = 4) {
             p.Product_Name as name,
             p.Product_Description as description,
             p.Product_Price as price,
+            p.Stock_Quantity,
             c.Category_Name,
             b.Brand_Name
         FROM product p

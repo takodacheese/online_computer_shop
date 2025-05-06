@@ -9,33 +9,35 @@
     <title>Online Computer Shop</title>
     <link rel="stylesheet" href="../css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
-    <!-- jQuery CDN -->
+    <!-- jQuery and jQuery UI -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script src="../js/main.js"></script>
 </head>
 <body>
     <header>
         <h1>Online Computer Shop</h1>
-        <nav>
-            <a href="../index.php" class="nav-link">Home</a>
+        <nav class="header-nav">
+            <a href="../index.php">Home</a>
             <?php 
             // Check if we're in admin directory
             $is_admin = strpos($_SERVER['PHP_SELF'], '/admin/') !== false;
             if ($is_admin): ?>
                 <!-- Display Admin Dashboard button for admin users -->
-                <a href="../admin/admin_products.php" class="nav-link">Admin</a>
+                <a href="../admin/admin_products.php">Admin</a>
             <?php endif; ?>
-            <a href="../products.php" class="nav-link">Products</a>
-            <a href="../mem_order/cart.php" class="nav-link">Cart</a>
+            <a href="../products.php">Products</a>
+            <a href="../mem_order/cart.php">Cart</a>
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <!-- Display Profile and Logout links if the user is logged in -->
-                <a href="../member/profile.php" class="nav-link">Profile</a>
-                <a href="../acc_security/logout.php" class="nav-link" id="logout-link">Logout</a>
+                <a href="../member/profile.php">Profile</a>
+                <a href="../acc_security/logout.php" id="logout-link">Logout</a>
             <?php else: ?>
                 <!-- Display Login and Register links if the user is not logged in -->
-                <a href="../acc_security/login.php" class="nav-link">Login</a>
-                <a href="../acc_security/register.php" class="nav-link">Register</a>
+                <a href="../acc_security/login.php">Login</a>
+                <a href="../acc_security/register.php">Register</a>
             <?php endif; ?>
         </nav>
     </header>

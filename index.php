@@ -51,11 +51,9 @@ require_once 'base.php';
                 echo "<h3>{$product['name']}</h3>";
                 echo "<p>{$product['description']}</p>";
                 echo "<p>Price: ".number_format($product['price'], 2)."</p>";
-                echo "<form action='cart.php' method='POST'>";
-                echo "<input type='hidden' name='product_id' value='{$product['Product_ID']}'>";
-                echo "<input type='hidden' name='quantity' value='1'>";
-                echo "<button type='submit' class='btn'>Add to Cart</button>";
-                echo "</form>";
+                echo '<div class="product-actions">';
+                echo '<a href="product_detail.php?product_id=' . htmlspecialchars($product['Product_ID']) . '" class="btn">View Details</a>';
+                echo '</div>';
                 echo "</div>";
             }
         }

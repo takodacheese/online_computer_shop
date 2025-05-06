@@ -8,7 +8,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = trim($_POST['password']);
 
     $role = loginUser($conn,$email, $password);
-    
     if ($role) {
         header("Location: " . ($role === 'admin' ? "../admin/admin_products.php" : "../index.php"));
         exit();

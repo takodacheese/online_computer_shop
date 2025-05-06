@@ -10,7 +10,7 @@ include '../includes/header.php';
 include '../db.php';
 
 // Fetch orders
-$stmt = $conn->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
+$stmt = $conn->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY Order_ID DESC");
 $stmt->execute([$_SESSION['user_id']]);
 $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>

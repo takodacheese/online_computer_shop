@@ -27,22 +27,6 @@ This file contains feature plans and /TODOs for advanced functionality. Each sec
 - /TODO (PHP): Admin: Add UI to update order status
 - /TODO (PHP): Member: Add "Cancel Order" option for eligible orders
 
----
-
-## 4. Product Reviews/Ratings✅
-- /TODO (SQL): Create `reviews` table (`review_id`, `product_id`, `user_id`, `rating`, `comment`, `created_at`)
-- /TODO (PHP): Add form for members to submit reviews/ratings on product detail page
-- /TODO (PHP): Display reviews/ratings on product detail page
-
----
-
-## 5. Multiple Product Photos & Sliders✅
-- /TODO (SQL): Create `product_photos` table (`photo_id`, `product_id`, `photo_path`)
-- /TODO (PHP): Update product add/edit forms to allow multiple photo uploads
-- /TODO (PHP): Display product photos as a slider/gallery on product detail page
-
----
-
 ## 6. Favorites/Wishlist ✅
 - /TODO (SQL): Create `wishlists` table (`wishlist_id`, `user_id`, `product_id`)
 - /TODO (PHP): Add “Add to Wishlist” button on product pages
