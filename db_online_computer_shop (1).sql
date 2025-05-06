@@ -165,8 +165,7 @@ CREATE TABLE `orders` (
   `tax_amount` decimal(10,2) DEFAULT NULL,
   `subtotal` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
+  ALTER TABLE `orders` ADD `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 -- Dumping data for table `orders`
 --
 
