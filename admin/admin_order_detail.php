@@ -9,10 +9,10 @@ include '../includes/header.php';
 include '../db.php';
 include '../base.php';
 
-$order_id = $_GET['id'];
+$Order_ID = $_GET['id'];
 
 // Fetch order details
-$order = getOrderDetails($conn, $order_id);
+$order = getOrderDetails($conn, $Order_ID);
 
 // If order not found, display an error and stop the script
 if (!$order) {
@@ -22,14 +22,14 @@ if (!$order) {
 }
 
 // Fetch order items
-$order_items = getOrderItems($conn, $order_id);
+$order_items = getOrderItems($conn, $Order_ID);
 ?>
 
 <h2>Order Details (Admin)</h2>
-<p><strong>Order ID:</strong> <?php echo $order['order_id']; ?></p>
+<p><strong>Order ID:</strong> <?php echo $order['Order_ID']; ?></p>
 <p><strong>User:</strong> <?php echo htmlspecialchars($order['username']); ?></p>
-<p><strong>Total Amount:</strong> $<?php echo number_format($order['total_amount'], 2); ?></p>
-<p><strong>Status:</strong> <?php echo $order['order_status']; ?></p>
+<p><strong>Total Amount:</strong> $<?php echo number_format($order['Total_Price'], 2); ?></p>
+<p><strong>Status:</strong> <?php echo $order['Status']; ?></p>
 <p><strong>Date:</strong> <?php echo $order['created_at']; ?></p>
 
 <h3>Order Items</h3>

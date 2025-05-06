@@ -6,14 +6,14 @@ require_once '../base.php';
 require_once '../db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = trim($_POST['username']);
-    $email = trim($_POST['email']);
+    $Username = trim($_POST['Username']);
+    $Email = trim($_POST['Email']);
     $password = trim($_POST['password']);
     $gender = trim($_POST['gender']);
     $birthday = trim($_POST['birthday']);
     $address = trim($_POST['address']);
 
-    if (registerUser($conn, $username, $email, $password, $gender, $birthday, $address)) {
+    if (registerUser($conn, $Username, $Email, $password, $gender, $birthday, $address)) {
         echo '<p>User registered successfully.</p>';
         header("Location: login.php");
         exit();
@@ -26,11 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <section class="register">
     <h2>Register</h2>
     <form method="POST" action="register.php">
-        <label for="username">Username:</label>
-        <input type="text" name="username" required><br>
+    <label for="Username">Username:</label>
+    <input type="text" name="Username" required><br>
         
-        <label for="email">Email:</label>
-        <input type="email" name="email" required><br>
+    <label for="Email">Email:</label>
+    <input type="Email" name="Email" required><br>
         
         <label for="password">Password:</label>
         <input type="password" name="password" required><br>

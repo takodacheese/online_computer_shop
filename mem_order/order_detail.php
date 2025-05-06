@@ -10,7 +10,7 @@ include '../includes/header.php';
 include '../db.php';
 include '../base.php';
 
-$order_id = $_GET['id'];
+$Order_ID = $_GET['id'];
 $message = '';
 
 // Handle cancellation
@@ -23,17 +23,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order'])) {
         // For processing orders, store the cancellation request
         $stmt = $conn->prepare("
             INSERT INTO order_cancellation_requests 
-            (order_id, user_id, reason, created_at) 
+            (Order_ID, user_id, reason, created_at) 
             VALUES (?, ?, ?, CURRENT_TIMESTAMP)
         ");
-        if ($stmt->execute([$order_id, $_SESSION['user_id'], $reason])) {
+        if ($stmt->execute([$Order_ID, $_SESSION['user_id'], $reason])) {
             $message = '<div class="success">Cancellation request submitted. An admin will review your request.</div>';
         } else {
             $message = '<div class="error">Failed to submit cancellation request.</div>';
         }
     } else {
         // For pending orders, cancel directly
-        if (cancelOrder($conn, $order_id, $reason)) {
+        if (cancelOrder($conn, $Order_ID, $reason)) {
             $message = '<div class="success">Order cancelled successfully. Your items have been returned to stock.</div>';
         } else {
             $message = '<div class="error">Failed to cancel order.</div>';
@@ -42,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order'])) {
 }
 
 // Fetch order details
-$stmt = $conn->prepare("SELECT * FROM orders WHERE order_id = ? AND user_id = ?");
-$stmt->execute([$order_id, $_SESSION['user_id']]);
+$stmt = $conn->prepare("SELECT * FROM orders WHERE Order_ID = ? AND user_id = ?");
+$stmt->execute([$Order_ID, $_SESSION['user_id']]);
 $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$order) {
@@ -53,21 +53,24 @@ if (!$order) {
 }
 
 // Fetch order items
-$stmt = $conn->prepare("SELECT order_items.*, products.name 
-                        FROM order_items 
-                        JOIN products ON order_items.product_id = products.product_id 
-                        WHERE order_items.order_id = ?");
-$stmt->execute([$order_id]);
+$stmt = $conn->prepare("SELECT od.*, p.Product_Name 
+                        FROM Order_Details od
+                        JOIN Product p ON od.Product_ID = p.Product_ID 
+                        WHERE od.Order_ID = ?");
+$stmt->execute([$Order_ID]);
 $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Check if there's an existing cancellation request
-$stmt = $conn->prepare("
-    SELECT * FROM order_cancellation_requests 
-    WHERE order_id = ? AND user_id = ? 
-    ORDER BY created_at DESC LIMIT 1
-");
-$stmt->execute([$order_id, $_SESSION['user_id']]);
-$cancellation_request = $stmt->fetch(PDO::FETCH_ASSOC);
+// Disabled: table does not exist in your DB
+// $stmt = $conn->prepare("
+//     SELECT * FROM order_cancellation_requests 
+//     WHERE Order_ID = ? AND user_id = ? 
+//     ORDER BY created_at DESC LIMIT 1
+// ");
+// $stmt->execute([$Order_ID, $_SESSION['user_id']]);
+// $cancellation_request = $stmt->fetch(PDO::FETCH_ASSOC);
+$cancellation_request = null; // Table not present, skip cancellation request check
+
 ?>
 
 <h2>Order Details</h2>

@@ -14,7 +14,7 @@ if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
 }
 
 // Check if stock needs to be deducted from a successful order
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Order_ID'])) {
     $productId = $_POST['Product_ID'] ?? null;
     $quantity = (int)($_POST['quantity'] ?? 1);
     if ($productId) {

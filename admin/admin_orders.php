@@ -29,13 +29,13 @@ $orders = getAllOrders($conn);
     <tbody>
         <?php foreach ($orders as $order): ?>
             <tr>
-                <td><?php echo $order['order_id']; ?></td>
+                <td><?php echo $order['Order_ID']; ?></td>
                 <td><?php echo htmlspecialchars($order['username']); ?></td>
-                <td>$<?php echo number_format($order['total_amount'], 2); ?></td>
-                <td><?php echo $order['order_status']; ?></td>
+                <td>$<?php echo number_format($order['Total_Price'], 2); ?></td>
+                <td><?php echo $order['Status']; ?></td>
                 <td><?php echo $order['created_at']; ?></td>
                 <td>
-                    <a href="admin_order_detail.php?id=<?php echo $order['order_id']; ?>">View Details</a>
+                    <a href="admin_order_detail.php?id=<?php echo $order['Order_ID']; ?>">View Details</a>
                 </td>
             </tr>
         <?php endforeach; ?>
