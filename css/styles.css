@@ -230,6 +230,12 @@ button:hover, .btn:hover {
     flex-direction: column;
     align-items: center;
     gap: 12px;
+    border: 1px solid rgb(255, 255, 255); /* white border matching √1 frame */
+    box-shadow: 
+        0 -3px 3px rgba(73, 0, 255, 10),    /* Top shadow */
+        0 3px 3px rgba(73, 0, 255, 10),      /* bottom shadow */
+        -3px 0 3px rgba(73, 0, 255, 10),    /* Left shadow */
+        3px 0 3px rgba(73, 0, 255, 10);     /* Right shadow */
 }
 
 .product:hover {
@@ -1265,11 +1271,6 @@ header {
         padding: 15px 20px;
     }
     
-    .nav-link {
-        margin: 0 8px;
-        padding: 4px 8px;
-    }
-    
     .hero {
         padding: 80px 20px;
     }
@@ -1652,6 +1653,12 @@ nav a:hover, .navbar a:hover, header a:hover {
     gap: 10px;
     justify-content: center;
     margin-top: 15px;
+    border: 1px solid rgb(255, 255, 255); /* white border matching √1 frame */
+    box-shadow: 
+        0 -3px 3px rgba(73, 0, 255, 10),    /* Top shadow */
+        0 3px 3px rgba(73, 0, 255, 10),      /* bottom shadow */
+        -3px 0 3px rgba(73, 0, 255, 10),    /* Left shadow */
+        3px 0 3px rgba(73, 0, 255, 10);     /* Right shadow */
 }
 .product-actions a, .product-actions button, .add-to-cart-form button, .submit-review {
     background: linear-gradient(90deg, #23263a 0%, #2f2b5c 100%);
