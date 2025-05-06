@@ -42,6 +42,23 @@
             <?php endif; ?>
         </nav>
     </header>
+    <?php if (isset($_SESSION['success_message'])): ?>
+        <div class="success-popup" id="flash-message">
+            <?= htmlspecialchars($_SESSION['success_message']) ?>
+        </div>
+        <script>
+            window.addEventListener('DOMContentLoaded', function() {
+                var msg = document.getElementById('flash-message');
+                if (msg) {
+                    setTimeout(function() {
+                        msg.classList.add('fade-out');
+                        setTimeout(function() { msg.style.display = 'none'; }, 500);
+                    }, 3000);
+                }
+            });
+        </script>
+        <?php unset($_SESSION['success_message']); ?>
+    <?php endif; ?>
 
     <script>
         $(document).ready(function() {

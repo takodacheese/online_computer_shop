@@ -18,6 +18,11 @@ try {
     if (!$product) {
         throw new Exception("Product not found.");
     }
+    // Map DB keys to legacy keys for template compatibility
+    $product['Product_Name'] = $product['name'];
+    $product['Product_Description'] = $product['description'];
+    $product['Product_Price'] = $product['price'];
+    $product['Stock_Quantity'] = $product['stock'];
 
     // Get reviews for this product
     $reviews = getReviewsByProductId($conn, $product_id);

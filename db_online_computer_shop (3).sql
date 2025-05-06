@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 06, 2025 at 03:20 PM
+-- Generation Time: May 06, 2025 at 05:42 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -96,13 +96,7 @@ CREATE TABLE `cart` (
 --
 
 INSERT INTO `cart` (`Cart_ID`, `User_ID`, `Product_ID`, `Quantity`, `Total_Price_Cart`, `Added_Date`) VALUES
-(1, 'U00001', 'P002', 1, 999.99, '2025-05-06 18:30:54'),
-(2, 'U00001', 'P005', 2, 9869.85, '2025-05-06 18:30:55'),
-(3, 'U00001', 'P022', 1, 39.99, '2025-05-06 18:30:56'),
-(4, 'U00001', 'P013', 6, 2799.93, '2025-05-06 18:30:56'),
-(5, 'U00001', 'P026', 1, 249.99, '2025-05-06 18:30:57'),
-(6, 'U00001', 'P012', 1, 69.99, '2025-05-06 18:30:59'),
-(7, 'U00001', 'P029', 2, 5697.00, '2025-05-06 21:14:25');
+(15, 'ADM001', 'P005', 1, 3289.95, '2025-05-06 23:20:03');
 
 -- --------------------------------------------------------
 
@@ -163,16 +157,23 @@ CREATE TABLE `orders` (
   `Shipping_Cost` decimal(10,2) DEFAULT NULL,
   `Order_Quantity` varchar(10) DEFAULT NULL,
   `tax_amount` decimal(10,2) DEFAULT NULL,
-  `subtotal` decimal(10,2) DEFAULT NULL
+  `subtotal` decimal(10,2) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
   ALTER TABLE `orders` ADD `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`Order_ID`, `User_ID`, `Total_Price`, `Status`, `Shipping_Cost`, `Order_Quantity`, `tax_amount`, `subtotal`) VALUES
-(1, 'U00001', 0.00, 'Pending', 0.00, '1', 0.00, 0.00),
-(2, 'U00001', 0.00, 'Pending', 0.00, '1', 0.00, 0.00);
+INSERT INTO `orders` (`Order_ID`, `User_ID`, `Total_Price`, `Status`, `Shipping_Cost`, `Order_Quantity`, `tax_amount`, `subtotal`, `created_at`) VALUES
+(23, 'U00001', 3289.95, 'Pending', 0.00, '1', 0.00, 3289.95, '2025-05-06 22:51:07'),
+(24, 'U00001', 3289.95, 'Pending', 0.00, '1', 0.00, 3289.95, '2025-05-06 23:05:26'),
+(25, 'U00001', 1389.00, 'Pending', 0.00, '1', 0.00, 1389.00, '2025-05-06 23:05:46'),
+(26, 'U00001', 1389.00, 'Pending', 0.00, '1', 0.00, 1389.00, '2025-05-06 23:06:52'),
+(27, 'U00001', 1389.00, 'Pending', 0.00, '1', 0.00, 1389.00, '2025-05-06 23:06:53'),
+(28, 'U00001', 3264.95, 'Pending', 0.00, '1', 0.00, 3264.95, '2025-05-06 23:08:04'),
+(29, 'U00001', 3264.95, 'Pending', 0.00, '1', 0.00, 3264.95, '2025-05-06 23:09:04'),
+(30, 'ADM001', 3289.95, 'Pending', 0.00, '1', 0.00, 3289.95, '2025-05-06 23:20:06');
 
 -- --------------------------------------------------------
 
@@ -202,6 +203,22 @@ CREATE TABLE `order_details` (
   `Quantity` int(11) NOT NULL,
   `Price` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_details`
+--
+
+INSERT INTO `order_details` (`Order_Detail_ID`, `Order_ID`, `Product_ID`, `Quantity`, `Price`) VALUES
+(1, '23', 'P005', 1, 3289.95),
+(2, '24', 'P005', 1, 3289.95),
+(3, '25', 'P022', 1, 1389.00),
+(4, '26', 'P022', 1, 1389.00),
+(5, '27', 'P022', 1, 1389.00),
+(6, '28', 'P013', 1, 1875.95),
+(7, '28', 'P022', 1, 1389.00),
+(8, '29', 'P013', 1, 1875.95),
+(9, '29', 'P022', 1, 1389.00),
+(10, '30', 'P005', 1, 3289.95);
 
 -- --------------------------------------------------------
 
@@ -431,19 +448,19 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `Cart_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `Cart_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `Order_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `Order_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `Order_Detail_ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Order_Detail_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `pc_build`

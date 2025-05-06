@@ -61,7 +61,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <form method="GET" action="products.php" class="filter-form">
         <div class="filter-group">
             <label for="category_id">Category:</label>
-            <select name="category_id" id="category_id" onchange="this.form.submit()">
+            <select name="category_id" id="category_id">
                 <option value="">All Categories</option>
                 <?php foreach ($categories as $cat): ?>
                     <option value="<?= htmlspecialchars($cat['Category_ID']) ?>" <?= $selected_category == $cat['Category_ID'] ? 'selected' : '' ?>>
@@ -72,7 +72,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
         <div class="filter-group">
             <label for="brand">Brand:</label>
-            <select name="brand" id="brand" onchange="this.form.submit()">
+            <select name="brand" id="brand">
                 <option value="">All Brands</option>
                 <?php foreach ($brands as $b): ?>
                     <option value="<?= htmlspecialchars($b['Brand_Name']) ?>" <?= $selected_brand == $b['Brand_Name'] ? 'selected' : '' ?>>
@@ -106,9 +106,32 @@ function clearFilters() {
     document.getElementById('brand').value = '';
     document.getElementById('price').value = 25000;
     document.getElementById('price-value').textContent = 'RM 25,000.00';
+    // Only submit if you want instant filter on clear
     document.querySelector('.filter-form').submit();
 }
 </script>
+
+<style>
+.success-popup {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #d4edda;
+    color: #155724;
+    padding: 16px 32px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 1.1em;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.5s;
+    text-align: center;
+}
+.success-popup.fade-out {
+    opacity: 0;
+}
+</style>
 
 <div class="products-bg">
     <!-- Display success message if exists -->
@@ -167,6 +190,51 @@ function clearFilters() {
         <?php endforeach; ?>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.add-to-cart-form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var formData = new FormData(form);
+            fetch('mem_order/add_to_cart.php', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showFlashMessage(data.message);
+                } else {
+                    showFlashMessage(data.message || 'Failed to add item to cart.');
+                }
+            })
+            .catch(() => {
+                showFlashMessage('An error occurred.');
+            });
+        });
+    });
+});
+function showFlashMessage(message) {
+    let msg = document.getElementById('flash-message');
+    if (!msg) {
+        msg = document.createElement('div');
+        msg.className = 'success-popup';
+        msg.id = 'flash-message';
+        document.body.appendChild(msg);
+    }
+    msg.textContent = message;
+    msg.classList.remove('fade-out');
+    msg.style.display = 'block';
+    setTimeout(function() {
+        msg.classList.add('fade-out');
+        setTimeout(function() { msg.style.display = 'none'; }, 500);
+    }, 3000);
+}
+</script>
 
 <?php
 include 'includes/footer.php';

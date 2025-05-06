@@ -12,10 +12,28 @@ include '../base.php';
 $product_id = $_POST['Product_ID'] ?? null;
 $quantity = $_POST['quantity'] ?? 1;
 
+if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+    header('Content-Type: application/json');
+    if ($product_id) {
+        if (addToCart($conn, $_SESSION['user_id'], $product_id, $quantity)) {
+            $stmt = $conn->prepare("SELECT Product_Name FROM product WHERE Product_ID = ?");
+            $stmt->execute([$product_id]);
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode([
+                'success' => true,
+                'message' => "Successfully added {$product['Product_Name']} to cart!"
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to add item to cart.']);
+        }
+    } else {
+        exit();
+    }
+    exit();
+}
+
 if (!$product_id) {
-    // Defensive: show error and stop if Product_ID is missing
-    $_SESSION['error_message'] = "Product ID missing. Please try again.";
-    header("Location: ../products.php");
+    // Defensive: if Product_ID is missing, do nothing and exit silently
     exit();
 }
 

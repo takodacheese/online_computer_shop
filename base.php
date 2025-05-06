@@ -115,6 +115,13 @@ function checkLogin() {
     }
     return true; // Allow form submission if logged in
 }
+function require_admin() {
+    session_start();
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        header("Location: login.php");
+        exit();
+    }
+}   
 // ------------------------
 // 👤 USER PROFILE
 // ------------------------
