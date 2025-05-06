@@ -38,7 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['voucher_code'])) {
     exit();
 }
 
+<<<<<<< HEAD
 $Total_Price = array_sum(array_map(function($item) {
+=======
+$total_amount = array_sum(array_map(function($item) {
+>>>>>>> parent of e496483 (Revert "Merge branch 'main' of https://github.com/takodacheese/online_computer_shop")
     return $item['price'] * $item['quantity'];
 }, $cart_items));
 
@@ -47,7 +51,11 @@ if (isset($_SESSION['voucher_discount'])) {
     if ($Total_Price < 0) $Total_Price = 0;
 }
 
+<<<<<<< HEAD
 $_SESSION['Total_Price'] = $Total_Price;
+=======
+$_SESSION['total_amount'] = $total_amount;
+>>>>>>> parent of e496483 (Revert "Merge branch 'main' of https://github.com/takodacheese/online_computer_shop")
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
     try {
@@ -59,12 +67,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
             exit();
         }
         $payment_method = $_POST['payment_method'];
+<<<<<<< HEAD
         $Order_ID = createOrder($conn, $user_id, $Total_Price);
         addOrderItems($conn, $Order_ID, $cart_items);
         if (isset($_SESSION['voucher_id'])) {
             recordVoucherUsage($conn, $_SESSION['voucher_id'], $user_id);
         }
         $_SESSION['Order_ID'] = $Order_ID;
+=======
+        $order_id = createOrder($conn, $user_id, $total_amount);
+        addOrderItems($conn, $order_id, $cart_items);
+        if (isset($_SESSION['voucher_id'])) {
+            recordVoucherUsage($conn, $_SESSION['voucher_id'], $user_id);
+        }
+        $_SESSION['order_id'] = $order_id;
+>>>>>>> parent of e496483 (Revert "Merge branch 'main' of https://github.com/takodacheese/online_computer_shop")
         // Set allowed payment methods based on user selection
         $allowed_methods = [];
         if ($payment_method === 'grabpay') {
@@ -83,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
                         'price_data' => [
                             'currency' => 'myr',
                             'product_data' => [
+<<<<<<< HEAD
                                 'name' => 'Order #' . $Order_ID,
                                 'description' => 'Computer Shop Order',
                             ],
@@ -112,6 +130,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
         if (isset($Order_ID)) {
             $stmt = $conn->prepare("DELETE FROM Orders WHERE Order_ID = ?");
             $stmt->execute([$Order_ID]);
+        }
+        $_SESSION['error'] = "Failed to process payment: " . $e->getMessage();
+        header("Location: cart.php");
+        exit();
+    }
+    
+    $_SESSION['order_id'] = $order_id;
+
+    // Create Stripe Checkout Session for GrabPay and FPX
+    $stripe = new \Stripe\StripeClient(STRIPE_SECRET_KEY);
+    $checkout_session = $stripe->checkout->sessions->create([
+        'payment_method_types' => ['grabpay', 'fpx'],
+        'line_items' => [[
+            'price_data' => [
+                'currency' => 'myr',
+                'product_data' => [
+                    'name' => 'Order #' . $order_id,
+=======
+                                'name' => 'Order #' . $order_id,
+                                'description' => 'Computer Shop Order',
+                            ],
+                            'unit_amount' => round($total_amount * 100),
+                        ],
+                        'quantity' => 1,
+                    ]
+>>>>>>> parent of e496483 (Revert "Merge branch 'main' of https://github.com/takodacheese/online_computer_shop")
+                ],
+                'mode' => 'payment',
+                'success_url' => 'http://' . $_SERVER['HTTP_HOST'] . '/mem_order/payment_success.php?order_id=' . $order_id,
+                'cancel_url' => 'http://' . $_SERVER['HTTP_HOST'] . '/mem_order/payment_cancel.php',
+                'metadata' => [
+                    'order_id' => $order_id,
+                    'user_id' => $user_id
+                ],
+            ]);
+            header('Location: ' . $checkout_session->url);
+            exit();
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            error_log("Stripe API Error: " . $e->getMessage());
+            $_SESSION['error'] = "Payment processing error: " . $e->getMessage();
+            header("Location: cart.php");
+            exit();
+        }
+    } catch (Exception $e) {
+        error_log("Payment error: " . $e->getMessage());
+        if (isset($order_id)) {
+            $stmt = $conn->prepare("DELETE FROM Orders WHERE Order_ID = ?");
+            $stmt->execute([$order_id]);
         }
         $_SESSION['error'] = "Failed to process payment: " . $e->getMessage();
         header("Location: cart.php");
@@ -153,7 +219,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
                 <?php endforeach; ?>
                     <tr class="checkout-total-row">
                         <td colspan="2" class="checkout-total-label">Total:</td>
+<<<<<<< HEAD
                         <td class="checkout-total-value">RM <?= number_format($Total_Price, 2) ?></td>
+=======
+                        <td class="checkout-total-value">RM <?= number_format($total_amount, 2) ?></td>
+>>>>>>> parent of e496483 (Revert "Merge branch 'main' of https://github.com/takodacheese/online_computer_shop")
                     </tr>
                 </tbody>
             </table>
@@ -172,4 +242,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
     </div>
 </div>
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> parent of e496483 (Revert "Merge branch 'main' of https://github.com/takodacheese/online_computer_shop")

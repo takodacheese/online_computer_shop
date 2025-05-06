@@ -1,8 +1,6 @@
 <?php
 // db.php
-if (!defined('STRIPE_SECRET_KEY')) {
-    define('STRIPE_SECRET_KEY', '');
-}
+const STRIPE_SECRET_KEY = '';
 
 $host = 'localhost';
 $dbname = 'db_online_computer_shop';
