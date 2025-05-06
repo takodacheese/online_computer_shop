@@ -1,9 +1,5 @@
 <?php
 // db.php
-// Database connection and Stripe keys for Online Computer Shop
-
-const STRIPE_SECRET_KEY = '';
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_51RLKMSPuVy5ObELRBVLUQ3UYmtN2V7aHMokiNWNGiLBOCbMKwTniUr2crrwV1BTa7RcYsWNfZyx7UbErsbqCvJvE00NDktQShn';
 if (!defined('STRIPE_SECRET_KEY')) {
     define('STRIPE_SECRET_KEY', '');
 }
@@ -19,5 +15,6 @@ try {
     $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     echo "Connection failed: " . $e->getMessage();
-    exit;
 }
+
+?>
