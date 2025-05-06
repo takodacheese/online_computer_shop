@@ -11,20 +11,13 @@ include '../db.php';
 
 // Handle search
 $search = isset($_GET['search']) ? $_GET['search'] : '';
-$stmt = $conn->prepare("SELECT * FROM users WHERE Username LIKE ? OR Email LIKE ?");
+$stmt = $conn->prepare("SELECT * FROM User WHERE Username LIKE ? OR Email LIKE ?");
 $stmt->execute(["%$search%", "%$search%"]);
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<h2>Member List</h2>
-
-<!-- Search Form -->
-<form method="GET" action="members.php">
-    <input type="text" name="search" placeholder="Search by Username or Email" value="<?php echo htmlspecialchars($search); ?>">
-    <button type="submit">Search</button>
-</form>
-
-<table border="1">
+<h2>Member List</h2>    
+<table class="member-table">
     <thead>
         <tr>
             <th>ID</th>

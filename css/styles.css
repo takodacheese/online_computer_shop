@@ -2368,3 +2368,54 @@ nav a:hover, .navbar a:hover, header a:hover {
 .admin-actions .btn-primary:hover {
     background-color: #0056b3;
 }
+/* Member List Table Styles */
+.member-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+    background-color: #150938;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.member-table thead {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.member-table th, .member-table td {
+    padding: 12px 15px;
+    border: 1px solid #150938;
+}
+
+.member-table th {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.member-table tbody tr:nth-child(even) {
+    background-color: #0a041f;
+}
+
+.member-table tbody tr:hover {
+    background-color: #0a3e10;
+}
+
+.member-table td a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 6px 12px;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.member-table td a:hover {
+    background-color: #007bff;
+    color: #ffffff;
+}
