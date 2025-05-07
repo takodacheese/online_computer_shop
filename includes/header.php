@@ -22,25 +22,26 @@
         <h1>Virtual Escapes Studio</h1>
         </div>
         <nav>
-        <a href="../index.php" class="nav-link">Home</a>
+    <a href="../index.php" class="nav-link">Home</a>
     <?php 
     // Check if the user is an admin
     if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-              <a href="../admin/admin_dashboard.php" class="nav-link">Admin</a>
-            <?php endif; ?>
-              <a href="../products.php" class="nav-link">Products</a>
-              <a href="../mem_order/cart.php" class="nav-link">Cart</a>
+        <a href="../admin/admin_dashboard.php" class="nav-link">Admin</a>
+    <?php else: ?>
+        <a href="../mem_order/cart.php" class="nav-link">Cart</a>
+    <?php endif; ?>
+    <a href="../products.php" class="nav-link">Products</a>
 
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <!-- Display Profile and Logout links if the user is logged in -->
-                <a href="../member/profile.php"class="nav-link">Profile  </a>
-                <a href="../acc_security/logout.php" id="logout-link">Logout</a>
-            <?php else: ?>
-                <!-- Display Login and Register links if the user is not logged in -->
-                <a href="../acc_security/login.php"class="nav-link">Login</a>
-                <a href="../acc_security/register.php"class="nav-link">Register</a>
-            <?php endif; ?>
-        </nav>
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <!-- Display Profile and Logout links if the user is logged in -->
+        <a href="../member/profile.php" class="nav-link">Profile</a>
+        <a href="../acc_security/logout.php" id="logout-link">Logout</a>
+    <?php else: ?>
+        <!-- Display Login and Register links if the user is not logged in -->
+        <a href="../acc_security/login.php" class="nav-link">Login</a>
+        <a href="../acc_security/register.php" class="nav-link">Register</a>
+    <?php endif; ?>
+</nav>
     </header>
     <?php if (isset($_SESSION['success_message'])): ?>
         <div class="success-popup" id="flash-message">
