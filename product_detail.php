@@ -112,16 +112,15 @@ try {
                 <?php foreach ($reviews as $review): ?>
                     <div class="review-item">
                         <div class="review-header">
-                            <span class="reviewer-name"><?= htmlspecialchars($review['username']) ?></span>
-                            <span class="review-date"><?= date('M j, Y', strtotime($review['Review_Date'])) ?></span>
-                            <div class="review-stars">
-                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                    <span class="star <?= $i <= $review['rating'] ? 'filled' : '' ?>">⭐</span>
-                                <?php endfor; ?>
-                            </div>
-                            <span class="review-date"><?= date('F j, Y', strtotime($review['created_at'])) ?></span>
+                            <span class="reviewer-name"><?= htmlspecialchars($review['Username'] ?? 'Unknown User') ?></span>
+<span class="review-date"><?= date('M j, Y', strtotime($review['Review_Date'])) ?></span>
+<div class="review-stars">
+    <?php for ($i = 1; $i <= 5; $i++): ?>
+        <span class="star <?= $i <= (intval($review['Rating'] ?? 0)) ? 'filled' : 'empty' ?>">⭐</span>
+    <?php endfor; ?>
+</div>
                         </div>
-                        <p class="review-text"><?= htmlspecialchars($review['comment']) ?></p>
+                        <p class="review-text"><?= htmlspecialchars($review['Comment'] ?? '') ?></p>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>

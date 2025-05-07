@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $gender = sanitizeInput($_POST['gender']);
         $message = updateUserProfile($conn, $user_id, $username, $email, $address, $birthdate, $gender);
         if (isset($_FILES['profile_photo'])) {
-            $message = uploadProfilePhoto($conn, $user_id, $_FILES['profile_photo']);
+            $message = uploadProfilePhoto($user_id, $_FILES['profile_photo']);
         }
         $user = getUserById($conn, $user_id); // Refresh user details
     }
@@ -37,7 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="profile-section">
         <div class="profile-main-info">
             <div class="profile-photo-preview">
-                <img src="<?= !empty($user['profile_photo']) ? htmlspecialchars($user['profile_photo']) : '../images/no-image.png'; ?>" alt="Profile Photo" width="120" height="120">
+                <?php
+$profile_img = "../images/profiles/" . $user_id . ".jpg";
+if (!file_exists($profile_img)) {
+    $profile_img = "../images/profiles/default.jpg";
+}
+?>
+<img src="<?= htmlspecialchars($profile_img) ?>" alt="Profile Photo" width="120" height="120">
             </div>
             <h2 class="profile-section-title" style="margin-bottom: 0;">Profile</h2>
         </div>
