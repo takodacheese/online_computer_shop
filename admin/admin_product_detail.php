@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-
+<div class="admin-dashboard">
 <h2>Edit Product (Admin)</h2>
 <form method="POST" action="admin_product_detail.php?id=<?php echo $product_id; ?>" enctype="multipart/form-data" class="edit-product-form">
     <label for="name">Name:</label>
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </form>
 
 <a href="admin_products.php">Back to Product List</a>
-
+</div>
 <?php
 include '../includes/footer.php';
 ?>

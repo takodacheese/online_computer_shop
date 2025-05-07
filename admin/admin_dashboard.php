@@ -8,10 +8,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 include '../includes/header.php';
 ?>
-<div class="adminboard">
+<div class="admin-dashboard">
     <h2>Admin Dashboard</h2>
     <p>Welcome to the Admin Dashboard. Use the buttons below to manage the system.</p>
-    <div class="admin-actions">
+    
         <a href="admin_products.php" class="btn btn-primary">Manage Products</a>
         <a href="../member/member.php" class="btn btn-primary">Manage Members</a>
     </div>
