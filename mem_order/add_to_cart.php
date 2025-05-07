@@ -40,20 +40,16 @@ if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQU
         $product_id = $_POST['Product_ID'] ?? null;
         $quantity = $_POST['quantity'] ?? 1;
         
-        if ($product_id) {
-            if (addToCart($conn, $_SESSION['user_id'], $product_id, $quantity)) {
-                $stmt = $conn->prepare("SELECT Product_Name FROM product WHERE Product_ID = ?");
-                $stmt->execute([$product_id]);
-                $product = $stmt->fetch(PDO::FETCH_ASSOC);
-                echo json_encode([
-                    'success' => true,
-                    'message' => "Successfully added {$product['Product_Name']} to cart!"
-                ]);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Failed to add item to cart.']);
-            }
+        if (addToCart($conn, $_SESSION['user_id'], $product_id, $quantity)) {
+            $stmt = $conn->prepare("SELECT Product_Name FROM product WHERE Product_ID = ?");
+            $stmt->execute([$product_id]);
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode([
+                'success' => true,
+                'message' => "Successfully added {$product['Product_Name']} to cart!"
+            ]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'No product ID provided.']);
+            echo json_encode(['success' => false, 'message' => 'Failed to add item to cart.']);
         }
     }
     exit();

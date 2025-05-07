@@ -106,32 +106,9 @@ function clearFilters() {
     document.getElementById('brand').value = '';
     document.getElementById('price').value = 25000;
     document.getElementById('price-value').textContent = 'RM 25,000.00';
-    // Only submit if you want instant filter on clear
     document.querySelector('.filter-form').submit();
 }
 </script>
-
-<style>
-.success-popup {
-    position: fixed;
-    top: 70px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #d4edda;
-    color: #155724;
-    padding: 16px 32px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    font-size: 1.1em;
-    z-index: 9999;
-    opacity: 1;
-    transition: opacity 0.5s;
-    text-align: center;
-}
-.success-popup.fade-out {
-    opacity: 0;
-}
-</style>
 
 <div class="products-bg">
     <!-- Display success message if exists -->
@@ -235,7 +212,6 @@ function showFlashMessage(message) {
     }, 3000);
 }
 </script>
-
 <?php
 include 'includes/footer.php';
 ?>

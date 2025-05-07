@@ -21,70 +21,7 @@ $cart_items = getCartItems($conn, $user_id);
 <?php if (empty($cart_items)): ?>
     <p class="cart-empty">Your cart is empty.</p>
 <?php else: ?>
-    <style>
-        .cart-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: var(--secondary-bg);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.28);
-        }
-        .cart-table th, .cart-table td {
-            padding: 16px 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-color);
-        }
-        .cart-table th {
-            background: var(--primary-bg);
-            color: #00fff7;
-            font-family: 'Orbitron', Arial, sans-serif;
-            letter-spacing: 1px;
-            font-size: 1.1em;
-        }
-        .cart-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-        .cart-table td.actions {
-            text-align: center;
-        }
-        .cart-table td.product-cell {
-            position: relative;
-            cursor: pointer;
-        }
-        .cart-product-hover-img {
-            display: none;
-            position: absolute;
-            left: 90%;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 120px;
-            height: 120px;
-            object-fit: contain;
-            background: #181a2a;
-            border: 2px solid var(--accent-color);
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.45);
-            z-index: 99;
-            pointer-events: none;
-        }
-        .cart-table td.product-cell:hover .cart-product-hover-img {
-            display: block;
-        }
-        .cart-total-row td {
-            font-weight: bold;
-            color: #00fff7;
-            font-size: 1.1em;
-            background: var(--primary-bg);
-        }
-        .cart-empty {
-            color: var(--text-muted);
-            text-align: center;
-            padding: 36px 0;
-        }
-    </style>
+
     <table class="cart-table">
         <thead>
             <tr>
@@ -120,13 +57,20 @@ $cart_items = getCartItems($conn, $user_id);
                             <?php endif; ?>
                         </span>
                     </td>
-                    <td><?= $item['quantity']; ?></td>
+                    <td>
+                        <div class="quantity-input">
+                            <span class="current-quantity">Current: <?= $item['quantity']; ?></span>
+                            <input type="number" min="1" max="<?= $item['quantity']; ?>" value="1" class="quantity-input-field">
+                        </div>
+                    </td>
                     <td>RM <?= number_format($item['price'], 2); ?></td>
                     <td>RM <?= number_format($item['price'] * $item['quantity'], 2); ?></td>
                     <td class="actions">
-                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                            <a href="remove_from_cart.php?cart_id=<?= htmlspecialchars($item['Cart_ID']); ?>" class="cart-remove-btn">Remove</a>
-                        </div>
+                        <form action="remove_from_cart.php" method="POST" class="remove-form">
+                            <input type="hidden" name="cart_id" value="<?= htmlspecialchars($item['Cart_ID']); ?>">
+                            <input type="hidden" name="quantity" value="1" class="remove-quantity">
+                            <button type="submit" class="cart-remove-btn">Remove</button>
+                        </form>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -144,6 +88,28 @@ $cart_items = getCartItems($conn, $user_id);
 <!-- Flash message auto-hide script -->
 <script>
     window.addEventListener('DOMContentLoaded', function() {
+        // Handle quantity input changes
+        document.querySelectorAll('.quantity-input-field').forEach(input => {
+            input.addEventListener('change', function() {
+                const form = this.closest('.remove-form');
+                const removeQuantity = form.querySelector('.remove-quantity');
+                removeQuantity.value = this.value;
+            });
+        });
+
+        // Handle form submission
+        document.querySelectorAll('.remove-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                // Get the input and hidden field
+                const input = this.querySelector('.quantity-input-field');
+                const removeQuantity = this.querySelector('.remove-quantity');
+                
+                // Update the hidden field value
+                removeQuantity.value = input.value;
+            });
+        });
+
+        // Auto-hide flash message
         var msg = document.getElementById('flash-message');
         if (msg) {
             setTimeout(function() {
