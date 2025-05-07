@@ -9,47 +9,101 @@ if (!isset($_SESSION['user_id'])) {
 require_once '../db.php';
 include '../base.php';
 
-$product_id = $_POST['Product_ID'] ?? null;
-$quantity = $_POST['quantity'] ?? 1;
-
+// Handle single item or multiple components from PC Builder
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
     header('Content-Type: application/json');
-    if ($product_id) {
-        if (addToCart($conn, $_SESSION['user_id'], $product_id, $quantity)) {
+    
+    // Check if this is a PC Builder request
+    if (isset($_POST['components'])) {
+        $components = json_decode($_POST['components'], true);
+        $success = true;
+        $messages = [];
+        
+        foreach ($components as $component) {
+            if (!addToCart($conn, $_SESSION['user_id'], $component['Product_ID'], $component['quantity'])) {
+                $success = false;
+                break;
+            }
+            
             $stmt = $conn->prepare("SELECT Product_Name FROM product WHERE Product_ID = ?");
-            $stmt->execute([$product_id]);
+            $stmt->execute([$component['Product_ID']]);
             $product = $stmt->fetch(PDO::FETCH_ASSOC);
-            echo json_encode([
-                'success' => true,
-                'message' => "Successfully added {$product['Product_Name']} to cart!"
-            ]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to add item to cart.']);
+            $messages[] = "Successfully added {$product['Product_Name']} to cart!";
         }
+        
+        echo json_encode([
+            'success' => $success,
+            'message' => $success ? implode("\n", $messages) : 'Failed to add components to cart.'
+        ]);
     } else {
-        exit();
+        // Handle single item
+        $product_id = $_POST['Product_ID'] ?? null;
+        $quantity = $_POST['quantity'] ?? 1;
+        
+        if ($product_id) {
+            if (addToCart($conn, $_SESSION['user_id'], $product_id, $quantity)) {
+                $stmt = $conn->prepare("SELECT Product_Name FROM product WHERE Product_ID = ?");
+                $stmt->execute([$product_id]);
+                $product = $stmt->fetch(PDO::FETCH_ASSOC);
+                echo json_encode([
+                    'success' => true,
+                    'message' => "Successfully added {$product['Product_Name']} to cart!"
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to add item to cart.']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'No product ID provided.']);
+        }
     }
     exit();
 }
 
-if (!$product_id) {
-    // Defensive: if Product_ID is missing, do nothing and exit silently
-    exit();
-}
-
-if (addToCart($conn, $_SESSION['user_id'], $product_id, $quantity)) {
-    // Get product name for success message
-    $stmt = $conn->prepare("SELECT Product_Name FROM product WHERE Product_ID = ?");
-    $stmt->execute([$product_id]);
-    $product = $stmt->fetch(PDO::FETCH_ASSOC);
+// Handle non-AJAX requests
+if (isset($_POST['components'])) {
+    $components = json_decode($_POST['components'], true);
+    $success = true;
+    $messages = [];
     
-    // Store success message in session
-    $_SESSION['success_message'] = "Successfully added {$product['Product_Name']} to cart!";
+    foreach ($components as $component) {
+        if (!addToCart($conn, $_SESSION['user_id'], $component['Product_ID'], $component['quantity'])) {
+            $success = false;
+            break;
+        }
+        
+        $stmt = $conn->prepare("SELECT Product_Name FROM product WHERE Product_ID = ?");
+        $stmt->execute([$component['Product_ID']]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        $messages[] = "Successfully added {$product['Product_Name']} to cart!";
+    }
     
-    // Redirect back to products page
-    header("Location: ../products.php");
-    exit();
+    if ($success) {
+        $_SESSION['success_message'] = implode("\n", $messages);
+        header("Location: ../mem_order/cart.php");
+    } else {
+        $_SESSION['error_message'] = 'Failed to add components to cart.';
+        header("Location: ../pc_builder.php");
+    }
 } else {
-    echo "Failed to add item to cart.";
+    // Handle single item
+    $product_id = $_POST['Product_ID'] ?? null;
+    $quantity = $_POST['quantity'] ?? 1;
+    
+    if (!$product_id) {
+        exit();
+    }
+    
+    if (addToCart($conn, $_SESSION['user_id'], $product_id, $quantity)) {
+        $stmt = $conn->prepare("SELECT Product_Name FROM product WHERE Product_ID = ?");
+        $stmt->execute([$product_id]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $_SESSION['success_message'] = "Successfully added {$product['Product_Name']} to cart!";
+        header("Location: ../products.php");
+    } else {
+        $_SESSION['error_message'] = 'Failed to add item to cart.';
+        header("Location: ../products.php");
+    }
 }
+exit();
 ?>

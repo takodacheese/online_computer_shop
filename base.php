@@ -607,14 +607,20 @@ function deductStock(PDO $conn, int $productId, int $quantity): void {
  */
 function updateOrderStatus($conn, $Order_ID, $status, $notes = null) {
     // Update order status
-    $stmt = $conn->prepare("UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE Order_ID = ?");
+    $stmt = $conn->prepare("UPDATE orders SET status = ?, created_at = CURRENT_TIMESTAMP WHERE Order_ID = ?");
     $success = $stmt->execute([$status, $Order_ID]);
     
-    // Add to order history
-    if ($success) {
-        $updated_by = $_SESSION['user_id'] ?? null;
-        $stmt = $conn->prepare("INSERT INTO order_history (Order_ID, status, updated_by, notes) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$Order_ID, $status, $updated_by, $notes]);
+    // Add to order cancellation table if status is Cancelled
+    if ($success && $status === 'Cancelled') {
+        // Generate a unique Cancellation_ID (e.g., CAN001, CAN002, etc.)
+        $stmt = $conn->prepare("SELECT MAX(CAST(SUBSTRING(Cancellation_ID, 4) AS UNSIGNED)) as last_id FROM order_cancellation");
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $next_id = $result['last_id'] + 1;
+        $Cancellation_ID = sprintf('CAN%03d', $next_id);
+        
+        $stmt = $conn->prepare("INSERT INTO order_cancellation (Cancellation_ID, Order_ID, Approve_Status, Cancellation_Reason, Cancellation_Date) VALUES (?, ?, ?, ?, NOW())");
+        $stmt->execute([$Cancellation_ID, $Order_ID, 'Pending', $notes]);
     }
     
     return $success;
@@ -643,22 +649,27 @@ function cancelOrder($conn, $Order_ID, $reason, $admin_approval = false) {
     if ($order['status'] === 'Pending') {
         // Pending orders can be cancelled directly
         $success = updateOrderStatus($conn, $Order_ID, 'Cancelled', $reason);
-    } elseif ($order['status'] === 'Processing' && $admin_approval) {
+    } elseif ($order['status'] === 'Processing') {
         // Processing orders require admin approval
-        $success = updateOrderStatus($conn, $Order_ID, 'Cancelled', $reason);
+        $success = updateOrderStatus($conn, $Order_ID, 'Cancellation Requested', $reason);
     } else {
         return false;
     }
     
-    // If successful, restore stock for all order items
+    // If successful, try to restore stock for order items
     if ($success) {
-        $stmt = $conn->prepare("
-            UPDATE products p
-            JOIN order_items oi ON p.product_id = oi.product_id
-            SET p.stock = p.stock + oi.quantity
-            WHERE oi.Order_ID = ?
-        ");
-        $stmt->execute([$Order_ID]);
+        try {
+            $stmt = $conn->prepare("
+                UPDATE product p
+                JOIN order_details od ON p.Product_ID = od.Product_ID
+                SET p.Stock = p.Stock + od.Quantity
+                WHERE od.Order_ID = ?
+            ");
+            $stmt->execute([$Order_ID]);
+        } catch (PDOException $e) {
+            // If there's an error (like missing table), just log it and continue
+            error_log("Error restoring stock: " . $e->getMessage());
+        }
     }
     
     return $success;

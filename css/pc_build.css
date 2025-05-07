@@ -1,0 +1,86 @@
+.pc-build-form {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #2a2a2a;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.component-group {
+    margin-bottom: 1.5rem;
+}
+
+.component-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #00fff7;
+    font-weight: bold;
+}
+
+.component-group select {
+    width: 100%;
+    padding: 0.8rem;
+    background: #2a2a2a;
+    border: 1px solid #4d3aff;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.component-group select:focus {
+    outline: none;
+    border-color: #00fff7;
+    box-shadow: 0 0 0 3px rgba(0, 255, 247, 0.2);
+}
+
+.build-summary {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #3a3a3a;
+    border-radius: 8px;
+}
+
+.build-summary h3 {
+    color: #00fff7;
+    margin-bottom: 1rem;
+}
+
+.build-summary ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.build-summary li {
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.build-summary .total {
+    margin-top: 1rem;
+    font-weight: bold;
+    color: #00fff7;
+    font-size: 1.2rem;
+}
+
+.build-button {
+    width: 100%;
+    padding: 1rem;
+    background: #4d3aff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.build-button:hover {
+    background: #3d2aff;
+}
+
+.build-button:disabled {
+    background: #666;
+    cursor: not-allowed;
+}

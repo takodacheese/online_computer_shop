@@ -49,7 +49,20 @@ if ($Order_ID) {
         } else {
             // For pending orders, cancel directly
             if (cancelOrder($conn, $Order_ID, $reason)) {
-                $message = '<div class="success">Order cancelled successfully. Your items have been returned to stock.</div>';
+                $message = '<div id="flash-message" class="success">Order cancelled successfully!</div>';
+                echo '<script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const flashMessage = document.getElementById("flash-message");
+                        if (flashMessage) {
+                            flashMessage.style.display = "block";
+                            
+                            // Auto-hide after 3 seconds
+                            setTimeout(function() {
+                                flashMessage.style.display = "none";
+                            }, 3000);
+                        }
+                    });
+                </script>';
             } else {
                 $message = '<div class="error">Failed to cancel order.</div>';
             }
@@ -75,7 +88,9 @@ if ($Order_ID) {
 <div class="order-detail-container">
     <div class="order-detail-card">
         <h2 class="order-detail-heading">Order Details</h2>
-        <?php echo $message; ?>
+        <?php if ($message): ?>
+    <div id="flash-message" class="success"><?php echo $message; ?></div>
+<?php endif; ?>
         <div class="order-detail-info">
             <h3>Order Information</h3>
             <p><strong>Order ID:</strong> <?php echo htmlspecialchars($order['Order_ID']); ?></p>
