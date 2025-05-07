@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $user = getUserByEmail($conn, $email);
 
         if ($user) {
-            $token = createPasswordResetToken($conn, $user['user_id']);
+            $token = createPasswordResetToken($conn, $user['User_ID']);
             $reset_link = generateResetLink($token);
 
             // Display the reset link for testing

@@ -16,15 +16,34 @@ if (!$user) {
 }
 ?>
 
-<h2>Member Details</h2>
-<p><strong>Username:</strong> <?php echo htmlspecialchars($user['Username']); ?></p>
-<p><strong>Email:</strong> <?php echo htmlspecialchars($user['Email']); ?></p>
-<p><strong>Gender:</strong> <?php echo htmlspecialchars($user['Gender'] ?? 'Not specified'); ?></p>
-<p><strong>Birthday:</strong> <?php echo htmlspecialchars($user['Birthday'] ?? 'Not specified'); ?></p>
-<p><strong>Register Date:</strong> <?php echo htmlspecialchars($user['Register_Date']); ?></p>
-<p><strong>Address:</strong> <?php echo htmlspecialchars($user['Address']); ?></p>
-
-<a href="../member/member.php">Back to Member List</a>
+<div class="member-details-container">
+    <h2>Member Details</h2>
+    <div class="member-details-row">
+        <span class="member-details-label">Username:</span>
+        <span class="member-details-value"><?= htmlspecialchars($user['Username']) ?></span>
+    </div>
+    <div class="member-details-row">
+        <span class="member-details-label">Email:</span>
+        <span class="member-details-value"><?= htmlspecialchars($user['Email']) ?></span>
+    </div>
+    <div class="member-details-row">
+        <span class="member-details-label">Gender:</span>
+        <span class="member-details-value"><?= htmlspecialchars($user['Gender'] ?? 'Not specified') ?></span>
+    </div>
+    <div class="member-details-row">
+        <span class="member-details-label">Birthday:</span>
+        <span class="member-details-value"><?= htmlspecialchars($user['Birthday'] ?? 'Not specified') ?></span>
+    </div>
+    <div class="member-details-row">
+        <span class="member-details-label">Register Date:</span>
+        <span class="member-details-value"><?= htmlspecialchars($user['Register_Date']) ?></span>
+    </div>
+    <div class="member-details-row">
+        <span class="member-details-label">Address:</span>
+        <span class="member-details-value"><?= htmlspecialchars($user['Address']) ?></span>
+    </div>
+    <a href="../member/member.php" class="member-details-back">Back to Member List</a>
+</div>
 
 <?php
 include '../includes/footer.php';

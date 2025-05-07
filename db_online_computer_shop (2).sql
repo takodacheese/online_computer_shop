@@ -1,13 +1,32 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: May 06, 2025 at 04:36 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
-CREATE TABLE `admin` (
+--
+-- Database: `db_online_computer_shop`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin`
+--
+
 CREATE TABLE `admin` (
   `Admin_ID` char(6) NOT NULL,
   `Username` varchar(100) NOT NULL,
@@ -18,6 +37,9 @@ CREATE TABLE `admin` (
   `Phone` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `admin`
+--
 
 INSERT INTO `admin` (`Admin_ID`, `Username`, `Gender`, `Password`, `Department`, `Email`, `Phone`) VALUES
 ('ADM001', 'AhmadSalleh', 'Male', '123456', 'IT', 'ahmad.salleh@company.com', '60-123456789'),
@@ -26,13 +48,21 @@ INSERT INTO `admin` (`Admin_ID`, `Username`, `Gender`, `Password`, `Department`,
 ('ADM005', 'AliBaba', 'Male', '123456', 'Marketing', 'ali.baba@company.com', '60-1677889900'),
 ('ADM006', 'NurulHuda', 'Female', '123456', 'Customer Service', 'nurul.huda@company.com', '60-1588776655');
 
-CREATE TABLE `brand` (
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `brand`
+--
+
 CREATE TABLE `brand` (
   `Brand_ID` char(4) NOT NULL,
   `Brand_Name` varchar(100) NOT NULL,
   `Brand_Info` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `brand`
+--
 
 INSERT INTO `brand` (`Brand_ID`, `Brand_Name`, `Brand_Info`) VALUES
 ('B001', 'NVIDIA', 'Leading GPU manufacturer'),
@@ -46,7 +76,12 @@ INSERT INTO `brand` (`Brand_ID`, `Brand_Name`, `Brand_Info`) VALUES
 ('B009', 'Gigabyte', 'Motherboards and graphics cards'),
 ('B010', 'Thermaltake', 'PC cases and cooling');
 
-CREATE TABLE `cart` (
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart`
+--
+
 CREATE TABLE `cart` (
   `Cart_ID` int(11) NOT NULL,
   `User_ID` char(6) NOT NULL,
@@ -56,11 +91,12 @@ CREATE TABLE `cart` (
   `Added_Date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
 
-INSERT INTO `cart` (`Cart_ID`, `User_ID`, `Product_ID`, `Quantity`, `Total_Price_Cart`, `Added_Date`) VALUES
-(15, 'ADM001', 'P005', 1, 3289.95, '2025-05-06 23:20:03');
+--
+-- Table structure for table `category`
+--
 
-CREATE TABLE `category` (
 CREATE TABLE `category` (
   `Category_ID` char(4) NOT NULL,
   `Category_Name` varchar(20) NOT NULL,
@@ -68,6 +104,9 @@ CREATE TABLE `category` (
   `Brand_ID` char(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `category`
+--
 
 INSERT INTO `category` (`Category_ID`, `Category_Name`, `Category_Description`, `Brand_ID`) VALUES
 ('C001', 'Graphics Cards', 'High-performance graphics cards for gaming and professional visualization', 'B001'),
@@ -81,7 +120,12 @@ INSERT INTO `category` (`Category_ID`, `Category_Name`, `Category_Description`, 
 ('C009', 'Peripherals', 'Keyboards, mice, and other input devices', 'B005'),
 ('C010', 'Networking', 'Network interface cards', 'B008');
 
-CREATE TABLE `delivery` (
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `delivery`
+--
+
 CREATE TABLE `delivery` (
   `Delivery_ID` char(6) NOT NULL,
   `Order_ID` char(6) NOT NULL,
@@ -92,9 +136,14 @@ CREATE TABLE `delivery` (
   `Shipping_Date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orders`
+--
+
 CREATE TABLE `orders` (
-CREATE TABLE `orders` (
-  `Order_ID` int(11) NOT NULL,
+  `Order_ID` char(6) NOT NULL,
   `User_ID` char(6) NOT NULL,
   `Total_Price` decimal(10,2) NOT NULL,
   `Status` varchar(20) NOT NULL,
@@ -105,19 +154,14 @@ CREATE TABLE `orders` (
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-  ALTER TABLE `orders` ADD `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+--
 
-INSERT INTO `orders` (`Order_ID`, `User_ID`, `Total_Price`, `Status`, `Shipping_Cost`, `Order_Quantity`, `tax_amount`, `subtotal`, `created_at`) VALUES
-(23, 'U00001', 3289.95, 'Pending', 0.00, '1', 0.00, 3289.95, '2025-05-06 22:51:07'),
-(24, 'U00001', 3289.95, 'Pending', 0.00, '1', 0.00, 3289.95, '2025-05-06 23:05:26'),
-(25, 'U00001', 1389.00, 'Pending', 0.00, '1', 0.00, 1389.00, '2025-05-06 23:05:46'),
-(26, 'U00001', 1389.00, 'Pending', 0.00, '1', 0.00, 1389.00, '2025-05-06 23:06:52'),
-(27, 'U00001', 1389.00, 'Pending', 0.00, '1', 0.00, 1389.00, '2025-05-06 23:06:53'),
-(28, 'U00001', 3264.95, 'Pending', 0.00, '1', 0.00, 3264.95, '2025-05-06 23:08:04'),
-(29, 'U00001', 3264.95, 'Pending', 0.00, '1', 0.00, 3264.95, '2025-05-06 23:09:04'),
-(30, 'ADM001', 3289.95, 'Pending', 0.00, '1', 0.00, 3289.95, '2025-05-06 23:20:06');
+-- --------------------------------------------------------
 
-CREATE TABLE `order_cancellation` (
+--
+-- Table structure for table `order_cancellation`
+--
+
 CREATE TABLE `order_cancellation` (
   `Cancellation_ID` char(6) NOT NULL,
   `Order_ID` char(6) NOT NULL,
@@ -127,29 +171,28 @@ CREATE TABLE `order_cancellation` (
   `Admin_Note` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_details`
+--
+
 CREATE TABLE `order_details` (
-CREATE TABLE `order_details` (
-  `Order_Detail_ID` int(11) NOT NULL,
+  `Order_Detail_ID` char(6) NOT NULL,
   `Order_ID` char(6) NOT NULL,
   `Product_ID` char(4) NOT NULL,
   `Quantity` int(11) NOT NULL,
   `Price` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `order_details` (`Order_Detail_ID`, `Order_ID`, `Product_ID`, `Quantity`, `Price`) VALUES
-(1, '23', 'P005', 1, 3289.95),
-(2, '24', 'P005', 1, 3289.95),
-(3, '25', 'P022', 1, 1389.00),
-(4, '26', 'P022', 1, 1389.00),
-(5, '27', 'P022', 1, 1389.00),
-(6, '28', 'P013', 1, 1875.95),
-(7, '28', 'P022', 1, 1389.00),
-(8, '29', 'P013', 1, 1875.95),
-(9, '29', 'P022', 1, 1389.00),
-(10, '30', 'P005', 1, 3289.95);
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pc_build`
+--
 
 CREATE TABLE `pc_build` (
-  `PC_ID` int(11) NOT NULL,
+  `PC_ID` char(6) NOT NULL,
   `User_ID` char(6) NOT NULL,
   `Build_Name` varchar(100) NOT NULL,
   `Purpose` text DEFAULT NULL,
@@ -157,6 +200,12 @@ CREATE TABLE `pc_build` (
   `Last_Update_Date` datetime NOT NULL,
   `Total_Price` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product`
+--
 
 CREATE TABLE `product` (
   `Product_ID` char(4) NOT NULL,
@@ -167,7 +216,9 @@ CREATE TABLE `product` (
   `Category_ID` char(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-ALTER TABLE product MODIFY Product_ID INT(11) NOT NULL AUTO_INCREMENT;
+--
+-- Dumping data for table `product`
+--
 
 INSERT INTO `product` (`Product_ID`, `Product_Name`, `Product_Description`, `Product_Price`, `Stock_Quantity`, `Category_ID`) VALUES
 ('P001', 'NVIDIA RTX 4090', 'Flagship 24GB GDDR6X GPU with advanced ray tracing, DLSS 3.0, and AI-powered rendering for ultimate 4K gaming and content creation workloads.', 7519.95, 15, 'C001'),
@@ -211,6 +262,12 @@ INSERT INTO `product` (`Product_ID`, `Product_Name`, `Product_Description`, `Pro
 ('P044', 'TP-Link Archer TXE75E', 'PCIe Wi-Fi 6E adapter with Bluetooth 5.3 support and low-latency gaming performance.', 229.00, 20, 'C010'),
 ('P045', 'ASUS XG-C100C', '10-Gigabit Ethernet PCIe adapter with wide OS support for fast LAN setups.', 389.00, 10, 'C010');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_review`
+--
+
 CREATE TABLE `product_review` (
   `Review_ID` char(6) NOT NULL,
   `Order_ID` char(6) NOT NULL,
@@ -219,6 +276,12 @@ CREATE TABLE `product_review` (
   `Comment` text DEFAULT NULL,
   `Review_Date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user`
+--
 
 CREATE TABLE `user` (
   `User_ID` char(6) NOT NULL,
@@ -231,12 +294,22 @@ CREATE TABLE `user` (
   `Address` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `user`
+--
+
 INSERT INTO `user` (`User_ID`, `Username`, `Gender`, `Password`, `Birthday`, `Register_Date`, `Email`, `Address`) VALUES
 ('U00001', 'John Doe', 'Male', '123456', '1990-05-15', '2025-01-10 09:30:00', 'john@example.com', 'B-8-12, Ivory Heights Condominium, Jalan Dato Ismail Hashim, 11900 Bayan Lepas, Pulau Pinang, Malaysia'),
 ('U00002', 'Jane Smith', 'Female', '123456', '1985-08-22', '2025-01-05 14:15:00', 'jane@example.com', 'No. 45, Jalan Merdeka, Taman Melaka Raya, 75000 Melaka, Melaka, Malaysia'),
 ('U00003', 'Robert Johnson', 'Male', '123456', '1988-11-30', '2025-02-18 16:45:00', 'robert@example.com', 'No. 22, Jalan Indah 15/3, Taman Bukit Indah, 81200 Johor Bahru, Johor, Malaysia'),
 ('U00004', 'Emily Davis', 'Female', '123456', '1995-04-22', '2025-03-05 10:20:00', 'emily@example.com', 'Suite 12-03, Menara Panorama, Jalan Puncak, Seksyen 13, 40000 Shah Alam, Selangor, Malaysia'),
-('U00005', 'Michael Wilson', 'Male', '123456', '1992-07-14', '2025-03-20 13:10:00', 'michael@example.com', 'Unit 3201, Tower B, The Mews, Jalan Yap Kwan Seng, 50450 Kuala Lumpur, Wilayah Persekutuan, Malaysia');
+('U00005', 'Michael Wilson', 'Male', '123456', '1992-07-14', '2025-03-20 13:10:00', 'michael@example.com', 'Unit 3201, Tower B, The Mews, Jalan Yap Kwan Seng, 50450 Kuala Lumpur, Wilayah Persekutuan, Malaysia'),
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wishlist`
+--
 
 CREATE TABLE `wishlist` (
   `Wishlist_ID` char(6) NOT NULL,
@@ -244,22 +317,114 @@ CREATE TABLE `wishlist` (
   `User_ID` char(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-ALTER TABLE `admin` ADD PRIMARY KEY (`Admin_ID`);
-ALTER TABLE `brand` ADD PRIMARY KEY (`Brand_ID`);
-ALTER TABLE `cart` ADD PRIMARY KEY (`Cart_ID`), ADD KEY `User_ID` (`User_ID`), ADD KEY `Product_ID` (`Product_ID`);
-ALTER TABLE `category` ADD PRIMARY KEY (`Category_ID`), ADD KEY `Brand_ID` (`Brand_ID`);
-ALTER TABLE `delivery` ADD PRIMARY KEY (`Delivery_ID`), ADD KEY `Order_ID` (`Order_ID`);
-ALTER TABLE `orders` ADD PRIMARY KEY (`Order_ID`), ADD KEY `User_ID` (`User_ID`);
-ALTER TABLE `order_cancellation` ADD PRIMARY KEY (`Cancellation_ID`), ADD KEY `Order_ID` (`Order_ID`);
-ALTER TABLE `order_details` ADD PRIMARY KEY (`Order_Detail_ID`), ADD KEY `Order_ID` (`Order_ID`), ADD KEY `Product_ID` (`Product_ID`);
-ALTER TABLE `pc_build` ADD PRIMARY KEY (`PC_ID`), ADD KEY `User_ID` (`User_ID`);
-ALTER TABLE `product_review` ADD PRIMARY KEY (`Review_ID`), ADD KEY `Order_ID` (`Order_ID`), ADD KEY `Product_ID` (`Product_ID`);
-ALTER TABLE `wishlist` ADD PRIMARY KEY (`Wishlist_ID`), ADD KEY `User_ID` (`User_ID`), ADD KEY `Product_ID` (`Product_ID`);
+--
+-- Indexes for dumped tables
+--
 
-ALTER TABLE `cart` MODIFY `Cart_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-ALTER TABLE `orders` MODIFY `Order_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
-ALTER TABLE `order_details` MODIFY `Order_Detail_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-ALTER TABLE `pc_build` MODIFY `PC_ID` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- Indexes for table `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`Admin_ID`);
+
+--
+-- Indexes for table `brand`
+--
+ALTER TABLE `brand`
+  ADD PRIMARY KEY (`Brand_ID`);
+
+--
+-- Indexes for table `cart`
+--
+ALTER TABLE `cart`
+  ADD PRIMARY KEY (`Cart_ID`),
+  ADD KEY `User_ID` (`User_ID`),
+  ADD KEY `Product_ID` (`Product_ID`);
+
+--
+-- Indexes for table `category`
+--
+ALTER TABLE `category`
+  ADD PRIMARY KEY (`Category_ID`),
+  ADD KEY `Brand_ID` (`Brand_ID`);
+
+--
+-- Indexes for table `delivery`
+--
+ALTER TABLE `delivery`
+  ADD PRIMARY KEY (`Delivery_ID`),
+  ADD KEY `Order_ID` (`Order_ID`);
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`Order_ID`),
+  ADD KEY `User_ID` (`User_ID`);
+
+--
+-- Indexes for table `order_cancellation`
+--
+ALTER TABLE `order_cancellation`
+  ADD PRIMARY KEY (`Cancellation_ID`),
+  ADD KEY `Order_ID` (`Order_ID`);
+
+--
+-- Indexes for table `order_details`
+--
+ALTER TABLE `order_details`
+  ADD PRIMARY KEY (`Order_Detail_ID`),
+  ADD KEY `Order_ID` (`Order_ID`),
+  ADD KEY `Product_ID` (`Product_ID`);
+
+--
+-- Indexes for table `pc_build`
+--
+ALTER TABLE `pc_build`
+  ADD PRIMARY KEY (`PC_ID`),
+  ADD KEY `User_ID` (`User_ID`);
+
+--
+-- Indexes for table `product_review`
+--
+ALTER TABLE `product_review`
+  ADD PRIMARY KEY (`Review_ID`),
+  ADD KEY `Order_ID` (`Order_ID`),
+  ADD KEY `Product_ID` (`Product_ID`);
+
+--
+-- Indexes for table `wishlist`
+--
+ALTER TABLE `wishlist`
+  ADD PRIMARY KEY (`Wishlist_ID`),
+  ADD KEY `User_ID` (`User_ID`),
+  ADD KEY `Product_ID` (`Product_ID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `cart`
+--
+ALTER TABLE `cart`
+  MODIFY `Cart_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `Order_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `order_details`
+--
+ALTER TABLE `order_details`
+  MODIFY `Order_Detail_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pc_build`
+--
 ALTER TABLE `pc_build`
   MODIFY `PC_ID` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;

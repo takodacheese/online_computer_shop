@@ -1,7 +1,7 @@
 <?php
 // base.php - Core business logic and utility functions for Online Computer Shop
 // All database access and reusable logic should be defined here.
-
+date_default_timezone_set('Asia/Kuala_Lumpur');
 require_once 'db.php'; // Database connection
 
 // ------------------------
@@ -379,8 +379,8 @@ function resetUserPassword($conn, $token, $new_password) {
     if (!$reset) return false;
     if (!validatePasswordStrength($new_password)) return false;
     $hashed = password_hash($new_password, PASSWORD_BCRYPT);
-    // Update user's password
-    $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+    // Update user's password (correct table and columns)
+    $stmt = $conn->prepare("UPDATE User SET Password = ? WHERE User_ID = ?");
     $stmt->execute([$hashed, $reset['user_id']]);
     // Delete the token (single-use)
     $conn->prepare("DELETE FROM password_resets WHERE token = ?")->execute([$token]);
@@ -408,7 +408,7 @@ function createPasswordResetTokenOld($conn, $user_id) {
  * Generate reset password URL (customize base URL as needed)
  */
 function generateResetLink($token) {
-    return "http://localhost/online_computer_shop/reset_password.php?token=" . urlencode($token);
+    return "http://localhost:8000/acc_security/reset_password.php?token=" . urlencode($token);
 }
 
 /**

@@ -3740,3 +3740,168 @@ body.payment-success-page {
     justify-content: center;
     background: linear-gradient(135deg, #23263a 0%, #181a2a 100%);
 }
+.member-details-container {
+    max-width: 500px;
+    margin: 60px auto 40px auto;
+    background: var(--card-bg, #23263a);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,191,255,0.13);
+    padding: 36px 32px 28px 32px;
+    color: var(--text-color);
+    border: 1.5px solid var(--border-color);
+}
+.member-details-container h2 {
+    color: #00fff7;
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 24px;
+    text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px #00fff7, 0 0 16px #6f00ff;
+}
+.member-details-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1.08em;
+}
+.member-details-row:last-child {
+    border-bottom: none;
+}
+.member-details-label {
+    color: #00fff7;
+    font-weight: 600;
+    min-width: 120px;
+}
+.member-details-value {
+    color: #fff;
+    font-weight: 400;
+    text-align: right;
+}
+.member-details-back {
+    display: block;
+    margin: 32px auto 0 auto;
+    background: var(--accent-color);
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 28px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,191,255,0.12);
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.member-details-back:hover {
+    background: #0099cc;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(0,191,255,0.18);
+}
+
+/* Member List Search Form */
+.search-form {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.search-form input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--secondary-bg);
+    color: var(--text-color);
+}
+
+.search-btn {
+    padding: 8px 16px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.search-btn:hover {
+    background: #0099cc;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.status-active {
+    background: #28a745;
+    color: white;
+}
+
+.status-blocked {
+    background: #dc3545;
+    color: white;
+}
+
+/* Action Buttons */
+.action-btn {
+    display: inline-block;
+    padding: 4px 8px;
+    margin: 0 4px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.view-btn {
+    background: #17a2b8;
+    color: white;
+}
+
+.view-btn:hover {
+    background: #138496;
+}
+
+.block-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.block-btn:hover {
+    background: #c82333;
+}
+
+.unblock-btn {
+    background: #28a745;
+    color: white;
+}
+
+.unblock-btn:hover {
+    background: #218838;
+}
+
+/* Alert Messages */
+.alert {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
