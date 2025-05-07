@@ -34,9 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <button type="submit">Login</button>
 </form>
 
-<p>Forgot your password? <a href="forgot_password.php">Reset it here</a>.</p>
-</section>
-
 <script>
 function togglePassword() {
     const passwordField = document.getElementById('passwordField');
@@ -55,6 +52,40 @@ function togglePassword() {
     }
 }
 </script>
+
+<style>
+.form-input {
+    width: 380px;
+    padding: 8px;
+    margin: 5px 0;
+}
+
+.password-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 390px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.password-toggle:hover {
+    opacity: 1;
+}
+</style>
+
+<p>Forgot your password? <a href="forgot_password.php">Reset it here</a>.</p>
+</section>
+
 <?php
 include '../includes/footer.php';
 ?>
