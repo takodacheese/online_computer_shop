@@ -250,7 +250,8 @@ CREATE TABLE `product` (
   `Stock_Quantity` int(11) NOT NULL,
   `Category_ID` char(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
+--for add new product needed
+ALTER TABLE product MODIFY Product_ID INT(11) NOT NULL AUTO_INCREMENT;
 --
 -- Dumping data for table `product`
 --

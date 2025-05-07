@@ -11,7 +11,7 @@ include '../db.php';
 $product_id = $_GET['id'];
 
 // Delete the product
-$stmt = $conn->prepare("DELETE FROM products WHERE product_id = ?");
+$stmt = $conn->prepare("DELETE FROM product WHERE Product_ID = ?");
 $stmt->execute([$product_id]);
 
 header("Location: admin_products.php");
