@@ -2675,102 +2675,191 @@ nav a:hover, .navbar a:hover, header a:hover {
 /*---------------------------------------------------
    Admin Dashboard Styles
 ---------------------------------------------------*/
-.admin-dashboard table th, .admin-dashboard table td {
+/* ===== NIGHT NEON DASHBOARD STYLES ===== */
+
+.admin-dashboard {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #0e0e0e;
+    color: #e0e0e0;
+    padding: 30px;
+}
+
+/* Headings */
+.admin-dashboard h2, .admin-dashboard h3 {
+    color: #00fff7;
+    text-shadow: 0 0 5px #00fff7;
+    margin-bottom: 15px;
+}
+
+/* === TABLE STYLING === */
+.admin-dashboard table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1a1a1a;
+    box-shadow: 0 0 10px #00ffc8;
+    margin-top: 20px;
+}
+
+.admin-dashboard thead {
+    background-color: #121212;
+}
+
+.admin-dashboard th, .admin-dashboard td {
+    border: 1px solid #333;
     padding: 12px;
-    text-align: left;
-    border: 1px solid #ddd;
+    color: #e0e0e0;
 }
 
-.admin-dashboard table th {
-    background-color: #280336;
-    font-weight: bold;
-    color: #ffffff;
+.admin-dashboard th {
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff;
 }
 
-.admin-dashboard table td img {
-    max-width: 100px;
+/* Row hover */
+.admin-dashboard tbody tr:hover {
+    background-color: #2e2e2e;
+    box-shadow: 0 0 15px #00ffcc;
+    transform: scale(1.01);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s;
+    z-index: 1;
+}
+
+/* Table action links */
+.admin-dashboard td a {
+    padding: 5px 10px;
+    background-color: #1f1f1f;
+    border: 1px solid #00ffcc;
     border-radius: 4px;
-}
-
-.admin-dashboard table td {
-    vertical-align: middle;
-    color: #ffffff;
-}
-
-.admin-dashboard table td a {
-    color: #007bff;
+    color: #00ffcc;
     text-decoration: none;
-    font-weight: bold;
+    transition: all 0.3s ease;
 }
 
-.admin-dashboard table td a:hover {
-    text-decoration: underline;
-}
-
-/* Search Form */
-.admin-dashboard form {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: flex-start;
-    gap: 10px;
-}
-
-.admin-dashboard form input[type="text"] {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 300px;
-}
-
-.admin-dashboard form button {
-    padding: 8px 16px;
-    background-color: #007bff;
+.admin-dashboard td a:hover {
+    background-color: #ff00cc;
+    border-color: #ff00cc;
     color: #fff;
-    border: none;
-    border-radius: 4px;
+    text-shadow: 0 0 5px #ffffff;
+}
+
+/* === IMAGE HOVER ZOOM === */
+.admin-dashboard .image-hover-container {
+    position: relative;
+    display: inline-block;
+}
+
+.admin-dashboard .image-hover-container img {
+    width: 100px;
+    border-radius: 5px;
+    transition: transform 0.3s ease;
+}
+
+.admin-dashboard .image-hover-container:hover img {
+    transform: scale(2.5);
+    z-index: 10;
+    position: absolute;
+    top: -20px;
+    left: 110%;
+    box-shadow: 0 0 20px #00ffc8;
+    background-color: #000;
+    border-radius: 10px;
+}
+
+/* === ORDER DETAILS BOX === */
+.admin-dashboard .order-details-box {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px #00ffc8;
+    max-width: 600px;
+    margin-bottom: 30px;
+}
+
+.admin-dashboard .order-details-box p {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.admin-dashboard .order-details-box p strong {
+    color: #00ffcc;
+    text-shadow: 0 0 5px #00ffcc;
+    display: inline-block;
+    min-width: 140px;
+}
+
+/* === EDIT PRODUCT FORM === */
+.admin-dashboard .edit-product-form {
+    background-color: #1a1a1a;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px #00ffc8;
+    max-width: 600px;
+    margin-bottom: 30px;
+}
+
+.admin-dashboard .edit-product-form label {
+    color: #00ffcc;
+    display: block;
+    margin-bottom: 6px;
+    text-shadow: 0 0 5px #00ffcc;
+}
+
+.admin-dashboard .edit-product-form input,
+.admin-dashboard .edit-product-form textarea {
+    width: 100%;
+    padding: 10px;
+    background-color: #121212;
+    border: 1px solid #333;
+    color: #ffffff;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 5px #00ffcc inset;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.admin-dashboard .edit-product-form input:focus,
+.admin-dashboard .edit-product-form textarea:focus {
+    outline: none;
+    border-color: #00ffff;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+/* Form buttons */
+.admin-dashboard .edit-product-form button {
+    background-color: #1f1f1f;
+    color: #00ffcc;
+    border: 1px solid #00ffcc;
+    padding: 10px 20px;
+    border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-    transition: background-color 0.3s ease;
+    text-shadow: 0 0 5px #00ffcc;
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
 }
 
-.admin-dashboard form button:hover {
-    background-color: #0056b3;
+.admin-dashboard .edit-product-form button:hover {
+    background-color: #ff00cc;
+    color: #ffffff;
+    border-color: #ff00cc;
+    box-shadow: 0 0 10px #ff00cc;
 }
 
-/* Quick Stats */
-.admin-dashboard .quick-stats p {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-/* Links and Buttons */
+/* Back link */
 .admin-dashboard a {
-    color: #007bff;
+    color: #00ffff;
     text-decoration: none;
     font-weight: bold;
+    display: inline-block;
+    margin-top: 20px;
+    transition: color 0.3s, text-shadow 0.3s;
 }
 
 .admin-dashboard a:hover {
-    text-decoration: underline;
+    color: #ff00cc;
+    text-shadow: 0 0 5px #ff00cc;
 }
 
-.admin-dashboard .add-product-link {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-.admin-dashboard .add-product-link:hover {
-    background-color: #218838;
-}
 
 .adminboard {
     margin: 20px auto;
@@ -3020,7 +3109,7 @@ transition: background 0.3s;
 }
 
 .member-table thead {
-    background-color: #007bff;
+    background-color: #086d49;
     color: #ffffff;
 }
 .member-table th, .member-table td {
@@ -3041,20 +3130,7 @@ transition: background 0.3s;
     background-color: #0a3e10;
 }
 
-.member-table td a {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 6px 12px;
-    border: 1px solid #007bff;
-    border-radius: 4px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
 
-.member-table td a:hover {
-    background-color: #007bff;
-    color: #ffffff;
-}
 
 /* Footer Styles */
 footer {

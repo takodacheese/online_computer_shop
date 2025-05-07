@@ -15,7 +15,7 @@ $stmt = $conn->prepare("SELECT * FROM User WHERE Username LIKE ? OR Email LIKE ?
 $stmt->execute(["%$search%", "%$search%"]);
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
+<div class="admin-dashboard">
 <h2>Member List</h2>    
 <table class="member-table">
     <thead>
@@ -39,7 +39,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endforeach; ?>
     </tbody>
 </table>
-
+</div>
 <?php
 include '../includes/footer.php';
 ?>

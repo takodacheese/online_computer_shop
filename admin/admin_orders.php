@@ -13,7 +13,7 @@ include '../base.php';
 // Fetch all orders
 $orders = getAllOrders($conn);
 ?>
-
+<div class="admin-dashboard">
 <h2>Order List (Admin)</h2>
 <table border="1">
     <thead>
@@ -41,7 +41,7 @@ $orders = getAllOrders($conn);
         <?php endforeach; ?>
     </tbody>
 </table>
-
+</div>
 <?php
 include '../includes/footer.php';
 ?>
