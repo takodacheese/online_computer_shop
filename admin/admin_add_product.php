@@ -20,18 +20,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!preg_match('/^C00[1-9]$/', $category_id)) {
         echo "<p style='color: red;'>Invalid Category ID. It must start with 'C' followed by 001 to 009.</p>";
     } else {
+        // Generate a new Product_ID
+        $stmt = $conn->prepare("SELECT MAX(Product_ID) AS max_id FROM product");
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $max_id = $result['max_id'];
+
+        if ($max_id) {
+            // Extract the numeric part of the Product_ID and increment it
+            $numeric_part = (int)substr($max_id, 1);
+            $new_id = 'P' . str_pad($numeric_part + 1, 3, '0', STR_PAD_LEFT);
+        } else {
+            // Start from P030 if no Product_ID exists
+            $new_id = 'P030';
+        }
+
         // Handle image upload
         $image_path = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $target_dir = "../images/";
-            $image_name = basename($_FILES['image']['name']);
-            $target_file = $target_dir . $image_name;
-            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+            $image_name = preg_replace('/[^a-zA-Z0-9\s-]/', '', $name); // Allow spaces and hyphens in the product name
+            $imageFileType = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+            $target_file = $target_dir . $image_name . '.' . $imageFileType;
 
             // Validate image file type
             if (in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
-                    $image_path = "images/" . $image_name; // Store relative path
+                    $image_path = "images/" . $image_name . '.' . $imageFileType; // Store relative path
                 } else {
                     echo "<p style='color: red;'>Error uploading the image.</p>";
                 }
@@ -41,9 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         // Insert product into the database
-        $stmt = $conn->prepare("INSERT INTO product (Product_Name, Product_Description, Product_Price, Stock_Quantity, Category_ID, Product_Image) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$name, $description, $price, $stock_quantity, $category_id, $image_path]);
-        echo "<p>Product added successfully.</p>";
+        $stmt = $conn->prepare("INSERT INTO product (Product_ID, Product_Name, Product_Description, Product_Price, Stock_Quantity, Category_ID) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$new_id, $name, $description, $price, $stock_quantity, $category_id]);
+        echo "<p>Product added successfully with Product ID: $new_id.</p>";
     }
 }
 ?>

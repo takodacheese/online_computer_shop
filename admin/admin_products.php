@@ -67,9 +67,8 @@ $recent_orders = get_recent_orders($conn);
 <!-- Quick Links -->
 <h3>Quick Links</h3>
 <ul>
-    <li><a href="admin_products.php">Manage Products</a></li>
     <li><a href="../member/member.php">Manage Members</a></li>
-    <li><a href="../member/profile.php">Your Profile</a></li>
+    <p><a href="admin_add_product.php">Add New Product</a></p>
 </ul>
 <table border="1">
     <thead>
@@ -118,6 +117,6 @@ if ($imagePath): ?>
     </tbody>
 </table>
 
-<p><a href="admin_add_product.php">Add New Product</a></p>
+
 </div>
 <?php include '../includes/footer.php'; ?>
