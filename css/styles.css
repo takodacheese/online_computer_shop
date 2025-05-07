@@ -2249,99 +2249,7 @@ nav a:hover, .navbar a:hover, header a:hover {
     resize: vertical;
 }
 
-.admin-dashboard {
-    margin: 20px auto;
-    max-width: 1200px;
-    padding: 20px;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.admin-dashboard h2, .admin-dashboard h3 {
-    font-family: 'Orbitron', sans-serif;
-    color: #333;
-    margin-bottom: 20px;
-}
-
-.admin-dashboard h2 {
-    font-size: 28px;
-    text-align: center;
-}
-
-.admin-dashboard h3 {
-    font-size: 22px;
-    margin-top: 30px;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 5px;
-}
-
-.admin-dashboard p, .admin-dashboard ul {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 15px;
-}
-
-.admin-dashboard ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.admin-dashboard ul li {
-    margin-bottom: 10px;
-}
-
-.admin-dashboard ul li a {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.admin-dashboard ul li a:hover {
-    text-decoration: underline;
-}
-
-/* Table Styles */
-.admin-dashboard table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-.admin-dashboard table th, .admin-dashboard table td {
-    padding: 12px 15px;
-    border: 1px solid #150938;
-}
-
-.admin-dashboard table th {
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.admin-dashboard table tbody tr:nth-child(even) {
-    background-color: #0a041f;
-}
-
-.admin-dashboard table tbody tr:hover {
-    background-color: #0a3e10;
-}
-
-.admin-dashboard table td a {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 6px 12px;
-    border: 1px solid #007bff;
-    border-radius: 4px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.admin-dashboard table td a:hover {
-    background-color: #007bff;
-    color: #ffffff;
-}
-
+/* Cart Product Hover Effect */
 .cart-product-name-hover {
     position: relative;
     color: #00fff7;
@@ -2629,4 +2537,287 @@ nav a:hover, .navbar a:hover, header a:hover {
     .title-content {
         padding: 24px 6vw 32px 6vw;
     }
+}
+/*---------------------------------------------------
+   Admin Dashboard Styles
+---------------------------------------------------*/
+.admin-dashboard table th, .admin-dashboard table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.admin-dashboard table th {
+    background-color: #280336;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.admin-dashboard table td img {
+    max-width: 100px;
+    border-radius: 4px;
+}
+
+.admin-dashboard table td {
+    vertical-align: middle;
+    color: #ffffff;
+}
+
+.admin-dashboard table td a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.admin-dashboard table td a:hover {
+    text-decoration: underline;
+}
+
+/* Search Form */
+.admin-dashboard form {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.admin-dashboard form input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 300px;
+}
+
+.admin-dashboard form button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.admin-dashboard form button:hover {
+    background-color: #0056b3;
+}
+
+/* Quick Stats */
+.admin-dashboard .quick-stats p {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Links and Buttons */
+.admin-dashboard a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.admin-dashboard a:hover {
+    text-decoration: underline;
+}
+
+.admin-dashboard .add-product-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.admin-dashboard .add-product-link:hover {
+    background-color: #218838;
+}
+
+.adminboard {
+    margin: 20px auto;
+    max-width: 800px;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.adminboard h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.adminboard p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.admin-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.admin-actions .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.admin-actions .btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+.admin-actions .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Admin edit  Product Detail Styles */
+.edit-product-form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #1b0526;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+.edit-product-form h2 {
+    font-size: 24px;
+    color: #f7f1f1;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.edit-product-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.edit-product-form input[type="text"],
+.edit-product-form input[type="number"],
+.edit-product-form textarea,
+.edit-product-form input[type="file"] {
+    width: 96%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #39063b;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #f0f0f0;
+}
+
+.edit-product-form textarea {
+    resize: vertical;
+    height: 100px;
+}
+
+.edit-product-form input:focus,
+.edit-product-form textarea:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.edit-product-form button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.edit-product-form button:hover {
+    background-color: #0056b3;
+}
+
+.edit-product-form a {
+    display: inline-block;
+    margin-top: 15px;
+    text-align: center;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.edit-product-form a:hover {
+    text-decoration: underline;
+}
+
+/* Member List Table Styles */
+.member-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+    background-color: #150938;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.member-table thead {
+    background-color: #007bff;
+    color: #ffffff;
+}
+.member-table th, .member-table td {
+    padding: 12px 15px;
+    border: 1px solid #150938;
+}
+
+.member-table th {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.admin-dashboard table tbody tr:nth-child(even) {
+    background-color: #0a041f;
+}
+
+.member-table tbody tr:hover {
+    background-color: #0a3e10;
+}
+
+.member-table td a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 6px 12px;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.member-table td a:hover {
+    background-color: #007bff;
+    color: #ffffff;
 }

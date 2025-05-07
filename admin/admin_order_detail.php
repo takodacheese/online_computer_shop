@@ -33,6 +33,7 @@ $order = getOrderDetails($conn, $_GET['id']);
 <p><strong>Status:</strong> <?= htmlspecialchars($order['Status']) ?></p>
 <p><strong>Date:</strong> <?= htmlspecialchars($order['created_at']) ?></p>
 
+<!------------
 <h3>Order Items</h3>
 <table border="1">
     <thead>
@@ -54,7 +55,7 @@ $order = getOrderDetails($conn, $_GET['id']);
         <?php endforeach; ?>
     </tbody>
 </table>
-
+----->
 <a href="admin_orders.php">Back to Order List</a>
 
 <?php

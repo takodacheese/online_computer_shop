@@ -30,7 +30,7 @@ $orders = getAllOrders($conn);
         <?php foreach ($orders as $order): ?>
             <tr>
                 <td><?php echo $order['Order_ID']; ?></td>
-                <td><?php echo htmlspecialchars($order['username']); ?></td>
+                <td><?php echo htmlspecialchars($order['Username']); ?></td>
                 <td>$<?php echo number_format($order['Total_Price'], 2); ?></td>
                 <td><?php echo $order['Status']; ?></td>
                 <td><?php echo $order['created_at']; ?></td>

@@ -484,9 +484,9 @@ function updateProduct($conn, $product_id, $name, $description, $price, $stock) 
  * Fetch all orders with user details (admin view)
  */
 function getAllOrders($conn) {
-    $stmt = $conn->prepare("SELECT orders.*, users.Username 
+    $stmt = $conn->prepare("SELECT orders.*, user.Username 
                             FROM orders 
-                            JOIN users ON orders.user_id = users.user_id 
+                            JOIN user ON orders.User_ID = user.User_ID 
                             ORDER BY orders.created_at DESC");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -987,11 +987,22 @@ function get_pending_orders($conn) {
     $stmt->execute();
     return $stmt->fetchColumn();
 }
-function get_recent_orders($conn, $limit = 5) {
-    $stmt = $conn->prepare("SELECT * FROM orders ORDER BY order_date DESC LIMIT ?");
-    $stmt->bindValue(1, (int)$limit, PDO::PARAM_INT);
+function get_recent_orders($conn) {
+    $stmt = $conn->prepare("
+        SELECT o.Order_ID, o.Total_Price, o.Status, o.created_at, u.Username 
+        FROM orders o
+        JOIN User u ON o.User_ID = u.User_ID
+        ORDER BY o.created_at DESC
+        LIMIT 10
+    ");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
+function search_products(PDO $conn, string $search) {
+    $stmt = $conn->prepare("SELECT * FROM product WHERE Product_Name LIKE :search OR Product_Description LIKE :search");
+    $searchTerm = '%' . $search . '%';
+    $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>

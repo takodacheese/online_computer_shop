@@ -52,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <h2>Add New Product (Admin)</h2>
+<div class="edit-product-form">
 <form method="POST" action="admin_add_product.php" enctype="multipart/form-data">
     <label for="name">Name:</label>
     <input type="text" name="name" required><br>
@@ -65,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </form>
 
 <a href="admin_products.php">Back to Product List</a>
-
+<div>
 <?php
 include '../includes/footer.php';
 ?>
