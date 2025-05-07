@@ -130,6 +130,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
                     </tr>
                 </tbody>
             </table>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="payment_cancel.php" class="cancel-payment-btn">Cancel Payment</a>
+            </div>
         </div>
         <div class="col-md-4">
             <div class="card">

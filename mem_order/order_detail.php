@@ -42,27 +42,20 @@ if ($Order_ID) {
                 VALUES (?, ?, ?, CURRENT_TIMESTAMP)
             ");
             if ($stmt->execute([$Order_ID, $_SESSION['user_id'], $reason])) {
-                $message = '<div class="success">Cancellation request submitted. An admin will review your request.</div>';
+                // Redirect to order history with a message
+                $_SESSION['success_message'] = 'Cancellation request submitted. An admin will review your request.';
+                header('Location: order_history.php');
+                exit();
             } else {
                 $message = '<div class="error">Failed to submit cancellation request.</div>';
             }
         } else {
             // For pending orders, cancel directly
             if (cancelOrder($conn, $Order_ID, $reason)) {
-                $message = '<div id="flash-message" class="success">Order cancelled successfully!</div>';
-                echo '<script>
-                    document.addEventListener("DOMContentLoaded", function() {
-                        const flashMessage = document.getElementById("flash-message");
-                        if (flashMessage) {
-                            flashMessage.style.display = "block";
-                            
-                            // Auto-hide after 3 seconds
-                            setTimeout(function() {
-                                flashMessage.style.display = "none";
-                            }, 3000);
-                        }
-                    });
-                </script>';
+                // Redirect to order history with a message
+                $_SESSION['success_message'] = 'Order cancelled successfully!';
+                header('Location: order_history.php');
+                exit();
             } else {
                 $message = '<div class="error">Failed to cancel order.</div>';
             }
@@ -89,8 +82,8 @@ if ($Order_ID) {
     <div class="order-detail-card">
         <h2 class="order-detail-heading">Order Details</h2>
         <?php if ($message): ?>
-    <div id="flash-message" class="success"><?php echo $message; ?></div>
-<?php endif; ?>
+            <?php echo $message; ?>
+        <?php endif; ?>
         <div class="order-detail-info">
             <h3>Order Information</h3>
             <p><strong>Order ID:</strong> <?php echo htmlspecialchars($order['Order_ID']); ?></p>

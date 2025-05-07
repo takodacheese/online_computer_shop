@@ -22,7 +22,7 @@
         <h1>Virtual Escapes Studio</h1>
         </div>
         <nav>
-        <a href="../index.php" class="nav-link">Home</a>
+    <a href="../index.php" class="nav-link">Home</a>
     <?php 
     // Check if the user is an admin
     if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
@@ -30,7 +30,7 @@
             <?php endif; ?>
               <a href="../products.php" class="nav-link">Products</a>
               <a href="../mem_order/cart.php" class="nav-link">Cart</a>
-
+              <a href="my_wishlist.php" class="nav-link">My Wishlist</a>
             <?php if (isset($_SESSION['user_id'])): ?>
                 <!-- Display Profile and Logout links if the user is logged in -->
                 <a href="../member/profile.php"class="nav-link">Profile  </a>

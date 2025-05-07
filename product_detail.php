@@ -118,6 +118,9 @@ try {
     <?php for ($i = 1; $i <= 5; $i++): ?>
         <span class="star <?= $i <= (intval($review['Rating'] ?? 0)) ? 'filled' : 'empty' ?>">⭐</span>
     <?php endfor; ?>
+    <span class="star-rating-number" style="margin-left:8px; color:#FFD700; font-weight:bold; font-size:1.08em;">
+        <?= (int)($review['Rating'] ?? 0) ?>/5
+    </span>
 </div>
                         </div>
                         <p class="review-text"><?= htmlspecialchars($review['Comment'] ?? '') ?></p>

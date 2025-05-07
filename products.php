@@ -52,6 +52,14 @@ $sql = "SELECT p.* FROM product p JOIN category c ON p.Category_ID = c.Category_
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$user_id = $_SESSION['user_id'] ?? null;
+$wishlist_product_ids = [];
+if ($user_id) {
+    $stmt = $conn->prepare("SELECT Product_ID FROM wishlist WHERE User_ID = ?");
+    $stmt->execute([$user_id]);
+    $wishlist_product_ids = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'Product_ID');
+}
 ?>
 
 <h1>All Products</h1>
@@ -154,14 +162,32 @@ function clearFilters() {
                 <p class="price">RM <?= number_format($product['Product_Price'], 2) ?></p>
                 <p>Stock: <?= htmlspecialchars($product['Stock_Quantity']) ?> units</p>
                 <div class="product-actions">
-                    <!-- Add to Cart Form -->
-                    <form method="POST" action="mem_order/add_to_cart.php" class="add-to-cart-form">
-                        <input type="hidden" name="Product_ID" value="<?= htmlspecialchars($product['Product_ID']) ?>">
-                        <label for="quantity">Quantity:</label>
-                        <input type="number" name="quantity" value="1" min="1" required>
-                        <button type="submit" class="add-to-cart">Add to Cart</button>
-                    </form>
-                    <a href="product_detail.php?id=<?= htmlspecialchars($product['Product_ID']) ?>" class="view-details-btn">View Details</a>
+                    <div class="product-actions-row">
+                        <!-- Wishlist button -->
+                        <?php if ($user_id): ?>
+                            <?php
+                            $in_wishlist = in_array($product['Product_ID'], $wishlist_product_ids);
+                            echo '<form method="POST" action="wishlist_toggle.php" class="wishlist-form">';
+                            echo '<input type="hidden" name="product_id" value="' . htmlspecialchars($product['Product_ID']) . '">';
+                            echo '<button type="submit" name="wishlist_action" value="' . ($in_wishlist ? 'remove' : 'add') . '" class="wishlist-heart-btn">';
+                            if ($in_wishlist) {
+                                echo '<span title="Remove from Wishlist" class="heart-filled">&#10084;</span>';
+                            } else {
+                                echo '<span title="Add to Wishlist" class="heart-outline">&#9825;</span>';
+                            }
+                            echo '</button>';
+                            echo '</form>';
+                            ?>
+                        <?php endif; ?>
+                        <!-- Add to Cart Form -->
+                        <form method="POST" action="mem_order/add_to_cart.php" class="add-to-cart-form">
+                            <input type="hidden" name="Product_ID" value="<?= htmlspecialchars($product['Product_ID']) ?>">
+                            <label for="quantity">Quantity:</label>
+                            <input type="number" name="quantity" value="1" min="1" required>
+                            <button type="submit" class="add-to-cart">Add to Cart</button>
+                        </form>
+                    </div>
+                    <a href="product_detail.php?id=" . htmlspecialchars($product['Product_ID']) . '" class="view-details-btn" style="margin-top:6px;">View Details</a>
                 </div>
             </div>
         <?php endforeach; ?>
@@ -188,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Reload the page after a short delay to show the message
                     setTimeout(() => {
                         window.location.reload();
-                    }, 500);
+                    }, 1000);
                 } else {
                     showFlashMessage(data.message || 'Failed to add item to cart.');
                 }

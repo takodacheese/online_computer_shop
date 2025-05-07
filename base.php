@@ -169,11 +169,11 @@ function updateUserProfile($conn, $user_id, $Username, $Email, $address, $birthd
  */
 function updateUserPassword($conn, $user_id, $current_password, $new_password) {
     $user = getUserById($conn, $user_id);
-    if (!$user || !password_verify($current_password, $user['password'])) {
+    if (!$user || !(password_verify($current_password, $user['Password']) || $current_password === $user['Password'])) {
         return "Error: Current password is incorrect.";
     }
     $hashedPassword = password_hash($new_password, PASSWORD_BCRYPT);
-    $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+    $stmt = $conn->prepare("UPDATE User SET Password = ? WHERE User_ID = ?");
     return $stmt->execute([$hashedPassword, $user_id]) ? "Password updated successfully." : "Error: Unable to update password.";
 }
 

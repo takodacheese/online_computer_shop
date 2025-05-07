@@ -22,6 +22,7 @@ try {
     
     if ($cart_item) {
         $new_quantity = $cart_item['Quantity'] - $quantity_to_remove;
+        $product_id = $cart_item['Product_ID'];
         
         if ($new_quantity > 0) {
             // Update quantity if there's still some left
@@ -32,6 +33,9 @@ try {
             $stmt = $conn->prepare("DELETE FROM cart WHERE Cart_ID = ?");
             $stmt->execute([$cart_id]);
         }
+        // Restore stock to product
+        $stmt = $conn->prepare("UPDATE product SET Stock_Quantity = Stock_Quantity + ? WHERE Product_ID = ?");
+        $stmt->execute([$quantity_to_remove, $product_id]);
         
         $_SESSION['success_message'] = "Successfully removed {$quantity_to_remove} item(s) from cart";
         $conn->commit();

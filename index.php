@@ -61,6 +61,45 @@ require_once 'base.php';
     </div>
 </section>
 
+<!-- About Us Section -->
+<section class="about-us" style="background: var(--secondary-bg, #181a2a); border-radius: 14px; box-shadow: 0 2px 16px rgba(0,191,255,0.13); padding: 36px 24px; margin: 40px auto 32px auto; max-width: 1200px; color: #fff;">
+    <h2 style="color: #fff; font-size: 2em; font-weight: bold; margin-bottom: 18px;">About Us</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 48px; justify-content: space-between;">
+        <div style="flex: 2; min-width: 320px;">
+            <p style="font-size: 1.15em; color: #e1e1e1; margin-bottom: 18px;">
+                <b>VIRTUAL ESCAPE STUDIO</b> is your trusted partner for all things computers and technology. With multiple locations across Johor and on-site service in Penang, Selangor, and Singapore, we provide the latest computers, accessories, and expert support for individuals and businesses alike. Our mission is to deliver quality, value, and exceptional service to every customer.
+            </p>
+            <div style="margin-bottom: 18px;">
+                <b>VIRTUAL ESCAPE STUDIO MOUNT AUSTIN</b><br>
+                <span style="color:#b0b3c6;">6, Jalan Austin Heights 7/9, Taman Mount Austin, 81100 Johor Bahru, Johor</span><br>
+                <a href="https://wa.me/601113002866" style="color:#ff4d4d;">Contact us</a>
+            </div>
+            <div style="margin-bottom: 18px;">
+                <b>VIRTUAL ESCAPE STUDIO SOUTHKEY JB</b><br>
+                <span style="color:#b0b3c6;">01-06, Block G Komersil, Southkey Mozek, Persiaran Southkey 1, 80150 Johor Bahru, Johor</span><br>
+                <a href="https://wa.me/601113002866" style="color:#ff4d4d;">Contact us</a>
+            </div>
+            <div style="margin-bottom: 18px;">
+                <b>VIRTUAL ESCAPE STUDIO BATU PAHAT</b><br>
+                <span style="color:#b0b3c6;">14, Jalan Desa Botani 2, Taman Desa Botani, 83000 Batu Pahat, Johor</span><br>
+                <a href="https://wa.me/601113002866" style="color:#ff4d4d;">Contact us</a>
+            </div>
+            <div style="margin-bottom: 18px;">
+                <b>VIRTUAL ESCAPE STUDIO (ON-SITE SERVICE)</b><br>
+                <span style="color:#b0b3c6;">Penang – Selangor – Singapore</span>
+            </div>
+        </div>
+        <div style="flex: 1; min-width: 260px; display: flex; flex-direction: column; align-items: flex-start; gap: 18px;">
+            <div style="margin-top: 12px;">
+                <b>Follow Us:</b><br>
+                <a href="#" style="color:#fff; margin-right:12px;"><img src="images/facebook.png" alt="Facebook" style="height:28px;vertical-align:middle;"></a>
+                <a href="#" style="color:#fff; margin-right:12px;"><img src="images/instagram.avif" alt="Instagram" style="height:28px;vertical-align:middle;"></a>
+                <a href="#" style="color:#fff; margin-right:12px;"><img src="images/tiktok.jpg" alt="TikTok" style="height:28px;vertical-align:middle;"></a>
+            </div>
+        </div>
+    </div>
+</section>
+
 <?php
 include 'includes/footer.php';
 ?>
