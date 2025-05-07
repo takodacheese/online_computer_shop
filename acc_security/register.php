@@ -14,12 +14,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $address = trim($_POST['address']);
 
     if (registerUser($conn, $Username, $Email, $password, $gender, $birthday, $address)) {
-        echo '<p>User registered successfully.</p>';
+        $_SESSION['flash_message'] = 'Successfully registered account! Please log in.';
         header("Location: login.php");
         exit();
     } else {
-        echo '<p>Error: Unable to register user.</p>';
+        $_SESSION['flash_message'] = 'Error: Unable to register user.';
     }
+}
+
+// Show flash message if set
+if (isset($_SESSION['flash_message'])) {
+    echo '<div class="flash-message">' . htmlspecialchars($_SESSION['flash_message']) . '</div>';
+    unset($_SESSION['flash_message']);
 }
 ?>
     

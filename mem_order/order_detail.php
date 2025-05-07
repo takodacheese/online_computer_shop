@@ -58,30 +58,15 @@ $stmt = $conn->prepare("SELECT od.*, p.Product_Name
                         JOIN Product p ON od.Product_ID = p.Product_ID 
                         WHERE od.Order_ID = ?");
 $stmt->execute([$Order_ID]);
-$stmt->execute([$order_id]);
 $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$stmt->execute([$Order_ID]);
-// $stmt = $conn->prepare("
-//     SELECT * FROM order_cancellation_requests 
-
-//     WHERE Order_ID = ? AND user_id = ? 
-//     ORDER BY created_at DESC LIMIT 1
-// ");
-// $stmt->execute([$Order_ID, $_SESSION['user_id']]);
-
-//     WHERE order_id = ? AND user_id = ? 
-//     ORDER BY created_at DESC LIMIT 1
-// ");
-// $stmt->execute([$order_id, $_SESSION['user_id']]);
-// $cancellation_request = $stmt->fetch(PDO::FETCH_ASSOC);
 $cancellation_request = null; // Table not present, skip cancellation request check
 
 ?>
 
-// Disabled: table does not exist in your DB
-<div class="order-detail-container">
-    <div class="order-detail-card">
+<div class="main-content">
+    <div class="order-detail-container">
+        <div class="order-detail-card">
         <h2 class="order-detail-heading">Order Details</h2>
         <?php echo $message; ?>
         <div class="order-detail-info">
@@ -89,13 +74,6 @@ $cancellation_request = null; // Table not present, skip cancellation request ch
             <p><strong>Total Amount:</strong> RM <?php echo isset($order['Total_Price']) ? number_format($order['Total_Price'], 2) : '0.00'; ?></p>
             <p><strong>Status:</strong> <?php echo isset($order['Status']) ? $order['Status'] : '-'; ?></p>
             <p><strong>Date:</strong> <?php echo isset($order['created_at']) ? $order['created_at'] : '-'; ?></p>
-<h2>Order Details</h2>
-<?php echo $message; ?>
-
-<p><strong>Order ID:</strong> <?php echo $order['order_id']; ?></p>
-<p><strong>Total Amount:</strong> $<?php echo number_format($order['total_amount'], 2); ?></p>
-<p><strong>Status:</strong> <?php echo $order['order_status']; ?></p>
-<p><strong>Date:</strong> <?php echo $order['created_at']; ?></p>
 
 <!-- Cancellation Form -->
 <?php 
@@ -140,17 +118,17 @@ endif; ?>
     <tbody>
         <?php foreach ($order_items as $item): ?>
             <tr>
-                <td><?php echo htmlspecialchars($item['name']); ?></td>
-                <td><?php echo $item['quantity']; ?></td>
-                <td>$<?php echo number_format($item['price'], 2); ?></td>
-                <td>$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></td>
+                <td><?php echo htmlspecialchars($item['Product_Name']); ?></td>
+                <td><?php echo $item['Quantity']; ?></td>
+                <td>RM <?php echo number_format($item['Price'], 2); ?></td>
+                <td>RM <?php echo number_format($item['Price'] * $item['Quantity'], 2); ?></td>
             </tr>
         <?php endforeach; ?>
     </tbody>
 </table>
 
 <a href="order_history.php">Back to Order History</a>
-
+</div>
 <?php
 include '../includes/footer.php';
 ?>

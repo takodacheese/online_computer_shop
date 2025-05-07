@@ -70,11 +70,14 @@ function loginUser(PDO $conn, string $Email, string $password) {
     }
 
     // Verify the password and return the role if successful
-    if ($user && $password === $user['Password']) { // Replace with password_verify if passwords are hashed
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['Username'] = $user['Username'];
-        $_SESSION['role'] = $user['role'];
-        return $user['role'];
+    if ($user) {
+        // Allow both hashed and plaintext passwords (for legacy accounts)
+        if (password_verify($password, $user['Password']) || $password === $user['Password']) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['Username'] = $user['Username'];
+            $_SESSION['role'] = $user['role'];
+            return $user['role'];
+        }
     }
 
     return false;
@@ -177,16 +180,20 @@ function updateUserPassword($conn, $user_id, $current_password, $new_password) {
 /**
  * Upload and store profile photo
  */
-function uploadProfilePhoto($conn, $user_id, $file) {
-    $uploadDir = "uploads/profile_photos/";
+function uploadProfilePhoto($user_id, $file) {
+    $uploadDir = __DIR__ . "/images/profiles/";
     if (!file_exists($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }
-    $uniqueName = uniqid('profile_', true) . '_' . basename($file['name']);
-    $filePath = $uploadDir . $uniqueName;
+    // Always save as {user_id}.jpg
+    $filePath = $uploadDir . $user_id . ".jpg";
+    $imageFileType = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+    $check = getimagesize($file['tmp_name']);
+    if($check === false) {
+        return "Error: File is not an image.";
+    }
     if (move_uploaded_file($file['tmp_name'], $filePath)) {
-        $stmt = $conn->prepare("UPDATE users SET profile_photo = ? WHERE user_id = ?");
-        return $stmt->execute([$filePath, $user_id]) ? "Profile photo uploaded successfully." : "Error: Unable to update profile photo.";
+        return "Profile photo uploaded successfully.";
     }
     return "Error: Unable to upload profile photo.";
 }
@@ -729,7 +736,7 @@ function isOrderEligibleForCancellation($order) {
  */
 function getReviewsByProductId($conn, $product_id) {
     $stmt = $conn->prepare("
-        SELECT r.*, u.Username 
+        SELECT DISTINCT r.Review_ID, r.Order_ID, r.Product_ID, r.Rating, r.Comment, r.Review_Date, u.Username
         FROM Product_Review r
         JOIN Orders o ON r.Order_ID = o.Order_ID
         JOIN User u ON o.User_ID = u.User_ID

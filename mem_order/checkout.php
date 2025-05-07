@@ -118,7 +118,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
                 <?php foreach ($cart_items as $item): ?>
                     <tr>
                         <td class="cart-product-cell">
-                            <img src="../images/products/<?= htmlspecialchars($item['Product_ID']); ?>.jpg" alt="<?= htmlspecialchars($item['product_name']); ?>" class="cart-product-img">
                             <span class="cart-product-name"><?= htmlspecialchars($item['product_name']); ?></span>
                         </td>
                         <td><?= htmlspecialchars($item['quantity']) ?></td>
@@ -142,11 +141,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
                         <div class="payment-methods">
                             <label>
                                 <input type="radio" name="payment_method" value="grabpay" required> 
-                                <img src="https://grabpay.com.my/assets/images/grabpay-logo.svg" alt="GrabPay" width="80" style="vertical-align:middle;"> GrabPay
+                                <span>GrabPay</span>
                             </label>
                             <label>
                                 <input type="radio" name="payment_method" value="fpx" required>
-                                <img src="https://www.fpx.com.my/assets/images/fpx-logo.png" alt="FPX" width="70" style="vertical-align:middle;"> FPX
+                                <span>FPX</span>
                             </label>
                         </div>
                         <button type="submit" class="cart-checkout-btn" style="margin-top: 24px;">Pay with Selected Method</button>
