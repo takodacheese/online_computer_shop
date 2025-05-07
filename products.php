@@ -185,6 +185,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     showFlashMessage(data.message);
+                    // Reload the page after a short delay to show the message
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
                 } else {
                     showFlashMessage(data.message || 'Failed to add item to cart.');
                 }

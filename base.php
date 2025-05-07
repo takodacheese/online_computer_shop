@@ -185,6 +185,10 @@ function uploadProfilePhoto($user_id, $file) {
     if (!file_exists($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }
+    // Only proceed if a file was actually uploaded
+    if (!isset($file['tmp_name']) || $file['tmp_name'] === '' || $file['error'] === UPLOAD_ERR_NO_FILE) {
+        return null; // No file uploaded, do nothing
+    }
     // Always save as {user_id}.jpg
     $filePath = $uploadDir . $user_id . ".jpg";
     $imageFileType = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));

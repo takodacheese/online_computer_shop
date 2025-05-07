@@ -60,7 +60,8 @@ $cart_items = getCartItems($conn, $user_id);
                     <td>
                         <div class="quantity-input">
                             <span class="current-quantity">Current: <?= $item['quantity']; ?></span>
-                            <input type="number" min="1" max="<?= $item['quantity']; ?>" value="1" class="quantity-input-field">
+                            <label for="remove-quantity-<?= $item['Cart_ID']; ?>">Remove quantity:</label>
+                            <input type="number" id="remove-quantity-<?= $item['Cart_ID']; ?>" min="1" max="<?= $item['quantity']; ?>" value="1" class="quantity-input-field">
                         </div>
                     </td>
                     <td>RM <?= number_format($item['price'], 2); ?></td>
@@ -69,7 +70,7 @@ $cart_items = getCartItems($conn, $user_id);
                         <form action="remove_from_cart.php" method="POST" class="remove-form">
                             <input type="hidden" name="cart_id" value="<?= htmlspecialchars($item['Cart_ID']); ?>">
                             <input type="hidden" name="quantity" value="1" class="remove-quantity">
-                            <button type="submit" class="cart-remove-btn">Remove</button>
+                            <button type="submit" class="cart-remove-btn">Remove Items</button>
                         </form>
                     </td>
                 </tr>
@@ -91,7 +92,7 @@ $cart_items = getCartItems($conn, $user_id);
         // Handle quantity input changes
         document.querySelectorAll('.quantity-input-field').forEach(input => {
             input.addEventListener('change', function() {
-                const form = this.closest('.remove-form');
+                const form = this.closest('tr').querySelector('.remove-form');
                 const removeQuantity = form.querySelector('.remove-quantity');
                 removeQuantity.value = this.value;
             });
@@ -100,12 +101,16 @@ $cart_items = getCartItems($conn, $user_id);
         // Handle form submission
         document.querySelectorAll('.remove-form').forEach(form => {
             form.addEventListener('submit', function(e) {
-                // Get the input and hidden field
-                const input = this.querySelector('.quantity-input-field');
+                e.preventDefault(); // Prevent immediate submission
+                const row = this.closest('tr');
+                const input = row.querySelector('.quantity-input-field');
                 const removeQuantity = this.querySelector('.remove-quantity');
                 
-                // Update the hidden field value
+                // Update the hidden field value with the current input value
                 removeQuantity.value = input.value;
+                
+                // Now submit the form
+                this.submit();
             });
         });
 

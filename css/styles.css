@@ -2397,7 +2397,7 @@ nav a:hover, .navbar a:hover, header a:hover {
 .cart-product-hover-img {
     display: none;
     position: absolute;
-    left: 105%;
+    left: 120%;  /* Changed from 90% to 120% to move it further right */
     top: 50%;
     transform: translateY(-50%);
     width: 120px;
@@ -3148,7 +3148,7 @@ footer {
 .cart-product-hover-img {
     display: none;
     position: absolute;
-    left: 90%;
+    left: 120%;  /* Changed from 90% to 120% to move it further right */
     top: 50%;
     transform: translateY(-50%);
     width: 120px;
@@ -3177,24 +3177,39 @@ footer {
 }
 .quantity-input {
     display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.quantity-input-field {
-    width: 60px;
-    padding: 4px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background: var(--card-bg);
-    color: var(--text-color);
-    text-align: center;
-}
-.remove-form {
-    display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    gap: 5px;
+    align-items: flex-start;
 }
-.remove-quantity {
-    display: none;
+
+.quantity-input label {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.quantity-input-field {
+    width: 80px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.cart-remove-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.cart-remove-btn:hover {
+    background-color: #c82333;
+}
+
+.current-quantity {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
 }

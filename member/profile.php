@@ -21,9 +21,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $address = sanitizeInput($_POST['address']);
         $birthdate = sanitizeInput($_POST['birthdate']);
         $gender = sanitizeInput($_POST['gender']);
-        $message = updateUserProfile($conn, $user_id, $username, $email, $address, $birthdate, $gender);
-        if (isset($_FILES['profile_photo'])) {
-            $message = uploadProfilePhoto($user_id, $_FILES['profile_photo']);
+        $result = updateUserProfile($conn, $user_id, $username, $email, $address, $birthdate, $gender);
+        if (strpos($result, 'successfully') !== false) {
+            $_SESSION['success_message'] = $result;
+        } else {
+            $message = $result;
+        }
+        if (isset($_FILES['profile_photo']) && isset($_FILES['profile_photo']['tmp_name']) && $_FILES['profile_photo']['tmp_name'] !== '') {
+            $photoResult = uploadProfilePhoto($user_id, $_FILES['profile_photo']);
+            if ($photoResult && strpos($photoResult, 'successfully') !== false) {
+                $_SESSION['success_message'] = $photoResult;
+            } else if ($photoResult) {
+                $message = $photoResult;
+            }
         }
         $user = getUserById($conn, $user_id); // Refresh user details
     }
@@ -34,6 +44,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 <div class="profile-container">
+    <?php if (!empty($message) && strpos($message, 'successfully') !== false): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const msg = document.createElement('div');
+            msg.className = 'success-popup';
+            msg.textContent = <?= json_encode($message) ?>;
+            document.body.appendChild(msg);
+            msg.classList.add('active');
+            setTimeout(() => {
+                msg.classList.remove('active');
+                msg.classList.add('fade-out');
+                setTimeout(() => msg.remove(), 200);
+            }, 3000);
+        });
+    </script>
+    <?php endif; ?>
     <div class="profile-section">
         <div class="profile-main-info">
             <div class="profile-photo-preview">
@@ -123,6 +149,24 @@ if (!file_exists($profile_img)) {
         </form>
     </div>
 </div>
+<?php if (isset($_SESSION['success_message'])): ?>
+    <div class="success-message" id="flash-message">
+        <?= htmlspecialchars($_SESSION['success_message']) ?>
+    </div>
+    <?php unset($_SESSION['success_message']); ?>
+<?php endif; ?>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+    var msg = document.getElementById('flash-message');
+    if (msg) {
+        setTimeout(function() {
+            msg.style.transition = 'opacity 0.5s';
+            msg.style.opacity = 0;
+            setTimeout(function() { msg.style.display = 'none'; }, 500);
+        }, 3000);
+    }
+});
+</script>
 <?php
 require_once '../includes/footer.php';
 ?>
