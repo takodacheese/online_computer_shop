@@ -33,12 +33,12 @@
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <!-- Display Profile and Logout links if the user is logged in -->
-                <a href="../member/profile.php">Profile</a>
+                <a href="../member/profile.php"class="nav-link">Profile  </a>
                 <a href="../acc_security/logout.php" id="logout-link">Logout</a>
             <?php else: ?>
                 <!-- Display Login and Register links if the user is not logged in -->
-                <a href="../acc_security/login.php">Login</a>
-                <a href="../acc_security/register.php">Register</a>
+                <a href="../acc_security/login.php"class="nav-link">Login</a>
+                <a href="../acc_security/register.php"class="nav-link">Register</a>
             <?php endif; ?>
         </nav>
     </header>
