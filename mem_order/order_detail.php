@@ -9,126 +9,136 @@ if (!isset($_SESSION['user_id'])) {
 include '../includes/header.php';
 include '../db.php';
 include '../base.php';
+?>
+<link rel="stylesheet" href="../css/styles.css">
 
-$Order_ID = $_GET['id'];
+<?php
+$Order_ID = $_GET['id'] ?? null;
 $message = '';
 
-// Handle cancellation
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order'])) {
-    $reason = $_POST['reason'] ?? '';
-    
-    // Check if order requires admin approval
-    $eligibility = isOrderEligibleForCancellation($order);
-    if ($eligibility['requires_approval']) {
-        // For processing orders, store the cancellation request
-        $stmt = $conn->prepare("
-            INSERT INTO order_cancellation_requests 
-            (Order_ID, user_id, reason, created_at) 
-            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-        ");
-        if ($stmt->execute([$Order_ID, $_SESSION['user_id'], $reason])) {
-            $message = '<div class="success">Cancellation request submitted. An admin will review your request.</div>';
+// Fetch order details
+if ($Order_ID) {
+    $stmt = $conn->prepare("SELECT * FROM orders WHERE Order_ID = ? AND User_ID = ?");
+    $stmt->execute([$Order_ID, $_SESSION['user_id']]);
+    $order = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$order) {
+        echo "<p>Order not found.</p>";
+        include '../includes/footer.php';
+        exit();
+    }
+
+    // Handle cancellation
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order'])) {
+        $reason = $_POST['reason'] ?? '';
+        
+        // Check if order requires admin approval
+        $eligibility = isOrderEligibleForCancellation($order);
+        if ($eligibility['requires_approval']) {
+            // For processing orders, store the cancellation request
+            $stmt = $conn->prepare("
+                INSERT INTO order_cancellation_requests 
+                (Order_ID, user_id, reason, created_at) 
+                VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+            ");
+            if ($stmt->execute([$Order_ID, $_SESSION['user_id'], $reason])) {
+                $message = '<div class="success">Cancellation request submitted. An admin will review your request.</div>';
+            } else {
+                $message = '<div class="error">Failed to submit cancellation request.</div>';
+            }
         } else {
-            $message = '<div class="error">Failed to submit cancellation request.</div>';
-        }
-    } else {
-        // For pending orders, cancel directly
-        if (cancelOrder($conn, $Order_ID, $reason)) {
-            $message = '<div class="success">Order cancelled successfully. Your items have been returned to stock.</div>';
-        } else {
-            $message = '<div class="error">Failed to cancel order.</div>';
+            // For pending orders, cancel directly
+            if (cancelOrder($conn, $Order_ID, $reason)) {
+                $message = '<div class="success">Order cancelled successfully. Your items have been returned to stock.</div>';
+            } else {
+                $message = '<div class="error">Failed to cancel order.</div>';
+            }
         }
     }
-}
 
-// Fetch order details
-$stmt = $conn->prepare("SELECT * FROM orders WHERE Order_ID = ? AND User_ID = ?");
-$stmt->execute([$Order_ID, $_SESSION['user_id']]);
-$order = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Fetch order items
+    $stmt = $conn->prepare("SELECT od.*, p.Product_Name 
+                            FROM Order_Details od
+                            JOIN Product p ON od.Product_ID = p.Product_ID 
+                            WHERE od.Order_ID = ?");
+    $stmt->execute([$Order_ID]);
+    $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if (!$order) {
-    echo "<p>Order not found.</p>";
+    $cancellation_request = null; // Table not present, skip cancellation request check
+} else {
+    echo "<p>Invalid order ID.</p>";
     include '../includes/footer.php';
     exit();
 }
-
-// Fetch order items
-$stmt = $conn->prepare("SELECT od.*, p.Product_Name 
-                        FROM Order_Details od
-                        JOIN Product p ON od.Product_ID = p.Product_ID 
-                        WHERE od.Order_ID = ?");
-$stmt->execute([$Order_ID]);
-$order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$cancellation_request = null; // Table not present, skip cancellation request check
-
 ?>
 
-<div class="main-content">
-    <div class="order-detail-container">
-        <div class="order-detail-card">
+<div class="order-detail-container">
+    <div class="order-detail-card">
         <h2 class="order-detail-heading">Order Details</h2>
         <?php echo $message; ?>
         <div class="order-detail-info">
-            <p><strong>Order ID:</strong> <?php echo isset($order['Order_ID']) ? $order['Order_ID'] : '-'; ?></p>
-            <p><strong>Total Amount:</strong> RM <?php echo isset($order['Total_Price']) ? number_format($order['Total_Price'], 2) : '0.00'; ?></p>
-            <p><strong>Status:</strong> <?php echo isset($order['Status']) ? $order['Status'] : '-'; ?></p>
-            <p><strong>Date:</strong> <?php echo isset($order['created_at']) ? $order['created_at'] : '-'; ?></p>
-
-<!-- Cancellation Form -->
-<?php 
-$eligibility = isOrderEligibleForCancellation($order);
-if ($eligibility['eligible']): 
-    if ($eligibility['requires_approval'] && !$cancellation_request): ?>
-        <h3>Request Cancellation</h3>
-        <p>Processing orders require admin approval. Please provide a reason for your cancellation request.</p>
-        <form method="POST" action="">
-            <label for="reason">Reason for Cancellation:</label>
-            <textarea name="reason" id="reason" required placeholder="Please explain why you want to cancel this order"></textarea>
-            
-            <button type="submit" name="cancel_order">Submit Cancellation Request</button>
-        </form>
-    <?php elseif ($eligibility['requires_approval'] && $cancellation_request): ?>
-        <div class="info">
-            <p>Cancellation request submitted. An admin will review your request.</p>
-            <p>Reason: <?php echo htmlspecialchars($cancellation_request['reason']); ?></p>
-            <p>Submitted: <?php echo $cancellation_request['created_at']; ?></p>
+            <h3>Order Information</h3>
+            <p><strong>Order ID:</strong> <?php echo htmlspecialchars($order['Order_ID']); ?></p>
+            <p><strong>Total Amount:</strong> RM <?php echo number_format($order['Total_Price'], 2); ?></p>
+            <p><strong>Status:</strong> <?php echo htmlspecialchars($order['Status']); ?></p>
+            <p><strong>Date:</strong> <?php echo date('Y-m-d H:i:s', strtotime($order['created_at'])); ?></p>
         </div>
-    <?php else: ?>
-        <h3>Cancel Order</h3>
-        <form method="POST" action="">
-            <label for="reason">Reason for Cancellation:</label>
-            <textarea name="reason" id="reason" required placeholder="Please explain why you want to cancel this order"></textarea>
-            
-            <button type="submit" name="cancel_order">Cancel Order</button>
-        </form>
-    <?php endif; 
-endif; ?>
 
-<h3>Order Items</h3>
-<table border="1">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($order_items as $item): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($item['Product_Name']); ?></td>
-                <td><?php echo $item['Quantity']; ?></td>
-                <td>RM <?php echo number_format($item['Price'], 2); ?></td>
-                <td>RM <?php echo number_format($item['Price'] * $item['Quantity'], 2); ?></td>
-            </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+        <?php
+        // Check if order is eligible for cancellation
+        $eligibility = isOrderEligibleForCancellation($order);
+        if ($eligibility['eligible']):
+        ?>
+        <div class="order-total">
+            <h3>Cancel Order</h3>
+            <?php if ($eligibility['requires_approval']): ?>
+            <div class="cancel-order-form">
+                <h3>Submit Cancellation Request</h3>
+                <p>Please provide a reason for your cancellation request. An admin will review your request.</p>
+                <form method="POST">
+                    <textarea name="reason" placeholder="Please explain why you want to cancel this order" required></textarea>
+                    <button type="submit" name="cancel_order" class="cancel-order-btn">Submit Request</button>
+                </form>
+            </div>
+            <?php else: ?>
+            <div class="cancel-order-form">
+                <h3>Cancel Order</h3>
+                <p>You can cancel this order immediately since it's still pending.</p>
+                <form method="POST">
+                    <textarea name="reason" placeholder="Please explain why you want to cancel this order" required></textarea>
+                    <button type="submit" name="cancel_order" class="cancel-order-btn">Cancel Order</button>
+                </form>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
 
-<a href="order_history.php">Back to Order History</a>
+        <h3>Order Items</h3>
+        <table class="order-items-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($order_items as $item): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($item['Product_Name']); ?></td>
+                    <td><?php echo htmlspecialchars($item['Quantity']); ?></td>
+                    <td>RM <?php echo number_format($item['Price'], 2); ?></td>
+                    <td>RM <?php echo number_format($item['Quantity'] * $item['Price'], 2); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <a href="order_history.php" class="back-link">Back to Order History</a>
+    </div>
 </div>
+
 <?php
 include '../includes/footer.php';
 ?>

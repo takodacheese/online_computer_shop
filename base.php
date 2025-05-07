@@ -715,7 +715,7 @@ function isOrderEligibleForCancellation($order) {
     ];
     
     // Check if order has a status and it's either 'Pending' or 'Processing'
-    $status = isset($order['status']) ? $order['status'] : '';
+    $status = isset($order['Status']) ? $order['Status'] : '';
     
     if ($status === 'Pending') {
         $result['eligible'] = true;
