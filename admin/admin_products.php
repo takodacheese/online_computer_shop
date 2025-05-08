@@ -24,14 +24,11 @@ $recent_orders = get_recent_orders($conn);
 
 <!-- Order Maintenance Section -->
 <h3>Order Maintenance</h3>
-<p><a href="admin_orders.php">View All Orders</a></p>
-<p><a href="../mem_order/order_history.php">View Member Order History</a></p>
 
-<!-- Quick Stats -->
-<h3>Quick Stats</h3>
-<p><strong>Total Orders:</strong> <?= $total_orders ?></p>
-<!-- get_total_revenue issue-->
-<p><strong>Pending Orders:</strong> <?= $pending_orders ?></p>
+ <button onclick="location.href='admin_orders.php'" >View All Orders</button>
+ <button onclick="location.href='../mem_order/order_history.php'">View Member Order History</button>
+
+
 
 <!-- Recent Orders -->
 <h3>Recent Orders</h3>
@@ -65,10 +62,9 @@ $recent_orders = get_recent_orders($conn);
 <?php endif; ?>
 
 <!-- Quick Links -->
-<h3>Quick Links</h3>
+<h2>Product List</h2>
 <ul>
-    <li><a href="../member/member.php">Manage Members</a></li>
-    <p><a href="admin_add_product.php">Add New Product</a></p>
+    <button onclick="location.href='admin_add_product.php'">Add New Product</button>
 </ul>
 <table border="1">
     <thead>

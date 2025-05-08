@@ -185,7 +185,7 @@ function clearFilters() {
                             ?>
                         <?php endif; ?>
                         <!-- Add to Cart Form -->
-                        <form method="POST" action="mem_order/add_to_cart.php" class="add-to-cart-form">
+                        <form method="POST" action="../mem_order/add_to_cart.php" class="add-to-cart-form">
                             <input type="hidden" name="Product_ID" value="<?= htmlspecialchars($product['Product_ID']) ?>">
                             <label for="quantity">Quantity:</label>
                             <input type="number" name="quantity" value="1" min="1" required>

@@ -35,6 +35,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <div class="admin-dashboard">
 <h2>Edit Product (Admin)</h2>
 <form method="POST" action="admin_product_detail.php?id=<?php echo $product_id; ?>" enctype="multipart/form-data" class="edit-product-form">
+
+<label>Product Image:</label>
+<?php
+// Construct the image path dynamically based on the product name
+$image_name = $product['name'];
+$image_extensions = ['jpg', 'jpeg', 'png', 'gif']; // Supported image extensions
+$image_path = null;
+
+// Check for the existence of the image file with supported extensions
+foreach ($image_extensions as $ext) {
+    $potential_path = "../images/" . $image_name . "." . $ext;
+    if (file_exists($potential_path)) {
+        $image_path = $potential_path;
+        break;
+    }
+}
+
+// Display the product image or a placeholder if no image is found
+if ($image_path) {
+    echo '<img src="' . htmlspecialchars($image_path) . '" alt="Product Image" width="150">';
+} else {
+    echo '<img src="../images/no-image.png" alt="No Image Available" width="150">';
+}
+?>
+<br>
+
+
     <label for="name">Name:</label>
     <input type="text" name="name" value="<?php echo htmlspecialchars($product['name']); ?>" required><br>
     <label for="description">Description:</label>

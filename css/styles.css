@@ -1429,7 +1429,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 /* Footer Styles */
 footer {
-    position: static; /* Change from fixed to static */
+    position: fixed;
     bottom: 0;
     width: 100%;
     background-color: #000000;
@@ -1443,7 +1443,7 @@ footer {
 }
 
 body {
-    padding-bottom: 0; /* Remove extra padding for the fixed footer */
+    padding-bottom: 60px; /* Match footer height */
     min-height: 100vh;
     position: relative;
 }

@@ -66,11 +66,11 @@ if (!file_exists($profile_img)) {
                 <input type="text" name="username" value="<?php echo isset($user['Username']) ? htmlspecialchars($user['Username']) : ''; ?>" required>
             </div>
             <div class="profile-input-group">
-                <label for="email">Email:</label>
+                <label for="email">Email    :</label>
                 <input type="email" name="email" value="<?php echo isset($user['Email']) ? htmlspecialchars($user['Email']) : ''; ?>" required>
             </div>
             <div class="profile-input-group">
-                <label for="address">Address:</label>
+                <label for="address">Address  :</label>
                 <textarea name="address" rows="5" required><?php echo isset($user['Address']) ? htmlspecialchars($user['Address']) : ''; ?></textarea>
             </div>
             <div class="profile-input-group">
@@ -79,7 +79,7 @@ if (!file_exists($profile_img)) {
                 <div id="birthdate-error" style="color: red; display: none;"></div>
             </div>
             <div class="profile-input-group">
-                <label for="gender">Gender:</label>
+                <label for="gender">Gender   :</label>
                 <select name="gender" required>
                     <option value="" disabled selected>Select your gender</option>
                     <option value="Male" <?php echo isset($user['Gender']) && $user['Gender'] == 'Male' ? 'selected' : ''; ?>>Male</option>
