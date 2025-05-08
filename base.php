@@ -27,7 +27,7 @@ function registerUser($conn, $Username, $Email, $password, $gender, $birthday, $
         INSERT INTO User (User_ID, Username, Gender, Password, Birthday, Register_Date, Email, Address)
         VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)
     ");
-    $stmt->execute([
+    return $stmt->execute([
         $user_id,         // User_ID
         $Username,       // Username
         $gender,         // Gender
@@ -36,8 +36,6 @@ function registerUser($conn, $Username, $Email, $password, $gender, $birthday, $
         $Email,          // Email
         $address         // Address
     ]);
-    
-    return $stmt->rowCount() > 0; // Return true if registration was successful
 }
 
 /**
@@ -872,7 +870,7 @@ function getFeaturedProducts($conn, $limit = 4) {
             b.Brand_Name
         FROM product p
         LEFT JOIN category c ON p.Category_ID = c.Category_ID
-        LEFT JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        LEFT JOIN Brand b ON p.Brand_ID = b.Brand_ID
         ORDER BY RAND()
         LIMIT :limit
     ");

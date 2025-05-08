@@ -100,25 +100,24 @@ CREATE TABLE `cart` (
 CREATE TABLE `category` (
   `Category_ID` char(4) NOT NULL,
   `Category_Name` varchar(20) NOT NULL,
-  `Category_Description` text DEFAULT NULL,
-  `Brand_ID` char(4) DEFAULT NULL
+  `Category_Description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `category`
 --
 
-INSERT INTO `category` (`Category_ID`, `Category_Name`, `Category_Description`, `Brand_ID`) VALUES
-('C001', 'Graphics Cards', 'High-performance graphics cards for gaming and professional visualization', 'B001'),
-('C002', 'Processors', 'Central processing units for all computing needs from entry-level to extreme performance', 'B002'),
-('C003', 'Memory', 'RAM modules and memory kits for desktops, laptops, and servers', 'B004'),
-('C004', 'Storage', 'SSDs, HDDs, and hybrid storage solutions for all applications', 'B006'),
-('C005', 'Motherboards', 'Motherboards supporting various form factors and processor sockets', 'B005'),
-('C006', 'Power Supplies', 'Power supply units with different wattages and efficiency ratings', 'B009'),
-('C007', 'Cases', 'Computer cases and chassis in various sizes and designs', 'B010'),
-('C008', 'Cooling', 'Cooling solutions including air coolers, liquid coolers, and thermal compounds', 'B004'),
-('C009', 'Peripherals', 'Keyboards, mice, and other input devices', 'B005'),
-('C010', 'Networking', 'Network interface cards', 'B008');
+INSERT INTO `category` (`Category_ID`, `Category_Name`, `Category_Description`) VALUES
+('C001', 'Graphics Cards', 'High-performance graphics cards for gaming and professional visualization'),
+('C002', 'Processors', 'Central processing units for all computing needs from entry-level to extreme performance'),
+('C003', 'Memory', 'RAM modules and memory kits for desktops, laptops, and servers'),
+('C004', 'Storage', 'SSDs, HDDs, and hybrid storage solutions for all applications'),
+('C005', 'Motherboards', 'Motherboards supporting various form factors and processor sockets'),
+('C006', 'Power Supplies', 'Power supply units with different wattages and efficiency ratings'),
+('C007', 'Cases', 'Computer cases and chassis in various sizes and designs'),
+('C008', 'Cooling', 'Cooling solutions including air coolers, liquid coolers, and thermal compounds'),
+('C009', 'Peripherals', 'Keyboards, mice, and other input devices'),
+('C010', 'Networking', 'Network interface cards');
 
 -- --------------------------------------------------------
 
@@ -213,54 +212,55 @@ CREATE TABLE `product` (
   `Product_Description` text DEFAULT NULL,
   `Product_Price` decimal(10,2) NOT NULL,
   `Stock_Quantity` int(11) NOT NULL,
-  `Category_ID` char(4) DEFAULT NULL
+  `Category_ID` char(4) DEFAULT NULL,
+  `Brand_ID` char(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `product`
 --
 
-INSERT INTO `product` (`Product_ID`, `Product_Name`, `Product_Description`, `Product_Price`, `Stock_Quantity`, `Category_ID`) VALUES
-('P001', 'NVIDIA RTX 4090', 'Flagship 24GB GDDR6X GPU with advanced ray tracing, DLSS 3.0, and AI-powered rendering for ultimate 4K gaming and content creation workloads.', 7519.95, 15, 'C001'),
-('P002', 'AMD RX 7900 XTX', 'High-end 24GB GDDR6 graphics card built on RDNA 3 architecture, optimized for 4K gaming and intensive graphic workloads.', 4699.95, 12, 'C001'),
-('P003', 'NVIDIA RTX 4070 Ti', 'Powerful 12GB GDDR6X GPU with 7680 CUDA cores, delivering high frame rates and advanced visual fidelity at 1440p resolution.', 3759.95, 18, 'C001'),
-('P004', 'Intel Core i9-13900K', 'Flagship 24-core (8 performance + 16 efficiency cores) processor with up to 5.8GHz boost, ideal for gaming and professional content creation.', 2772.95, 20, 'C002'),
-('P005', 'AMD Ryzen 9 7950X', '16-core 32-thread processor with Zen 4 architecture, 5.7GHz boost clock, and PCIe 5.0 support, great for enthusiasts and creators.', 3289.95, 15, 'C002'),
-('P006', 'Intel Core i5-13600K', 'Mid-range 14-core (6 performance + 8 efficiency cores) processor with 5.1GHz boost, perfect for gaming and multitasking.', 1550.95, 25, 'C002'),
-('P007', 'Corsair Vengeance 32GB DDR5', 'High-speed DDR5 5600MHz memory kit (2x16GB) with low latency CL36 and support for Intel XMP 3.0.', 610.95, 30, 'C003'),
-('P008', 'G.Skill Trident Z 64GB DDR4', 'Premium DDR4 3600MHz (2x32GB) memory kit with CL16 latency and RGB lighting for enthusiast PC builds.', 1174.95, 15, 'C003'),
-('P009', 'Kingston Fury 16GB DDR4', 'Reliable 3200MHz (2x8GB) memory kit with CL16 latency and plug-and-play compatibility with Intel and AMD systems.', 281.95, 40, 'C003'),
-('P010', 'Samsung 980 Pro 1TB SSD', 'High-performance PCIe 4.0 NVMe SSD with read speeds up to 7000MB/s, suitable for gaming and professional workloads.', 610.95, 25, 'C004'),
-('P011', 'WD Black SN850X 2TB SSD', 'PCIe Gen4 NVMe SSD with speeds up to 7300MB/s, designed for gamers and creative professionals needing fast storage.', 1085.95, 10, 'C004'),
-('P012', 'Crucial MX500 1TB SSD', 'Reliable SATA III SSD with sequential read/write speeds up to 560/510MB/s, excellent for mainstream desktops and laptops.', 329.95, 35, 'C004'),
-('P013', 'ASUS ROG Strix Z790-E', 'Enthusiast-grade ATX motherboard for Intel 13th Gen CPUs, featuring DDR5, PCIe 5.0, and built-in WiFi 6E support.', 1875.95, 8, 'C005'),
-('P014', 'MSI MAG B650 Tomahawk', 'Durable AM5 motherboard with DDR5 support, PCIe 5.0, and a high-performance VRM design for Ryzen 7000 CPUs.', 1029.95, 12, 'C005'),
-('P015', 'Gigabyte B660 AORUS Pro', 'LGA1700 motherboard with DDR4 support, PCIe 4.0, and 12+1+1 phase digital power design for Intel 12th Gen processors.', 889.95, 15, 'C005'),
-('P016', 'Corsair RM850x PSU', '850W 80+ Gold certified fully modular power supply unit, silent operation with premium capacitors and fan design.', 699.95, 20, 'C006'),
-('P017', 'EVGA SuperNOVA 1000W PSU', '1000W 80+ Platinum fully modular PSU with 10-year warranty, designed for high-performance gaming and workstation PCs.', 1162.95, 5, 'C006'),
-('P018', 'Lian Li PC-O11 Dynamic', 'Premium mid-tower case with dual-chamber design, tempered glass panels, and wide liquid cooling support.', 699.95, 10, 'C007'),
-('P019', 'Fractal Design Meshify C', 'Compact ATX case with high airflow mesh front panel, tempered glass side, and excellent cable management.', 469.95, 15, 'C007'),
-('P020', 'Noctua NH-D15 Air Cooler', 'High-end dual-tower air CPU cooler with dual 140mm fans, excellent thermal performance, and low noise operation.', 515.95, 12, 'C008'),
-('P021', 'MSI GeForce RTX 4060 Ventus', 'Compact yet powerful 8GB GDDR6 graphics card with DLSS 3 and ray tracing support for smooth 1080p gaming.', 1499.00, 20, 'C001'),
-('P022', 'ASUS Dual Radeon RX 7600', 'A performance-focused GPU with 8GB GDDR6 for mid-range gaming and efficient cooling.', 1389.00, 18, 'C001'),
-('P028', 'Intel Core i7-13700KF', 'High-end 16-core (8P+8E) processor with up to 5.4GHz boost, ideal for gaming and productivity.', 2099.00, 22, 'C002'),
-('P029', 'AMD Ryzen 7 7700X', '8-core Zen 4 CPU with PCIe 5.0 support and impressive multitasking performance.', 1899.00, 20, 'C002'),
-('P030', 'Thermaltake TOUGHRAM RGB 32GB DDR4', 'RGB-lit memory kit (2x16GB) at 3600MHz for gamers and creators.', 589.00, 30, 'C003'),
-('P031', 'Corsair Dominator Platinum RGB 64GB DDR5', 'Premium memory kit (2x32GB) with customizable lighting and extreme performance.', 1399.00, 10, 'C003'),
-('P032', 'Seagate FireCuda 530 1TB', 'Ultra-fast PCIe 4.0 NVMe SSD with up to 7300MB/s for gamers and professionals.', 769.00, 15, 'C004'),
-('P033', 'Samsung 870 EVO 2TB', 'Reliable SATA SSD with long endurance and performance for everyday computing.', 899.00, 20, 'C004'),
-('P034', 'Gigabyte Z790 AORUS Elite AX', 'Feature-rich ATX board with DDR5 support, Wi-Fi 6E, and PCIe 5.0.', 1099.00, 12, 'C005'),
-('P035', 'MSI B650M Mortar WiFi', 'Compact AM5 micro-ATX motherboard with modern connectivity and cooling.', 799.00, 18, 'C005'),
-('P036', 'Thermaltake Toughpower GF1 750W', '750W 80+ Gold modular PSU designed for silent operation and durability.', 499.00, 25, 'C006'),
-('P037', 'ASUS ROG Thor 1200W Platinum II', 'Enthusiast-grade fully modular power supply with OLED panel and Aura Sync.', 1399.00, 8, 'C006'),
-('P038', 'Corsair 4000D Airflow', 'Mid-tower ATX case with optimized ventilation and minimalist design.', 379.00, 20, 'C007'),
-('P039', 'Thermaltake Core P3', 'Open-frame chassis with panoramic view and wall-mountable support.', 649.00, 6, 'C007'),
-('P040', 'MSI MAG CoreLiquid C360', '360mm AIO liquid cooler with vibrant ARGB and efficient heat dissipation.', 639.00, 15, 'C008'),
-('P041', 'Arctic Liquid Freezer II 240', 'Quiet 240mm AIO cooler with integrated VRM fan and outstanding thermal performance.', 449.00, 18, 'C008'),
-('P042', 'Razer BlackWidow V4 Pro', 'Mechanical RGB keyboard with macro controls and wrist rest for premium typing.', 799.00, 15, 'C009'),
-('P043', 'Logitech G502 X Lightspeed', 'Wireless gaming mouse with HERO 25K sensor and customizable buttons.', 599.00, 25, 'C009'),
-('P044', 'TP-Link Archer TXE75E', 'PCIe Wi-Fi 6E adapter with Bluetooth 5.3 support and low-latency gaming performance.', 229.00, 20, 'C010'),
-('P045', 'ASUS XG-C100C', '10-Gigabit Ethernet PCIe adapter with wide OS support for fast LAN setups.', 389.00, 10, 'C010');
+INSERT INTO `product` (`Product_ID`, `Product_Name`, `Product_Description`, `Product_Price`, `Stock_Quantity`, `Category_ID`, `Brand_ID`) VALUES
+('P001', 'NVIDIA RTX 4090', 'Flagship 24GB GDDR6X GPU with advanced ray tracing, DLSS 3.0, and AI-powered rendering for ultimate 4K gaming and content creation workloads.', 7519.95, 15, 'C001', 'B001'),
+('P002', 'AMD RX 7900 XTX', 'High-end 24GB GDDR6 graphics card built on RDNA 3 architecture, optimized for 4K gaming and intensive graphic workloads.', 4699.95, 12, 'C001', 'B002'),
+('P003', 'NVIDIA RTX 4070 Ti', 'Powerful 12GB GDDR6X GPU with 7680 CUDA cores, delivering high frame rates and advanced visual fidelity at 1440p resolution.', 3759.95, 18, 'C001', 'B001'),
+('P004', 'Intel Core i9-13900K', 'Flagship 24-core (8 performance + 16 efficiency cores) processor with up to 5.8GHz boost, ideal for gaming and professional content creation.', 2772.95, 20, 'C002', 'B003'),
+('P005', 'AMD Ryzen 9 7950X', '16-core 32-thread processor with Zen 4 architecture, 5.7GHz boost clock, and PCIe 5.0 support, great for enthusiasts and creators.', 3289.95, 15, 'C002', 'B002'),
+('P006', 'Intel Core i5-13600K', 'Mid-range 14-core (6 performance + 8 efficiency cores) processor with 5.1GHz boost, perfect for gaming and multitasking.', 1550.95, 25, 'C002', 'B003'),
+('P007', 'Corsair Vengeance 32GB DDR5', 'High-speed DDR5 5600MHz memory kit (2x16GB) with low latency CL36 and support for Intel XMP 3.0.', 610.95, 30, 'C003', 'B004'),
+('P008', 'G.Skill Trident Z 64GB DDR4', 'Premium DDR4 3600MHz (2x32GB) memory kit with CL16 latency and RGB lighting for enthusiast PC builds.', 1174.95, 15, 'C003', 'B005'),
+('P009', 'Kingston Fury 16GB DDR4', 'Reliable 3200MHz (2x8GB) memory kit with CL16 latency and plug-and-play compatibility with Intel and AMD systems.', 281.95, 40, 'C003', 'B006'),
+('P010', 'Samsung 980 Pro 1TB SSD', 'High-performance PCIe 4.0 NVMe SSD with read speeds up to 7000MB/s, suitable for gaming and professional workloads.', 610.95, 25, 'C004', 'B006'),
+('P011', 'WD Black SN850X 2TB SSD', 'PCIe Gen4 NVMe SSD with speeds up to 7300MB/s, designed for gamers and creative professionals needing fast storage.', 1085.95, 10, 'C004', 'B007'),
+('P012', 'Crucial MX500 1TB SSD', 'Reliable SATA III SSD with sequential read/write speeds up to 560/510MB/s, excellent for mainstream desktops and laptops.', 329.95, 35, 'C004', 'B008'),
+('P013', 'ASUS ROG Strix Z790-E', 'Enthusiast-grade ATX motherboard for Intel 13th Gen CPUs, featuring DDR5, PCIe 5.0, and built-in WiFi 6E support.', 1875.95, 8, 'C005', 'B005'),
+('P014', 'MSI MAG B650 Tomahawk', 'Durable AM5 motherboard with DDR5 support, PCIe 5.0, and a high-performance VRM design for Ryzen 7000 CPUs.', 1029.95, 12, 'C005', 'B008'),
+('P015', 'Gigabyte B660 AORUS Pro', 'LGA1700 motherboard with DDR4 support, PCIe 4.0, and 12+1+1 phase digital power design for Intel 12th Gen processors.', 889.95, 15, 'C005', 'B009'),
+('P016', 'Corsair RM850x PSU', '850W 80+ Gold certified fully modular power supply unit, silent operation with premium capacitors and fan design.', 699.95, 20, 'C006', 'B004'),
+('P017', 'EVGA SuperNOVA 1000W PSU', '1000W 80+ Platinum fully modular PSU with 10-year warranty, designed for high-performance gaming and workstation PCs.', 1162.95, 5, 'C006', 'B010'),
+('P018', 'Lian Li PC-O11 Dynamic', 'Premium mid-tower case with dual-chamber design, tempered glass panels, and wide liquid cooling support.', 699.95, 10, 'C007', 'B010'),
+('P019', 'Fractal Design Meshify C', 'Compact ATX case with high airflow mesh front panel, tempered glass side, and excellent cable management.', 469.95, 15, 'C007', 'B004'),
+('P020', 'Noctua NH-D15 Air Cooler', 'High-end dual-tower air CPU cooler with dual 140mm fans, excellent thermal performance, and low noise operation.', 515.95, 12, 'C008', 'B004'),
+('P021', 'MSI GeForce RTX 4060 Ventus', 'Compact yet powerful 8GB GDDR6 graphics card with DLSS 3 and ray tracing support for smooth 1080p gaming.', 1499.00, 20, 'C001', 'B001'),
+('P022', 'ASUS Dual Radeon RX 7600', 'A performance-focused GPU with 8GB GDDR6 for mid-range gaming and efficient cooling.', 1389.00, 18, 'C001', 'B002'),
+('P028', 'Intel Core i7-13700KF', 'High-end 16-core (8P+8E) processor with up to 5.4GHz boost, ideal for gaming and productivity.', 2099.00, 22, 'C002', 'B003'),
+('P029', 'AMD Ryzen 7 7700X', '8-core Zen 4 CPU with PCIe 5.0 support and impressive multitasking performance.', 1899.00, 20, 'C002', 'B002'),
+('P030', 'Thermaltake TOUGHRAM RGB 32GB DDR4', 'RGB-lit memory kit (2x16GB) at 3600MHz for gamers and creators.', 589.00, 30, 'C003', 'B010'),
+('P031', 'Corsair Dominator Platinum RGB 64GB DDR5', 'Premium memory kit (2x32GB) with customizable lighting and extreme performance.', 1399.00, 10, 'C003', 'B004'),
+('P032', 'Seagate FireCuda 530 1TB', 'Ultra-fast PCIe 4.0 NVMe SSD with up to 7300MB/s for gamers and professionals.', 769.00, 15, 'C004', 'B007'),
+('P033', 'Samsung 870 EVO 2TB', 'Reliable SATA SSD with long endurance and performance for everyday computing.', 899.00, 20, 'C004', 'B006'),
+('P034', 'Gigabyte Z790 AORUS Elite AX', 'Feature-rich ATX board with DDR5 support, Wi-Fi 6E, and PCIe 5.0.', 1099.00, 12, 'C005', 'B009'),
+('P035', 'MSI B650M Mortar WiFi', 'Compact AM5 micro-ATX motherboard with modern connectivity and cooling.', 799.00, 18, 'C005', 'B008'),
+('P036', 'Thermaltake Toughpower GF1 750W', '750W 80+ Gold modular PSU designed for silent operation and durability.', 499.00, 25, 'C006', 'B010'),
+('P037', 'ASUS ROG Thor 1200W Platinum II', 'Enthusiast-grade fully modular power supply with OLED panel and Aura Sync.', 1399.00, 8, 'C006', 'B005'),
+('P038', 'Corsair 4000D Airflow', 'Mid-tower ATX case with optimized ventilation and minimalist design.', 379.00, 20, 'C007', 'B004'),
+('P039', 'Thermaltake Core P3', 'Open-frame chassis with panoramic view and wall-mountable support.', 649.00, 6, 'C007', 'B010'),
+('P040', 'MSI MAG CoreLiquid C360', '360mm AIO liquid cooler with vibrant ARGB and efficient heat dissipation.', 639.00, 15, 'C008', 'B008'),
+('P041', 'Arctic Liquid Freezer II 240', 'Quiet 240mm AIO cooler with integrated VRM fan and outstanding thermal performance.', 449.00, 18, 'C008', 'B004'),
+('P042', 'Razer BlackWidow V4 Pro', 'Mechanical RGB keyboard with macro controls and wrist rest for premium typing.', 799.00, 15, 'C009', 'B005'),
+('P043', 'Logitech G502 X Lightspeed', 'Wireless gaming mouse with HERO 25K sensor and customizable buttons.', 599.00, 25, 'C009', 'B004'),
+('P044', 'TP-Link Archer TXE75E', 'PCIe Wi-Fi 6E adapter with Bluetooth 5.3 support and low-latency gaming performance.', 229.00, 20, 'C010', 'B008'),
+('P045', 'ASUS XG-C100C', '10-Gigabit Ethernet PCIe adapter with wide OS support for fast LAN setups.', 389.00, 10, 'C010', 'B005');
 
 -- --------------------------------------------------------
 
@@ -303,7 +303,7 @@ INSERT INTO `user` (`User_ID`, `Username`, `Gender`, `Password`, `Birthday`, `Re
 ('U00002', 'Jane Smith', 'Female', '123456', '1985-08-22', '2025-01-05 14:15:00', 'jane@example.com', 'No. 45, Jalan Merdeka, Taman Melaka Raya, 75000 Melaka, Melaka, Malaysia'),
 ('U00003', 'Robert Johnson', 'Male', '123456', '1988-11-30', '2025-02-18 16:45:00', 'robert@example.com', 'No. 22, Jalan Indah 15/3, Taman Bukit Indah, 81200 Johor Bahru, Johor, Malaysia'),
 ('U00004', 'Emily Davis', 'Female', '123456', '1995-04-22', '2025-03-05 10:20:00', 'emily@example.com', 'Suite 12-03, Menara Panorama, Jalan Puncak, Seksyen 13, 40000 Shah Alam, Selangor, Malaysia'),
-('U00005', 'Michael Wilson', 'Male', '123456', '1992-07-14', '2025-03-20 13:10:00', 'michael@example.com', 'Unit 3201, Tower B, The Mews, Jalan Yap Kwan Seng, 50450 Kuala Lumpur, Wilayah Persekutuan, Malaysia'),
+('U00005', 'Michael Wilson', 'Male', '123456', '1992-07-14', '2025-03-20 13:10:00', 'michael@example.com', 'Unit 3201, Tower B, The Mews, Jalan Yap Kwan Seng, 50450 Kuala Lumpur, Wilayah Persekutuan, Malaysia');
 
 -- --------------------------------------------------------
 
@@ -345,8 +345,7 @@ ALTER TABLE `cart`
 -- Indexes for table `category`
 --
 ALTER TABLE `category`
-  ADD PRIMARY KEY (`Category_ID`),
-  ADD KEY `Brand_ID` (`Brand_ID`);
+  ADD PRIMARY KEY (`Category_ID`);
 
 --
 -- Indexes for table `delivery`
@@ -427,6 +426,11 @@ ALTER TABLE `order_details`
 --
 ALTER TABLE `pc_build`
   MODIFY `PC_ID` int(11) NOT NULL AUTO_INCREMENT;
+
+-- Add foreign key constraints
+ALTER TABLE `product`
+  ADD CONSTRAINT `product_ibfk_1` FOREIGN KEY (`Category_ID`) REFERENCES `category` (`Category_ID`),
+  ADD CONSTRAINT `product_ibfk_2` FOREIGN KEY (`Brand_ID`) REFERENCES `brand` (`Brand_ID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

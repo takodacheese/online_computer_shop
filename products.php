@@ -34,7 +34,7 @@ if ($selected_category !== '') {
     $params[] = $selected_category;
 }
 if ($selected_brand !== '') {
-    $where[] = 'b.Brand_Name = ?';
+    $where[] = 'p.Brand_ID = ?';
     $params[] = $selected_brand;
 }
 if ($selected_price !== '') {
@@ -45,10 +45,14 @@ $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 // Fetch category and brand options
 $categories = $conn->query('SELECT * FROM category')->fetchAll(PDO::FETCH_ASSOC);
-$brands = $conn->query('SELECT DISTINCT Brand_Name FROM Brand')->fetchAll(PDO::FETCH_ASSOC);
+$brands = $conn->query('SELECT Brand_ID, Brand_Name FROM Brand')->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch products with filter (JOIN Brand and Category)
-$sql = "SELECT p.* FROM product p JOIN category c ON p.Category_ID = c.Category_ID JOIN Brand b ON c.Brand_ID = b.Brand_ID $whereClause ORDER BY p.Product_Name ASC";
+// Fetch products with filter (JOIN Brand directly)
+$sql = "SELECT p.*, b.Brand_Name 
+        FROM product p 
+        JOIN Brand b ON p.Brand_ID = b.Brand_ID 
+        $whereClause 
+        ORDER BY p.Product_Name ASC";
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -83,7 +87,7 @@ if ($user_id) {
             <select name="brand" id="brand">
                 <option value="">All Brands</option>
                 <?php foreach ($brands as $b): ?>
-                    <option value="<?= htmlspecialchars($b['Brand_Name']) ?>" <?= $selected_brand == $b['Brand_Name'] ? 'selected' : '' ?>>
+                    <option value="<?= htmlspecialchars($b['Brand_ID']) ?>" <?= $selected_brand == $b['Brand_ID'] ? 'selected' : '' ?>>
                         <?= htmlspecialchars($b['Brand_Name']) ?>
                     </option>
                 <?php endforeach; ?>
@@ -158,6 +162,7 @@ function clearFilters() {
                 }
                 ?>
                 <h3><?= htmlspecialchars($product['Product_Name']) ?></h3>
+                <p class="brand">Brand: <?= htmlspecialchars($product['Brand_Name']) ?></p>
                 <p><?= htmlspecialchars($product['Product_Description']) ?></p>
                 <p class="price">RM <?= number_format($product['Product_Price'], 2) ?></p>
                 <p>Stock: <?= htmlspecialchars($product['Stock_Quantity']) ?> units</p>

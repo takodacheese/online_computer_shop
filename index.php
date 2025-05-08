@@ -51,6 +51,7 @@ require_once 'base.php';
                 echo "<h3 style='color:#00bfff; font-size:1.18em; font-weight:bold; margin-bottom:8px;'>".htmlspecialchars($product['name'])."</h3>";
                 echo "<p style='color:#d3eaff; font-size:0.98em; min-height:52px;'>".htmlspecialchars($product['description'])."</p>";
                 echo "<p style='color:#fff; font-weight:bold; font-size:1.08em; margin:8px 0 10px 0;'>Price: ".number_format($product['price'], 2)."</p>";
+                echo "<p style='color:#d3eaff; font-size:0.9em; margin-bottom:8px;'>Brand: ".htmlspecialchars($product['Brand_Name'])."</p>";
                 echo '<div class="product-actions" style="margin-top:auto;">';
                 echo '<a href="product_detail.php?product_id=' . htmlspecialchars($product['Product_ID']) . '" class="btn btn-outline">View Details</a>';
                 echo '</div>';

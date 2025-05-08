@@ -5,20 +5,20 @@ include '../includes/header.php';
 require_once '../base.php';
 require_once '../db.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $Username = trim($_POST['Username']);
-    $Email = trim($_POST['Email']);
-    $password = trim($_POST['password']);
-    $gender = trim($_POST['gender']);
-    $birthday = trim($_POST['birthday']);
-    $address = trim($_POST['address']);
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $Username = $_POST['Username'];
+    $Email = $_POST['Email'];
+    $password = $_POST['password'];
+    $gender = $_POST['gender'];
+    $birthday = $_POST['birthday'];
+    $address = $_POST['address'];
+    
     if (registerUser($conn, $Username, $Email, $password, $gender, $birthday, $address)) {
-        $_SESSION['flash_message'] = 'Successfully registered account! Please log in.';
-        header("Location: login.php");
+        $_SESSION['flash_message'] = 'Registration successful! You can now login.';
+        header('Location: login.php');
         exit();
     } else {
-        $_SESSION['flash_message'] = 'Error: Unable to register user.';
+        $_SESSION['flash_message'] = 'Error: Unable to register user. Please try again.';
     }
 }
 
@@ -36,17 +36,16 @@ if (isset($_SESSION['flash_message'])) {
     <input type="text" name="Username" required><br>
         
     <label for="Email">Email:</label>
-    <input type="Email" name="Email" required><br>
+    <input type="email" name="Email" required><br>
         
         <label for="password">Password:</label>
-        <input type="password" name="password" required><br>
+        <input type="password" name="password" required minlength="8"><br>
         
         <label for="gender">Gender:</label>
         <select name="gender" required>
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+            <option value="O">Other</option>
         </select><br>
         
         <label for="birthday">Birthday:</label>
@@ -57,6 +56,7 @@ if (isset($_SESSION['flash_message'])) {
         
         <button type="submit">Register</button>
     </form>
+    <p>Already have an account? <a href="login.php">Login here</a></p>
 </section>
 <?php
 include '../includes/footer.php';
