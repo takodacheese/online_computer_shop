@@ -6,7 +6,7 @@ require_once '../db.php';
 require_once '../base.php';
 require_login();
 ?>
-<link rel="stylesheet" href="../css/profile.css">
+
 
 <?php
 $user_id = $_SESSION['user_id'];
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php
 $profile_img = "../images/profiles/" . $user_id . ".jpg";
 if (!file_exists($profile_img)) {
-    $profile_img = "../images/profiles/default.jpg";
+    $profile_img = "../images/default-profile.png";
 }
 ?>
 <img src="<?= htmlspecialchars($profile_img) ?>" alt="Profile Photo" width="120" height="120">
