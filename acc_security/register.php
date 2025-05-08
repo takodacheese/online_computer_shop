@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $gender = $_POST['gender'];
     $birthday = $_POST['birthday'];
     $address = $_POST['address'];
+
     
     if (registerUser($conn, $Username, $Email, $password, $gender, $birthday, $address)) {
         $_SESSION['flash_message'] = 'Registration successful! You can now login.';
