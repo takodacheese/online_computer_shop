@@ -4187,3 +4187,47 @@ body.payment-success-page {
     text-align: center;
     font-weight: bold;
 }
+
+.build-description {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    font-size: 0.9em;
+    white-space: pre-line;
+    color: #333;
+}
+
+.cart-product-name-hover {
+    position: relative;
+    display: inline-block;
+}
+
+.cart-product-name-hover:hover .build-description {
+    display: block;
+}
+
+.build-description {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    min-width: 300px;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.build-description-static {
+    display: block !important;
+    position: static !important;
+    background: #23263a;
+    color: #00fff7;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 1em;
+    box-shadow: 0 2px 8px rgba(0,255,247,0.08);
+    white-space: pre-line;
+    font-family: monospace, 'Consolas', 'Menlo', 'Courier', monospace;
+}

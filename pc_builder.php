@@ -132,8 +132,11 @@ $components = getPCBuilderComponents($conn);
             <label for="os">Operating System (Optional):</label>
             <select name="os" id="os">
                 <option value="">-- Select OS --</option>
-                <option value="P048" data-price="199.99">Windows 11 Home</option>
-                <option value="P049" data-price="149.99">Windows 10 Pro</option>
+                <?php foreach ($components['operating_systems'] as $os): ?>
+                    <option value="<?= htmlspecialchars($os['Product_ID']) ?>" data-price="<?= $os['Product_Price'] ?>">
+                        <?= htmlspecialchars($os['Product_Name']) ?> (<?= $os['Brand_Name'] ?>)
+                    </option>
+                <?php endforeach; ?>
             </select>
         </div>
 
@@ -248,7 +251,8 @@ document.querySelector('.pc-build-form').addEventListener('submit', function(e) 
             alert('PC Build added to cart successfully!');
             window.location.href = 'mem_order/cart.php';
         } else {
-            alert(data.message || 'Failed to add PC Build to cart.');
+            console.error('Error details:', data);
+            alert(data.message || 'Failed to add PC Build to cart. Please try again.');
         }
     })
     .catch(error => {

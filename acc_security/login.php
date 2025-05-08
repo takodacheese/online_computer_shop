@@ -6,9 +6,9 @@ require_once '../base.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $Email = $_POST['Email'];
     $password = $_POST['password'];
-    
+
     $role = loginUser($conn, $Email, $password);
-    
+
     if ($role === 'blocked') {
         $_SESSION['error_message'] = 'Your account has been blocked. Please contact the administrator.';
     } elseif ($role === 'admin') {

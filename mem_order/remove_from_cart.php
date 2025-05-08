@@ -33,9 +33,33 @@ try {
             $stmt = $conn->prepare("DELETE FROM cart WHERE Cart_ID = ?");
             $stmt->execute([$cart_id]);
         }
-        // Restore stock to product
-        $stmt = $conn->prepare("UPDATE product SET Stock_Quantity = Stock_Quantity + ? WHERE Product_ID = ?");
-        $stmt->execute([$quantity_to_remove, $product_id]);
+        if ($product_id === 'PCBU') {
+            // Restore stock for each component in the custom build
+            $build_description = $cart_item['Build_Description'];
+            // Try to extract Product_ID and quantity from the description (if possible)
+            // If you want a more robust solution, store components as JSON in the cart table
+            $lines = explode("\n", $build_description);
+            foreach ($lines as $line) {
+                // Example line: - AMD Ryzen 7 7700X ($1,899.00) x2
+                if (preg_match('/- (.+) \(\$([0-9\.,]+)\)(?: x(\d+))?/', $line, $matches)) {
+                    // We don't have Product_ID, only name, so we need to look up by name
+                    $component_name = $matches[1];
+                    $component_quantity = isset($matches[3]) ? (int)$matches[3] : 1;
+                    $stmt = $conn->prepare("SELECT Product_ID FROM product WHERE Product_Name = ? LIMIT 1");
+                    $stmt->execute([$component_name]);
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if ($row) {
+                        $component_id = $row['Product_ID'];
+                        $updateStmt = $conn->prepare("UPDATE product SET Stock_Quantity = Stock_Quantity + ? WHERE Product_ID = ?");
+                        $updateStmt->execute([$component_quantity, $component_id]);
+                    }
+                }
+            }
+        } else {
+            // Restore stock to product
+            $stmt = $conn->prepare("UPDATE product SET Stock_Quantity = Stock_Quantity + ? WHERE Product_ID = ?");
+            $stmt->execute([$quantity_to_remove, $product_id]);
+        }
         
         $_SESSION['success_message'] = "Successfully removed {$quantity_to_remove} item(s) from cart";
         $conn->commit();

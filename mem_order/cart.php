@@ -50,6 +50,11 @@ $cart_items = getCartItems($conn, $user_id);
                         ?>
                         <span class="cart-product-name-hover">
                             <?= htmlspecialchars($item['product_name']); ?>
+                            <?php if ($item['Product_ID'] === 'PCBU'): ?>
+                                <div class="build-description build-description-static">
+                                    <?= nl2br(htmlspecialchars($item['Build_Description'])) ?>
+                                </div>
+                            <?php endif; ?>
                             <?php if ($imagePath): ?>
                                 <img class="cart-product-hover-img" src="<?= htmlspecialchars($imagePath); ?>" alt="<?= htmlspecialchars($item['product_name']); ?>">
                             <?php else: ?>
