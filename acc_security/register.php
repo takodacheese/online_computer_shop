@@ -49,7 +49,8 @@ if (isset($_SESSION['flash_message'])) {
         </select><br>
         
         <label for="birthday">Birthday:</label>
-        <input type="date" name="birthday" required><br>
+        <input type="date" name="birthday" id="birthday" required><br>
+        <div id="birthday-error" style="color: red; display: none;"></div>
         
         <label for="address">Address:</label>
         <textarea name="address" required></textarea><br>
@@ -58,6 +59,28 @@ if (isset($_SESSION['flash_message'])) {
     </form>
     <p>Already have an account? <a href="login.php">Login here</a></p>
 </section>
+<script>
+    document.getElementById('birthday').addEventListener('change', function() {
+        const birthday = new Date(this.value);
+        const today = new Date();
+        const age = today.getFullYear() - birthday.getFullYear();
+        const monthDiff = today.getMonth() - birthday.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthday.getDate())) {
+            age--;
+        }
+        
+        const errorDiv = document.getElementById('birthday-error');
+        if (age < 16) {
+            errorDiv.textContent = 'You must be at least 16 years old to register.';
+            errorDiv.style.display = 'block';
+            this.setCustomValidity('You must be at least 16 years old to register.');
+        } else {
+            errorDiv.style.display = 'none';
+            this.setCustomValidity('');
+        }
+    });
+</script>
 <?php
 include '../includes/footer.php';
 ?>

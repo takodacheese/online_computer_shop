@@ -42,12 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (passwordField.type === 'password') {
             passwordField.type = 'text';
-            toggleIcon.src = "../images/passwordeyeopen.png";
+            toggleIcon.src = "../images/passwordeye.png";
             toggleIcon.alt = "Hide Password";
             toggleIcon.title = "Hide password";
         } else {
             passwordField.type = 'password';
-            toggleIcon.src = "../images/passwordeye.png";
+            toggleIcon.src = "../images/passwordeyeopen.png";
             toggleIcon.alt = "Show Password";
             toggleIcon.title = "Show password";
         }

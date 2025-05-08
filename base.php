@@ -9,9 +9,23 @@ require_once 'db.php'; // Database connection
 // ------------------------
 
 /**
+ * Validate if user is at least 16 years old
+ */
+function validateAge($birthdate) {
+    $birthday = new DateTime($birthdate);
+    $today = new DateTime();
+    $age = $today->diff($birthday)->y;
+    return $age >= 16;
+}
+
+/**
  * Register new user (with hashed password)
  */
 function registerUser($conn, $Username, $Email, $password, $gender, $birthday, $address) {
+    if (!validateAge($birthday)) {
+        return false;
+    }
+    
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
     
     // Generate User_ID (e.g., U00001)
@@ -140,6 +154,10 @@ function getUserById($conn, $user_id) {
  * Update Username and Email
  */
 function updateUserProfile($conn, $user_id, $Username, $Email, $address, $birthdate, $gender) {
+    if (!validateAge($birthdate)) {
+        return "Error: You must be at least 16 years old.";
+    }
+    
     $Username = sanitizeInput($Username);
     $Email = sanitizeInput($Email);
     $address = sanitizeInput($address);
@@ -519,10 +537,10 @@ function getOrderDetails($conn, $Order_ID) {
  * Fetch order items for a specific order
  */
 function getOrderItems($conn, $Order_ID) {
-    $stmt = $conn->prepare("SELECT order_items.*, products.name 
-                            FROM order_items 
-                            JOIN products ON order_items.product_id = products.product_id 
-                            WHERE order_items.Order_ID = ?");
+    $stmt = $conn->prepare("SELECT od.*, p.Product_Name 
+                            FROM Order_Details od
+                            JOIN Product p ON od.Product_ID = p.Product_ID 
+                            WHERE od.Order_ID = ?");
     $stmt->execute([$Order_ID]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -886,7 +904,7 @@ function getPCBuilderComponents($conn) {
         SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
         FROM product p
         JOIN category c ON p.Category_ID = c.Category_ID
-        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        JOIN Brand b ON p.Brand_ID = b.Brand_ID
         WHERE c.Category_Name = 'Processors'
         ORDER BY p.Product_Price ASC
     ");
@@ -898,7 +916,7 @@ function getPCBuilderComponents($conn) {
         SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
         FROM product p
         JOIN category c ON p.Category_ID = c.Category_ID
-        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        JOIN Brand b ON p.Brand_ID = b.Brand_ID
         WHERE c.Category_Name = 'Graphics Cards'
         ORDER BY p.Product_Price ASC
     ");
@@ -910,7 +928,7 @@ function getPCBuilderComponents($conn) {
         SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
         FROM product p
         JOIN category c ON p.Category_ID = c.Category_ID
-        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        JOIN Brand b ON p.Brand_ID = b.Brand_ID
         WHERE c.Category_Name = 'Motherboards'
         ORDER BY p.Product_Price ASC
     ");
@@ -922,7 +940,7 @@ function getPCBuilderComponents($conn) {
         SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
         FROM product p
         JOIN category c ON p.Category_ID = c.Category_ID
-        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        JOIN Brand b ON p.Brand_ID = b.Brand_ID
         WHERE c.Category_Name = 'Memory'
         ORDER BY p.Product_Price ASC
     ");
@@ -934,7 +952,7 @@ function getPCBuilderComponents($conn) {
         SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
         FROM product p
         JOIN category c ON p.Category_ID = c.Category_ID
-        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        JOIN Brand b ON p.Brand_ID = b.Brand_ID
         WHERE c.Category_Name = 'Storage'
         ORDER BY p.Product_Price ASC
     ");
@@ -946,7 +964,7 @@ function getPCBuilderComponents($conn) {
         SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
         FROM product p
         JOIN category c ON p.Category_ID = c.Category_ID
-        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        JOIN Brand b ON p.Brand_ID = b.Brand_ID
         WHERE c.Category_Name = 'Power Supplies'
         ORDER BY p.Product_Price ASC
     ");
@@ -958,7 +976,7 @@ function getPCBuilderComponents($conn) {
         SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
         FROM product p
         JOIN category c ON p.Category_ID = c.Category_ID
-        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        JOIN Brand b ON p.Brand_ID = b.Brand_ID
         WHERE c.Category_Name = 'Cases'
         ORDER BY p.Product_Price ASC
     ");
@@ -970,7 +988,7 @@ function getPCBuilderComponents($conn) {
         SELECT DISTINCT p.Product_ID, p.Product_Name, p.Product_Price, c.Category_Name, b.Brand_Name
         FROM product p
         JOIN category c ON p.Category_ID = c.Category_ID
-        JOIN Brand b ON c.Brand_ID = b.Brand_ID
+        JOIN Brand b ON p.Brand_ID = b.Brand_ID
         WHERE c.Category_Name = 'Cooling'
         ORDER BY p.Product_Price ASC
     ");

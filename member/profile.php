@@ -75,7 +75,8 @@ if (!file_exists($profile_img)) {
             </div>
             <div class="profile-input-group">
                 <label for="birthdate">Birthdate:</label>
-                <input type="date" name="birthdate" value="<?php echo isset($user['Birthdate']) ? htmlspecialchars($user['Birthdate']) : ''; ?>" required>
+                <input type="date" name="birthdate" id="birthdate" value="<?php echo isset($user['Birthdate']) ? htmlspecialchars($user['Birthdate']) : ''; ?>" required>
+                <div id="birthdate-error" style="color: red; display: none;"></div>
             </div>
             <div class="profile-input-group">
                 <label for="gender">Gender:</label>
@@ -139,6 +140,28 @@ if (!file_exists($profile_img)) {
     </div>
     <?php unset($_SESSION['success_message']); ?>
 <?php endif; ?>
+<script>
+    document.getElementById('birthdate').addEventListener('change', function() {
+        const birthday = new Date(this.value);
+        const today = new Date();
+        const age = today.getFullYear() - birthday.getFullYear();
+        const monthDiff = today.getMonth() - birthday.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthday.getDate())) {
+            age--;
+        }
+        
+        const errorDiv = document.getElementById('birthdate-error');
+        if (age < 16) {
+            errorDiv.textContent = 'You must be at least 16 years old.';
+            errorDiv.style.display = 'block';
+            this.setCustomValidity('You must be at least 16 years old.');
+        } else {
+            errorDiv.style.display = 'none';
+            this.setCustomValidity('');
+        }
+    });
+</script>
 <?php
 require_once '../includes/footer.php';
 ?>

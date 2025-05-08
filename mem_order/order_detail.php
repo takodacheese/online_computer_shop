@@ -98,7 +98,6 @@ if ($Order_ID) {
         if ($eligibility['eligible']):
         ?>
         <div class="order-total">
-            <h3>Cancel Order</h3>
             <?php if ($eligibility['requires_approval']): ?>
             <div class="cancel-order-form">
                 <h3>Submit Cancellation Request</h3>

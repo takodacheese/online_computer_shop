@@ -25,7 +25,7 @@ $components = getPCBuilderComponents($conn);
             <select name="cpu" id="cpu" required>
                 <option value="">-- Select CPU --</option>
                 <?php foreach ($components['cpus'] as $cpu): ?>
-                    <option value="<?= htmlspecialchars($cpu['Product_ID']) ?>" data-price="<?= $cpu['Price'] ?>">
+                    <option value="<?= htmlspecialchars($cpu['Product_ID']) ?>" data-price="<?= $cpu['Product_Price'] ?>">
                         <?= htmlspecialchars($cpu['Product_Name']) ?> (<?= $cpu['Brand_Name'] ?>)
                     </option>
                 <?php endforeach; ?>
@@ -37,7 +37,7 @@ $components = getPCBuilderComponents($conn);
             <select name="cpu_cooler" id="cpu_cooler" required>
                 <option value="">-- Select CPU Cooler --</option>
                 <?php foreach ($components['cooling'] as $cooler): ?>
-                    <option value="<?= htmlspecialchars($cooler['Product_ID']) ?>" data-price="<?= $cooler['Price'] ?>">
+                    <option value="<?= htmlspecialchars($cooler['Product_ID']) ?>" data-price="<?= $cooler['Product_Price'] ?>">
                         <?= htmlspecialchars($cooler['Product_Name']) ?> (<?= $cooler['Brand_Name'] ?>)
                     </option>
                 <?php endforeach; ?>
@@ -49,7 +49,7 @@ $components = getPCBuilderComponents($conn);
             <select name="motherboard" id="motherboard" required>
                 <option value="">-- Select Motherboard --</option>
                 <?php foreach ($components['motherboards'] as $motherboard): ?>
-                    <option value="<?= htmlspecialchars($motherboard['Product_ID']) ?>" data-price="<?= $motherboard['Price'] ?>">
+                    <option value="<?= htmlspecialchars($motherboard['Product_ID']) ?>" data-price="<?= $motherboard['Product_Price'] ?>">
                         <?= htmlspecialchars($motherboard['Product_Name']) ?> (<?= $motherboard['Brand_Name'] ?>)
                     </option>
                 <?php endforeach; ?>
@@ -61,7 +61,7 @@ $components = getPCBuilderComponents($conn);
             <select name="gpu" id="gpu" required>
                 <option value="">-- Select GPU --</option>
                 <?php foreach ($components['gpus'] as $gpu): ?>
-                    <option value="<?= htmlspecialchars($gpu['Product_ID']) ?>" data-price="<?= $gpu['Price'] ?>">
+                    <option value="<?= htmlspecialchars($gpu['Product_ID']) ?>" data-price="<?= $gpu['Product_Price'] ?>">
                         <?= htmlspecialchars($gpu['Product_Name']) ?> (<?= $gpu['Brand_Name'] ?>)
                     </option>
                 <?php endforeach; ?>
@@ -73,7 +73,7 @@ $components = getPCBuilderComponents($conn);
             <select name="ram" id="ram" required>
                 <option value="">-- Select RAM --</option>
                 <?php foreach ($components['ram'] as $ram): ?>
-                    <option value="<?= htmlspecialchars($ram['Product_ID']) ?>" data-price="<?= $ram['Price'] ?>">
+                    <option value="<?= htmlspecialchars($ram['Product_ID']) ?>" data-price="<?= $ram['Product_Price'] ?>">
                         <?= htmlspecialchars($ram['Product_Name']) ?> (<?= $ram['Brand_Name'] ?>)
                     </option>
                 <?php endforeach; ?>
@@ -85,7 +85,7 @@ $components = getPCBuilderComponents($conn);
             <select name="storage" id="storage" required>
                 <option value="">-- Select Storage --</option>
                 <?php foreach ($components['storage'] as $storage): ?>
-                    <option value="<?= htmlspecialchars($storage['Product_ID']) ?>" data-price="<?= $storage['Price'] ?>">
+                    <option value="<?= htmlspecialchars($storage['Product_ID']) ?>" data-price="<?= $storage['Product_Price'] ?>">
                         <?= htmlspecialchars($storage['Product_Name']) ?> (<?= $storage['Brand_Name'] ?>)
                     </option>
                 <?php endforeach; ?>
@@ -97,7 +97,7 @@ $components = getPCBuilderComponents($conn);
             <select name="second_storage" id="second_storage">
                 <option value="">-- Select Second Storage --</option>
                 <?php foreach ($components['storage'] as $storage): ?>
-                    <option value="<?= htmlspecialchars($storage['Product_ID']) ?>" data-price="<?= $storage['Price'] ?>">
+                    <option value="<?= htmlspecialchars($storage['Product_ID']) ?>" data-price="<?= $storage['Product_Price'] ?>">
                         <?= htmlspecialchars($storage['Product_Name']) ?> (<?= $storage['Brand_Name'] ?>)
                     </option>
                 <?php endforeach; ?>
@@ -108,8 +108,8 @@ $components = getPCBuilderComponents($conn);
             <label for="power_supply">Power Supply:</label>
             <select name="power_supply" id="power_supply" required>
                 <option value="">-- Select Power Supply --</option>
-                <?php foreach ($components['power_supply'] as $psu): ?>
-                    <option value="<?= htmlspecialchars($psu['Product_ID']) ?>" data-price="<?= $psu['Price'] ?>">
+                <?php foreach ($components['power_supplies'] as $psu): ?>
+                    <option value="<?= htmlspecialchars($psu['Product_ID']) ?>" data-price="<?= $psu['Product_Price'] ?>">
                         <?= htmlspecialchars($psu['Product_Name']) ?> (<?= $psu['Brand_Name'] ?>)
                     </option>
                 <?php endforeach; ?>
@@ -120,8 +120,8 @@ $components = getPCBuilderComponents($conn);
             <label for="case">Case:</label>
             <select name="case" id="case" required>
                 <option value="">-- Select Case --</option>
-                <?php foreach ($components['case'] as $case): ?>
-                    <option value="<?= htmlspecialchars($case['Product_ID']) ?>" data-price="<?= $case['Price'] ?>">
+                <?php foreach ($components['cases'] as $case): ?>
+                    <option value="<?= htmlspecialchars($case['Product_ID']) ?>" data-price="<?= $case['Product_Price'] ?>">
                         <?= htmlspecialchars($case['Product_Name']) ?> (<?= $case['Brand_Name'] ?>)
                     </option>
                 <?php endforeach; ?>
