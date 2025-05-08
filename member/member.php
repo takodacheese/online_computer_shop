@@ -12,10 +12,11 @@ include '../db.php';
 // Handle search
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 if ($search !== '') {
-    $stmt = $conn->prepare("SELECT * FROM User WHERE Username LIKE ? OR Email LIKE ?");
-    $stmt->execute(["%$search%", "%$search%"]);
+    $stmt = $conn->prepare("SELECT DISTINCT * FROM User WHERE Username LIKE ? OR Email LIKE ? ORDER BY User_ID");
+    $searchTerm = "%$search%";
+    $stmt->execute([$searchTerm, $searchTerm]);
 } else {
-    $stmt = $conn->prepare("SELECT * FROM User");
+    $stmt = $conn->prepare("SELECT DISTINCT * FROM User ORDER BY User_ID");
     $stmt->execute();
 }
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);

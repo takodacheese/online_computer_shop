@@ -192,7 +192,7 @@ function clearFilters() {
                             <button type="submit" class="add-to-cart">Add to Cart</button>
                         </form>
                     </div>
-                    <a href="product_detail.php?id=" . htmlspecialchars($product['Product_ID']) . '" class="view-details-btn" style="margin-top:6px;">View Details</a>
+                    <a href="product_detail.php?id=<?= htmlspecialchars($product['Product_ID']) ?>" class="view-details-btn" style="margin-top:6px;">View Details</a>
                 </div>
             </div>
         <?php endforeach; ?>

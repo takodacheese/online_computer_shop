@@ -132,8 +132,8 @@ $components = getPCBuilderComponents($conn);
             <label for="os">Operating System (Optional):</label>
             <select name="os" id="os">
                 <option value="">-- Select OS --</option>
-                <option value="os1" data-price="199.99">Windows 11 Home</option>
-                <option value="os2" data-price="149.99">Windows 10 Pro</option>
+                <option value="P048" data-price="199.99">Windows 11 Home</option>
+                <option value="P049" data-price="149.99">Windows 10 Pro</option>
             </select>
         </div>
 
@@ -196,45 +196,65 @@ selects.forEach(select => {
 updateBuildSummary();
 
 // Submit form with all selected components
-document.querySelector('form').addEventListener('submit', function(e) {
-    const formData = new FormData(this);
+document.querySelector('.pc-build-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
     const components = [];
+    const buildSummary = [];
+    let totalPrice = 0;
+    const selects = document.querySelectorAll('select');
     
     // Add all selected components to the form data
     selects.forEach(select => {
         if (select.value && select.value !== '') {
+            const selectedOption = select.options[select.selectedIndex];
+            const price = parseFloat(selectedOption.dataset.price);
+            totalPrice += price;
+            
             components.push({
                 Product_ID: select.value,
                 quantity: 1
             });
+            
+            buildSummary.push({
+                name: selectedOption.text,
+                price: price
+            });
         }
     });
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('components', JSON.stringify(components));
+    formData.append('build_summary', JSON.stringify(buildSummary));
+    formData.append('total_price', totalPrice);
     
     // Send AJAX request to add all components to cart
     fetch('mem_order/add_to_cart.php', {
         method: 'POST',
+        body: formData,
         headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            components: components
-        })
+            'X-Requested-With': 'XMLHttpRequest'
+        }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            alert('All components added to cart successfully!');
+            alert('PC Build added to cart successfully!');
             window.location.href = 'mem_order/cart.php';
         } else {
-            alert('Failed to add components to cart.');
+            alert(data.message || 'Failed to add PC Build to cart.');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while adding components to cart.');
+        alert('An error occurred while adding PC Build to cart. Please try again.');
     });
-    
-    e.preventDefault();
 });
 </script>
 <?php include 'includes/footer.php'; ?>

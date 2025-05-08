@@ -75,7 +75,7 @@ if (!file_exists($profile_img)) {
             </div>
             <div class="profile-input-group">
                 <label for="birthdate">Birthdate:</label>
-                <input type="date" name="birthdate" id="birthdate" value="<?php echo isset($user['Birthdate']) ? htmlspecialchars($user['Birthdate']) : ''; ?>" required>
+                <input type="date" name="birthdate" id="birthdate" value="<?php echo isset($user['Birthdate']) ? htmlspecialchars($user['Birthdate']) : ''; ?>">
                 <div id="birthdate-error" style="color: red; display: none;"></div>
             </div>
             <div class="profile-input-group">

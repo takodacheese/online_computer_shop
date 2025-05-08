@@ -3,24 +3,51 @@ session_start();
 include '../includes/header.php';
 require_once '../base.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $Email = trim($_POST['Email']);
-    $password = trim($_POST['password']);
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $Email = $_POST['Email'];
+    $password = $_POST['password'];
+    
     $role = loginUser($conn, $Email, $password);
-
-    if ($role) {
-        // Redirect based on role
-        header("Location: " . ($role === 'admin' ? "../admin/admin_dashboard.php" : "../index.php"));
+    
+    if ($role === 'blocked') {
+        $_SESSION['error_message'] = 'Your account has been blocked. Please contact the administrator.';
+    } elseif ($role === 'admin') {
+        header('Location: ../admin/admin_dashboard.php');
+        exit();
+    } elseif ($role === 'user') {
+        header('Location: ../index.php');
         exit();
     } else {
-        echo "<p class='error'>Invalid Email or password.</p>";
+        $_SESSION['error_message'] = 'Invalid email or password.';
     }
 }
 ?>
 
 <section class="login">
+    <style>
+        .error-message {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ef9a9a;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+    
     <h2>Login</h2>
+    
+    <?php if (isset($_SESSION['error_message'])): ?>
+        <div class="error-message">
+            <?php 
+            echo $_SESSION['error_message'];
+            unset($_SESSION['error_message']);
+            ?>
+        </div>
+    <?php endif; ?>
+
     <form method="POST" action="login.php">
         <label for="Email">Email:</label>
         <input type="email" name="Email" class="form-input" required><br>

@@ -4177,3 +4177,13 @@ body.payment-success-page {
 .receipt-table td, .receipt-table th {
     border: none;
 }
+ .error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ef9a9a;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+}
