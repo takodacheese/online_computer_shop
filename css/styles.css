@@ -4230,3 +4230,33 @@ body.payment-success-page {
     white-space: pre-line;
     font-family: monospace, 'Consolas', 'Menlo', 'Courier', monospace;
 }
+
+/* Flash Message Styles */
+.flash-message {
+    position: fixed;
+    top: 80px; /* Adjust this value based on your header height */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 30px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    text-align: center;
+    min-width: 300px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.flash-message.success {
+    background-color: #4CAF50;
+}
+
+.flash-message.error {
+    background-color: #f44336;
+}
+
+.flash-message.fade-out {
+    opacity: 0;
+}

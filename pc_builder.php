@@ -240,23 +240,16 @@ document.querySelector('.pc-build-form').addEventListener('submit', function(e) 
             'X-Requested-With': 'XMLHttpRequest'
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
             alert('PC Build added to cart successfully!');
             window.location.href = 'mem_order/cart.php';
         } else {
-            console.error('Error details:', data);
             alert(data.message || 'Failed to add PC Build to cart. Please try again.');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
         alert('An error occurred while adding PC Build to cart. Please try again.');
     });
 });

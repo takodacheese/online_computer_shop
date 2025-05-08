@@ -205,7 +205,16 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             var formData = new FormData(form);
-            fetch('mem_order/add_to_cart.php', {
+            var productCard = form.closest('.product-card');
+            var stockElement = productCard.querySelector('p:nth-last-child(2)');
+            var quantityInput = form.querySelector('input[name="quantity"]');
+            
+            console.log('Adding to cart:', {
+                Product_ID: formData.get('Product_ID'),
+                quantity: formData.get('quantity')
+            });
+            
+            fetch('../mem_order/add_to_cart.php', {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -215,26 +224,38 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showFlashMessage(data.message);
-                    // Reload the page after a short delay to show the message
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
+                    // Update stock display
+                    if (data.new_stock !== undefined) {
+                        stockElement.textContent = 'Stock: ' + data.new_stock + ' units';
+                        // Disable add to cart button if stock is 0
+                        if (data.new_stock === 0) {
+                            form.querySelector('button[type="submit"]').disabled = true;
+                            quantityInput.disabled = true;
+                        }
+                    }
+                    
+                    // Show success message
+                    showFlashMessage(data.message, 'success');
+                    
+                    // Reset quantity input to 1
+                    quantityInput.value = 1;
                 } else {
-                    showFlashMessage(data.message || 'Failed to add item to cart.');
+                    showFlashMessage(data.message || 'Failed to add item to cart.', 'error');
                 }
             })
-            .catch(() => {
-                showFlashMessage('An error occurred.');
+            .catch(error => {
+                console.error('Error:', error);
+                showFlashMessage('An error occurred while adding to cart.', 'error');
             });
         });
     });
 });
-function showFlashMessage(message) {
+
+function showFlashMessage(message, type = 'success') {
     let msg = document.getElementById('flash-message');
     if (!msg) {
         msg = document.createElement('div');
-        msg.className = 'success-popup';
+        msg.className = `flash-message ${type}`;
         msg.id = 'flash-message';
         document.body.appendChild(msg);
     }
