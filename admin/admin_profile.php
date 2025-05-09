@@ -48,14 +48,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $profile_img = "../images/default-profile.png";
                 }
                 ?>
-                <img src="<?= htmlspecialchars($profile_img) ?>" alt="Profile Photo" width="120" height="120">
+                <!-- Profile picture with click-to-upload functionality -->
+                <img src="<?= htmlspecialchars($profile_img) ?>" alt="Profile Photo" width="120" height="120" id="profile-picture" style="cursor: pointer;">
+                <form method="POST" action="admin_profile.php" enctype="multipart/form-data" id="upload-profile-pic-form" style="display: none;">
+                    <input type="file" name="profile_pic" id="profile-pic-input" accept="image/*" style="display: none;">
+                    <button type="submit" name="upload_profile_pic" id="upload-profile-pic-btn" style="display: none;">Upload</button>
+                </form>
             </div>
             <h2 class="profile-section-title" style="margin-bottom: 0;">Admin Profile</h2>
         </div>
         <?php if ($message): ?>
             <p><?php echo $message; ?></p>
         <?php endif; ?>
-        <form class="profile-form" method="POST" action="admin_profile.php" enctype="multipart/form-data">
+        <form class="profile-form" method="POST" action="admin_profile.php">
             <div class="profile-input-group">
                 <label for="username">Username:</label>
                 <input type="text" name="username" value="<?php echo isset($admin['Username']) ? htmlspecialchars($admin['Username']) : ''; ?>" required>
@@ -103,5 +108,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 <?php endif; ?>
 <?php
+
 require_once '../includes/footer.php';
 ?>
+<script>
+    // JavaScript to handle profile picture click-to-upload
+    const profilePicture = document.getElementById('profile-picture');
+    const profilePicInput = document.getElementById('profile-pic-input');
+    const uploadProfilePicForm = document.getElementById('upload-profile-pic-form');
+
+    profilePicture.addEventListener('click', () => {
+        profilePicInput.click();
+    });
+
+    profilePicInput.addEventListener('change', () => {
+        uploadProfilePicForm.submit();
+    });
+</script>
