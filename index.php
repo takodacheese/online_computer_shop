@@ -6,7 +6,17 @@ session_start();
 include 'includes/header.php';
 include 'db.php';
 require_once 'base.php';
-?>
+
+
+ if (isset($_SESSION['flash_success'])): ?>
+    <div class="flash_success"><?= htmlspecialchars($_SESSION['flash_success']) ?></div>
+    <?php unset($_SESSION['flash_success']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['flash_error'])): ?>
+    <div class="flash_error"><?= htmlspecialchars($_SESSION['flash_error']) ?></div>
+    <?php unset($_SESSION['flash_error']); ?>
+<?php endif;?>
 
 <!-- title Section with background image and button for nav -->
 <section class="title" style="background: url('images/picture_background_shop.jpg') center/cover no-repeat; min-height: 320px; border-radius: 16px; box-shadow: 0 4px 32px rgba(0,0,0,0.18); margin-bottom: 32px; position: relative;">
@@ -93,13 +103,14 @@ require_once 'base.php';
         <div style="flex: 1; min-width: 260px; display: flex; flex-direction: column; align-items: flex-start; gap: 18px;">
             <div style="margin-top: 12px;">
                 <b>Follow Us:</b><br>
-                <a href="#" style="color:#fff; margin-right:12px;"><img src="images/facebook.png" alt="Facebook" style="height:28px;vertical-align:middle;"></a>
-                <a href="#" style="color:#fff; margin-right:12px;"><img src="images/instagram.avif" alt="Instagram" style="height:28px;vertical-align:middle;"></a>
+                <a href="https://www.facebook.com/karhengong" style="color:#fff; margin-right:12px;"><img src="images/facebook.png" alt="Facebook" style="height:28px;vertical-align:middle;"></a>
+                <a href="https://www.instagram.com/kar_henglol/" style="color:#fff; margin-right:12px;"><img src="images/instagram.png" alt="Instagram" style="height:28px;vertical-align:middle;"></a>
                 <a href="#" style="color:#fff; margin-right:12px;"><img src="images/tiktok.jpg" alt="TikTok" style="height:28px;vertical-align:middle;"></a>
             </div>
         </div>
     </div>
 </section>
+
 
 <?php
 include 'includes/footer.php';

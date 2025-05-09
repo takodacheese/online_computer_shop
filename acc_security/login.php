@@ -1,4 +1,5 @@
 <?php
+//login.php
 session_start();
 include '../includes/header.php';
 require_once '../base.php';
@@ -10,43 +11,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $role = loginUser($conn, $Email, $password);
 
     if ($role === 'blocked') {
-        $_SESSION['error_message'] = 'Your account has been blocked. Please contact the administrator.';
+        $_SESSION['flash_error'] = 'Your account has been blocked. Please contact the administrator.';
+        header('Location: login.php');
+        exit();
     } elseif ($role === 'admin') {
+        $_SESSION['flash_success'] = 'Login successful! Welcome Admin.';
         header('Location: ../admin/admin_dashboard.php');
         exit();
     } elseif ($role === 'user') {
+        $_SESSION['flash_success'] = 'Login successful! Welcome back.';
         header('Location: ../index.php');
         exit();
     } else {
-        $_SESSION['error_message'] = 'Invalid email or password.';
+        $_SESSION['flash_error'] = 'Invalid email or password.';
+        header('Location: login.php');
+        exit();
     }
 }
 ?>
 
+<!-- Flash messages display -->
+<?php if (isset($_SESSION['flash_success'])): ?>
+    <div class="flash_success"><?= htmlspecialchars($_SESSION['flash_success']) ?></div>
+    <?php unset($_SESSION['flash_success']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['flash_error'])): ?>
+    <div class="flash_error"><?= htmlspecialchars($_SESSION['flash_error']) ?></div>
+    <?php unset($_SESSION['flash_error']); ?>
+<?php endif; ?>
+
+
 <section class="login">
-    <style>
-        .error-message {
-            background-color: #ffebee;
-            color: #c62828;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ef9a9a;
-            border-radius: 4px;
-            text-align: center;
-            font-weight: bold;
-        }
-    </style>
-    
+    <div class="logo-container">
+        <a href="login.php">
+        <img src="../images/logo.png" alt="Site Logo" class="logo"></a>
+    </div>
+ 
     <h2>Login</h2>
-    
-    <?php if (isset($_SESSION['error_message'])): ?>
-        <div class="error-message">
-            <?php 
-            echo $_SESSION['error_message'];
-            unset($_SESSION['error_message']);
-            ?>
-        </div>
-    <?php endif; ?>
 
     <form method="POST" action="login.php">
         <label for="Email">Email:</label>
@@ -57,7 +59,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="password" name="password" id="passwordField" class="form-input" required>
             <img src="../images/passwordeye.png" class="password-toggle" onclick="togglePassword()" 
                  alt="Show Password" title="Toggle visibility" id="toggleIcon">
-        </div><br>
+        </div>
+
+         <?php if (isset($_SESSION['error_message'])): ?>
+        <div class="login_error_message">
+            <?php 
+            echo $_SESSION['error_message'];
+            unset($_SESSION['error_message']);
+            ?>
+        </div>
+    <?php endif; ?>
 
         <button type="submit">Login</button>
     </form>
@@ -80,9 +91,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     </script>
-    <div class="reset-link">
-        <p>Forgot your password? <a href="forgot_password.php">Reset it here</a>.</p>
+    <p>Forgot your password? <a href="forgot_password.php">Reset it here</a>.</p>
+        <br>
+        <div class="social-signup">
+    <div class="reset-link">       
+    <p>-----   Or Sign In With   -----</p>
+    <div class="social-icons">
+        <a href="https://www.facebook.com/" target="_blank" class="facebook-icon">
+            <img src="../images/facebook.jpg" alt="Facebook Signup">
+        </a>
+        <a href="https://www.instagram.com/accounts/login/" target="_blank" class="instar-icon">
+            <img src="../images/instagram.png" alt="Instagram Signup">
+        </a>
+        <a href="https://discord.com/login?redirect_to=%2Fstore%2F" target="_blank" class="discord-icon">
+            <img src="../images/discordicon.png" alt="Discord Signup">
+        </a>
     </div>
+</div>
+
+
+
+    </div>
+    <br>
+<p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
 </section>
 
 <?php include '../includes/footer.php'; ?>

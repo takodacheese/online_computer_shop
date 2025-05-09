@@ -1271,6 +1271,22 @@ header {
     text-align: center;
     color: white;
 }
+.logo {
+    max-width: 150px;
+    margin: 0 auto; /* Centers the logo */
+}
+
+/* Add logo styling */
+.logo_container {
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+.login-error {
+    color: #ff0019;
+    font-size: 0.9em;  
+}
+
 /* Style the calendar button */
 input[type="date"]::-webkit-calendar-picker-indicator {
     background-color: #3300ff; /* Change the background color */
@@ -1279,11 +1295,73 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 5px; /* Add some padding */
     cursor: pointer; /* Change the cursor to pointer */
 }
+/* For Firefox */
+input[type="date"]::-moz-calendar-picker-indicator {
+    color:  rgb(255, 255, 255, 0.8);
+    filter: invert(70%);
 
-/* Optional: Add hover effect */
+}
+/*  Add hover effect */
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
     background-color: #2a00cc; /* Change background color on hover */
 }
+/* Date picker dropdown styling */
+input[type="date"]::-webkit-datetime-edit {
+    color:  rgb(255, 255, 255, 0.8);
+}
+.register_error_message {
+    text-align: center;
+    font-size: 1.0em;
+    margin: 5px 0 5px 0;
+    background: #2d1212;
+    border: 1px solid #ff6b6b;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 15px;
+    color: rgba(255, 255, 255, 0.8); /* Updated text color */
+}
+/* Input placeholder */
+input::placeholder {
+    background-color: black;
+    color:  rgb(255, 255, 255, 0.8);
+    opacity: 1; /* For Firefox */
+}
+::-webkit-input-placeholder { /* Chrome, Safari, Opera */
+    color:  rgb(255, 255, 255, 0.8);
+}
+::-ms-input-placeholder { /* Microsoft Edge */
+    color:  rgb(255, 255, 255, 0.8);
+}
+
+.passwordField {
+    background-color: black;
+    color: white;
+}
+
+/* Add placeholder styling */
+::placeholder {
+    color:  rgb(255, 255, 255, 0.8);
+    font-size: 0.9em;
+}
+
+.password-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 390px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 1px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 25px;
+    height: 35px;
+    opacity: 0.7;
+    color: black;
+}
+
 
 /* Login Styles */
 .login h2 {
@@ -1355,6 +1433,54 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     margin-top: 1rem;
     text-align: center;
 }
+.login_error_message {
+    text-align: center;
+    font-size: 1.0em;
+    margin: 5px 0 5px 0;
+    background: #2d1212;
+    border: 1px solid #ff6b6b;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 15px;
+    color: rgba(255, 255, 255, 0.8); /* Updated text color */
+    }
+.social-signup {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.social-signup p {
+    margin-bottom: 15px;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+
+.social-icons img {
+    width: 60px;
+    height: 60px;
+    transition: transform 0.3s ease;
+}
+
+.social-icons img:hover {
+    transform: scale(1.1);
+}
+
+.facebook-icon {
+    order: 1;
+}
+
+.instar-icon {
+    order: 2;
+}
+
+.discord-icon {
+    order: 3;
+}
+
 
 /* Forgot-password Styles */
 .forgot-password {
@@ -4321,6 +4447,80 @@ body.payment-success-page {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+.flash_success {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    background-color:rgb(22, 145, 0); /* Green background */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    animation: fadeOutUp 3s forwards;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    border: 1px solid rgb(255, 255, 255, 0.8);
+    box-shadow: 
+        0 -3px 3px rgba(38, 255, 0, 10),
+        0 3px 3px rgba(38, 255, 0, 10),
+        -3px 0 3px rgba(38, 255, 0, 10),
+        3px 0 3px rgba(38, 255, 0, 10);
+    }
+
+.flash_error {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    background-color:rgb(143, 0, 0); /* Red background */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    animation: fadeOutUp 3s forwards;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    border: 1px solid rgb(255, 255, 255, 0.8);
+    box-shadow: 
+        0 -3px 3px rgba(255, 0, 0, 10),
+        0 3px 3px rgba(255, 0, 0, 10),
+        -3px 0 3px rgba(255, 0, 0, 10),
+        3px 0 3px rgba(255, 0, 0, 10);
+    }
+
+    .flash_success {
+    animation: fadeOutUp 2s forwards; /* Changed from 3s to 2s */
+    /* rest of the styles remain the same */
+}
+
+.flash_error {
+    animation: fadeOutUp 2s forwards; /* Changed from 3s to 2s */
+    /* rest of the styles remain the same */
+}
+
+@keyframes fadeOutUp {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+    50% { /* Changed from 70% to 50% for faster fade start */
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -80%);
     }
 }
 
