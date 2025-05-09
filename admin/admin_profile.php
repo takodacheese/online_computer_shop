@@ -19,42 +19,58 @@ $admin = getUserById($conn, $admin_id); // Fetch admin details
 $message = "";
 
 // Handle profile update
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['update_profile'])) {
-        $username = sanitizeInput($_POST['username']);
-        $email = sanitizeInput($_POST['email']);
-        $result = updateAdminProfile($conn, $admin_id, $username, $email);
-        if (strpos($result, 'successfully') !== false) {
-            $_SESSION['flash_message'] = $result;
-            $_SESSION['flash_type'] = "success";
-        } else {
-            $message = $result;
-        }
-        $admin = getUserById($conn, $admin_id); // Refresh admin details
-    }
+if (isset($_POST['upload_profile_pic'])) {
+    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
+        $target_dir = "../images/";
+        $image_name = $admin_id; // Unique name for the admin profile picture
+        $imageFileType = strtolower(pathinfo($_FILES['profile_pic']['name'], PATHINFO_EXTENSION));
+        $target_file = $target_dir . $image_name . '.' . $imageFileType;
 
-    if (isset($_POST['update_password'])) {
-        updateUserPassword($conn, $admin_id, $_POST['current_password'], $_POST['new_password']);
+        // Delete the previous profile picture if it exists
+        $existing_files = glob($target_dir  . $admin_id . ".*");
+        foreach ($existing_files as $file) {
+            if (file_exists($file)) {
+                unlink($file); // Delete the file
+            }
+        }
+
+        // Validate image file type
+        if (in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
+            if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $target_file)) {
+                $_SESSION['flash_message'] = "Profile picture updated successfully.";
+                $_SESSION['flash_type'] = "success";
+            } else {
+                $_SESSION['flash_message'] = "Error uploading profile picture.";
+                $_SESSION['flash_type'] = "error";
+            }
+        } else {
+            $_SESSION['flash_message'] = "Invalid image format. Only JPG, JPEG, PNG, and GIF are allowed.";
+            $_SESSION['flash_type'] = "error";
+        }
+    } else {
+        $_SESSION['flash_message'] = "No file selected or an error occurred.";
+        $_SESSION['flash_type'] = "error";
     }
+    header("Location: admin_profile.php");
+    exit();
 }
 ?>
 <div class="profile-container">
     <div class="profile-section">
         <div class="profile-main-info">
-            <div class="profile-photo-preview">
-                <?php
-                $profile_img = "../images/profiles/" . $admin_id . ".jpg";
-                if (!file_exists($profile_img)) {
-                    $profile_img = "../images/default-profile.png";
-                }
-                ?>
-                <!-- Profile picture with click-to-upload functionality -->
-                <img src="<?= htmlspecialchars($profile_img) ?>" alt="Profile Photo" width="120" height="120" id="profile-picture" style="cursor: pointer;">
-                <form method="POST" action="admin_profile.php" enctype="multipart/form-data" id="upload-profile-pic-form" style="display: none;">
-                    <input type="file" name="profile_pic" id="profile-pic-input" accept="image/*" style="display: none;">
-                    <button type="submit" name="upload_profile_pic" id="upload-profile-pic-btn" style="display: none;">Upload</button>
-                </form>
-            </div>
+        <div class="profile-photo-preview">
+    <?php
+    // Construct the expected profile picture path
+    $profile_img = "../images/" . $admin_id . ".jpg";
+
+    ?>
+    <!-- Display the profile picture -->
+    <img src="<?= htmlspecialchars($profile_img) ?>" alt="Profile Photo" width="120" height="120" id="profile-picture" style="cursor: pointer;">
+    <form method="POST" action="admin_profile.php" enctype="multipart/form-data" id="upload-profile-pic-form">
+        <input type="file" name="profile_pic" id="profile-pic-input" accept="images/*" style="display: none;">
+        <input type="hidden" name="upload_profile_pic" value="1">
+    </form>
+</div>
             <h2 class="profile-section-title" style="margin-bottom: 0;">Admin Profile</h2>
         </div>
         <?php if ($message): ?>
