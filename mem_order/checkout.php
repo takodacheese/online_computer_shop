@@ -33,8 +33,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
     try {
         $payment_method = $_POST['payment_method'];
         $Order_ID = createOrder($conn, $user_id, $Total_Price);
+        
+        if (!$Order_ID) {
+            throw new Exception("Failed to create order");
+        }
+        
         addOrderItems($conn, $Order_ID, $cart_items);
         $_SESSION['Order_ID'] = $Order_ID;
+        
+        // Debug log
+        error_log("Created order with ID: " . $Order_ID);
+        
         // Set allowed payment methods based on user selection
         $allowed_methods = [];
         if ($payment_method === 'grabpay') {
@@ -62,10 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_method'])) {
                     ]
                 ],
                 'mode' => 'payment',
-                'success_url' => 'http://' . $_SERVER['HTTP_HOST'] . '/mem_order/payment_success.php?order_id=' . $Order_ID,
+                'success_url' => 'http://' . $_SERVER['HTTP_HOST'] . '/mem_order/payment_success.php?Order_ID=' . $Order_ID,
                 'cancel_url' => 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/payment_cancel.php',
                 'metadata' => [
-                    'order_id' => $Order_ID,
+                    'Order_ID' => $Order_ID,
                     'user_id' => $user_id
                 ],
             ]);

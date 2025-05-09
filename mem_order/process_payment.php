@@ -54,10 +54,10 @@ try {
         clearCart($conn, $_SESSION['user_id']);
 
         // Store order ID in session for success page
-        $_SESSION['success_Order_ID'] = $Order_ID;
+        $_SESSION['Order_ID'] = $Order_ID;
         
-        // Redirect to success page
-        header('Location: payment_success.php');
+        // Redirect to success page with Order_ID in URL
+        header('Location: payment_success.php?Order_ID=' . $Order_ID);
         exit();
     } else {
         throw new Exception('Payment failed: ' . $paymentIntent->last_payment_error->message ?? 'Unknown error');

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 08, 2025 at 02:49 PM
+-- Generation Time: May 09, 2025 at 08:39 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -94,16 +94,6 @@ CREATE TABLE `cart` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `cart`
---
-
-INSERT INTO `cart` (`Cart_ID`, `User_ID`, `Product_ID`, `Quantity`, `Total_Price_Cart`, `Added_Date`, `Build_Description`) VALUES
-('CRT001', 'U00001', 'P029', 1, 1899.00, '2025-05-08 15:29:09', NULL),
-('CRT002', 'U00001', 'P005', 1, 3289.95, '2025-05-08 15:29:12', NULL),
-('CRT003', 'U00001', 'P002', 1, 4699.95, '2025-05-08 16:09:04', NULL),
-('CRT004', 'ADM001', 'P029', 1, 1899.00, '2025-05-08 16:11:48', NULL);
-
---
 -- Triggers `cart`
 --
 DELIMITER $$
@@ -154,7 +144,7 @@ CREATE TABLE `delivery` (
   `Delivery_ID` char(7) NOT NULL,
   `Order_ID` char(7) NOT NULL,
   `Shipping_Address` text NOT NULL,
-  `Delivery_Status` varchar(20) NOT NULL,
+  `Delivery_Status` varchar(32) DEFAULT 'In Transit',
   `Tracking_Number` varchar(100) DEFAULT NULL,
   `Recipient_Name` varchar(20) NOT NULL,
   `Shipping_Date` datetime NOT NULL
@@ -191,13 +181,6 @@ CREATE TABLE `orders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `orders`
---
-
-INSERT INTO `orders` (`Order_ID`, `User_ID`, `Total_Price`, `Status`, `Shipping_Cost`, `Order_Quantity`, `tax_amount`, `subtotal`, `created_at`) VALUES
-('ORD0001', 'U00001', 9888.90, 'Cancelled', 0.00, '1', 0.00, 9888.90, '2025-05-08 08:11:05');
-
---
 -- Triggers `orders`
 --
 DELIMITER $$
@@ -225,13 +208,6 @@ CREATE TABLE `order_cancellation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `order_cancellation`
---
-
-INSERT INTO `order_cancellation` (`Cancellation_ID`, `Order_ID`, `Approve_Status`, `Cancellation_Reason`, `Cancellation_Date`, `Admin_Note`) VALUES
-('CANCEL0001', 'ORD0001', 'Pending', 'vhvhvhcgcgfcgfggfdf', '2025-05-08 16:11:05', '');
-
---
 -- Triggers `order_cancellation`
 --
 DELIMITER $$
@@ -254,17 +230,9 @@ CREATE TABLE `order_details` (
   `Order_ID` char(7) NOT NULL,
   `Product_ID` char(4) NOT NULL,
   `Quantity` int(11) NOT NULL,
-  `Price` decimal(10,2) NOT NULL
+  `Price` decimal(10,2) NOT NULL,
+  `Build_Description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `order_details`
---
-
-INSERT INTO `order_details` (`Order_Detail_ID`, `Order_ID`, `Product_ID`, `Quantity`, `Price`) VALUES
-('ORDT0001', '0', 'P029', 1, 1899.00),
-('ORDT0002', '0', 'P005', 1, 3289.95),
-('ORDT0003', '0', 'P002', 1, 4699.95);
 
 --
 -- Triggers `order_details`
@@ -352,42 +320,42 @@ CREATE TABLE `product` (
 --
 
 INSERT INTO `product` (`Product_ID`, `Product_Name`, `Product_Description`, `Product_Price`, `Stock_Quantity`, `Category_ID`, `Brand_ID`) VALUES
-('P001', 'NVIDIA RTX 4090', 'Flagship 24GB GDDR6X GPU with advanced ray tracing, DLSS 3.0, and AI-powered rendering for ultimate 4K gaming and content creation workloads.', 7519.95, 16, 'C001', 'B001'),
-('P002', 'AMD RX 7900 XTX', 'High-end 24GB GDDR6 graphics card built on RDNA 3 architecture, optimized for 4K gaming and intensive graphic workloads.', 4699.95, 10, 'C001', 'B002'),
-('P003', 'NVIDIA RTX 4070 Ti', 'Powerful 12GB GDDR6X GPU with 7680 CUDA cores, delivering high frame rates and advanced visual fidelity at 1440p resolution.', 3759.95, 18, 'C001', 'B001'),
+('P001', 'NVIDIA RTX 4090', 'Flagship 24GB GDDR6X GPU with advanced ray tracing, DLSS 3.0, and AI-powered rendering for ultimate 4K gaming and content creation workloads.', 8500.00, 16, 'C001', 'B001'),
+('P002', 'AMD RX 7900 XTX', 'High-end 24GB GDDR6 graphics card built on RDNA 3 architecture, optimized for 4K gaming and intensive graphic workloads.', 4700.00, 20, 'C001', 'B002'),
+('P003', 'NVIDIA RTX 4070 Ti', 'Powerful 12GB GDDR6X GPU with 7680 CUDA cores, delivering high frame rates and advanced visual fidelity at 1440p resolution.', 3759.95, 16, 'C001', 'B001'),
 ('P004', 'Intel Core i9-13900K', 'Flagship 24-core (8 performance + 16 efficiency cores) processor with up to 5.8GHz boost, ideal for gaming and professional content creation.', 2772.95, 20, 'C002', 'B003'),
-('P005', 'AMD Ryzen 9 7950X', '16-core 32-thread processor with Zen 4 architecture, 5.7GHz boost clock, and PCIe 5.0 support, great for enthusiasts and creators.', 3289.95, 11, 'C002', 'B002'),
-('P006', 'Intel Core i5-13600K', 'Mid-range 14-core (6 performance + 8 efficiency cores) processor with 5.1GHz boost, perfect for gaming and multitasking.', 1550.95, 24, 'C002', 'B003'),
-('P007', 'Corsair Vengeance 32GB DDR5', 'High-speed DDR5 5600MHz memory kit (2x16GB) with low latency CL36 and support for Intel XMP 3.0.', 610.95, 29, 'C003', 'B004'),
+('P005', 'AMD Ryzen 9 7950X', '16-core 32-thread processor with Zen 4 architecture, 5.7GHz boost clock, and PCIe 5.0 support, great for enthusiasts and creators.', 3289.95, 12, 'C002', 'B002'),
+('P006', 'Intel Core i5-13600K', 'Mid-range 14-core (6 performance + 8 efficiency cores) processor with 5.1GHz boost, perfect for gaming and multitasking.', 1550.95, 19, 'C002', 'B003'),
+('P007', 'Corsair Vengeance 32GB DDR5', 'High-speed DDR5 5600MHz memory kit (2x16GB) with low latency CL36 and support for Intel XMP 3.0.', 610.95, 28, 'C003', 'B004'),
 ('P008', 'G.Skill Trident Z 64GB DDR4', 'Premium DDR4 3600MHz (2x32GB) memory kit with CL16 latency and RGB lighting for enthusiast PC builds.', 1174.95, 15, 'C003', 'B005'),
-('P009', 'Kingston Fury 16GB DDR4', 'Reliable 3200MHz (2x8GB) memory kit with CL16 latency and plug-and-play compatibility with Intel and AMD systems.', 281.95, 39, 'C003', 'B006'),
-('P010', 'Samsung 980 Pro 1TB SSD', 'High-performance PCIe 4.0 NVMe SSD with read speeds up to 7000MB/s, suitable for gaming and professional workloads.', 610.95, 25, 'C004', 'B006'),
+('P009', 'Kingston Fury 16GB DDR4', 'Reliable 3200MHz (2x8GB) memory kit with CL16 latency and plug-and-play compatibility with Intel and AMD systems.', 281.95, 37, 'C003', 'B006'),
+('P010', 'Samsung 980 Pro 1TB SSD', 'High-performance PCIe 4.0 NVMe SSD with read speeds up to 7000MB/s, suitable for gaming and professional workloads.', 610.95, 22, 'C004', 'B006'),
 ('P011', 'WD Black SN850X 2TB SSD', 'PCIe Gen4 NVMe SSD with speeds up to 7300MB/s, designed for gamers and creative professionals needing fast storage.', 1085.95, 10, 'C004', 'B007'),
-('P012', 'Crucial MX500 1TB SSD', 'Reliable SATA III SSD with sequential read/write speeds up to 560/510MB/s, excellent for mainstream desktops and laptops.', 329.95, 32, 'C004', 'B008'),
+('P012', 'Crucial MX500 1TB SSD', 'Reliable SATA III SSD with sequential read/write speeds up to 560/510MB/s, excellent for mainstream desktops and laptops.', 329.95, 28, 'C004', 'B008'),
 ('P013', 'ASUS ROG Strix Z790-E', 'Enthusiast-grade ATX motherboard for Intel 13th Gen CPUs, featuring DDR5, PCIe 5.0, and built-in WiFi 6E support.', 1875.95, 8, 'C005', 'B005'),
-('P014', 'MSI MAG B650 Tomahawk', 'Durable AM5 motherboard with DDR5 support, PCIe 5.0, and a high-performance VRM design for Ryzen 7000 CPUs.', 1029.95, 11, 'C005', 'B008'),
-('P015', 'Gigabyte B660 AORUS Pro', 'LGA1700 motherboard with DDR4 support, PCIe 4.0, and 12+1+1 phase digital power design for Intel 12th Gen processors.', 889.95, 14, 'C005', 'B009'),
-('P016', 'Corsair RM850x PSU', '850W 80+ Gold certified fully modular power supply unit, silent operation with premium capacitors and fan design.', 699.95, 20, 'C006', 'B004'),
+('P014', 'MSI MAG B650 Tomahawk', 'Durable AM5 motherboard with DDR5 support, PCIe 5.0, and a high-performance VRM design for Ryzen 7000 CPUs.', 1029.95, 9, 'C005', 'B008'),
+('P015', 'Gigabyte B660 AORUS Pro', 'LGA1700 motherboard with DDR4 support, PCIe 4.0, and 12+1+1 phase digital power design for Intel 12th Gen processors.', 889.95, 12, 'C005', 'B009'),
+('P016', 'Corsair RM850x PSU', '850W 80+ Gold certified fully modular power supply unit, silent operation with premium capacitors and fan design.', 699.95, 14, 'C006', 'B004'),
 ('P017', 'EVGA SuperNOVA 1000W PSU', '1000W 80+ Platinum fully modular PSU with 10-year warranty, designed for high-performance gaming and workstation PCs.', 1162.95, 5, 'C006', 'B010'),
 ('P018', 'Lian Li PC-O11 Dynamic', 'Premium mid-tower case with dual-chamber design, tempered glass panels, and wide liquid cooling support.', 699.95, 10, 'C007', 'B010'),
-('P019', 'Fractal Design Meshify C', 'Compact ATX case with high airflow mesh front panel, tempered glass side, and excellent cable management.', 469.95, 14, 'C007', 'B004'),
-('P020', 'Noctua NH-D15 Air Cooler', 'High-end dual-tower air CPU cooler with dual 140mm fans, excellent thermal performance, and low noise operation.', 515.95, 10, 'C008', 'B004'),
-('P021', 'MSI GeForce RTX 4060 Ventus', 'Compact yet powerful 8GB GDDR6 graphics card with DLSS 3 and ray tracing support for smooth 1080p gaming.', 1499.00, 19, 'C001', 'B001'),
-('P022', 'ASUS Dual Radeon RX 7600', 'A performance-focused GPU with 8GB GDDR6 for mid-range gaming and efficient cooling.', 1389.00, 17, 'C001', 'B002'),
-('P028', 'Intel Core i7-13700KF', 'High-end 16-core (8P+8E) processor with up to 5.4GHz boost, ideal for gaming and productivity.', 2099.00, 22, 'C002', 'B003'),
+('P019', 'Fractal Design Meshify C', 'Compact ATX case with high airflow mesh front panel, tempered glass side, and excellent cable management.', 469.95, 13, 'C007', 'B004'),
+('P020', 'Noctua NH-D15 Air Cooler', 'High-end dual-tower air CPU cooler with dual 140mm fans, excellent thermal performance, and low noise operation.', 515.95, 8, 'C008', 'B004'),
+('P021', 'MSI GeForce RTX 4060 Ventus', 'Compact yet powerful 8GB GDDR6 graphics card with DLSS 3 and ray tracing support for smooth 1080p gaming.', 1499.00, 16, 'C001', 'B001'),
+('P022', 'ASUS Dual Radeon RX 7600', 'A performance-focused GPU with 8GB GDDR6 for mid-range gaming and efficient cooling.', 1389.00, 15, 'C001', 'B002'),
+('P028', 'Intel Core i7-13700KF', 'High-end 16-core (8P+8E) processor with up to 5.4GHz boost, ideal for gaming and productivity.', 2099.00, 21, 'C002', 'B003'),
 ('P029', 'AMD Ryzen 7 7700X', '8-core Zen 4 CPU with PCIe 5.0 support and impressive multitasking performance.', 1899.00, 2, 'C002', 'B002'),
-('P030', 'Thermaltake TOUGHRAM RGB 32GB DDR4', 'RGB-lit memory kit (2x16GB) at 3600MHz for gamers and creators.', 589.00, 29, 'C003', 'B010'),
+('P030', 'Thermaltake TOUGHRAM RGB 32GB DDR4', 'RGB-lit memory kit (2x16GB) at 3600MHz for gamers and creators.', 589.00, 25, 'C003', 'B010'),
 ('P031', 'Corsair Dominator Platinum RGB 64GB DDR5', 'Premium memory kit (2x32GB) with customizable lighting and extreme performance.', 1399.00, 10, 'C003', 'B004'),
 ('P032', 'Seagate FireCuda 530 1TB', 'Ultra-fast PCIe 4.0 NVMe SSD with up to 7300MB/s for gamers and professionals.', 769.00, 15, 'C004', 'B007'),
 ('P033', 'Samsung 870 EVO 2TB', 'Reliable SATA SSD with long endurance and performance for everyday computing.', 899.00, 20, 'C004', 'B006'),
 ('P034', 'Gigabyte Z790 AORUS Elite AX', 'Feature-rich ATX board with DDR5 support, Wi-Fi 6E, and PCIe 5.0.', 1099.00, 12, 'C005', 'B009'),
-('P035', 'MSI B650M Mortar WiFi', 'Compact AM5 micro-ATX motherboard with modern connectivity and cooling.', 799.00, 17, 'C005', 'B008'),
-('P036', 'Thermaltake Toughpower GF1 750W', '750W 80+ Gold modular PSU designed for silent operation and durability.', 499.00, 2, 'C006', 'B010'),
+('P035', 'MSI B650M Mortar WiFi', 'Compact AM5 micro-ATX motherboard with modern connectivity and cooling.', 799.00, 14, 'C005', 'B008'),
+('P036', 'Thermaltake Toughpower GF1 750W', '750W 80+ Gold modular PSU designed for silent operation and durability.', 499.00, 1, 'C006', 'B010'),
 ('P037', 'ASUS ROG Thor 1200W Platinum II', 'Enthusiast-grade fully modular power supply with OLED panel and Aura Sync.', 1399.00, 8, 'C006', 'B005'),
-('P038', 'Corsair 4000D Airflow', 'Mid-tower ATX case with optimized ventilation and minimalist design.', 379.00, 18, 'C007', 'B004'),
+('P038', 'Corsair 4000D Airflow', 'Mid-tower ATX case with optimized ventilation and minimalist design.', 379.00, 12, 'C007', 'B004'),
 ('P039', 'Thermaltake Core P3', 'Open-frame chassis with panoramic view and wall-mountable support.', 649.00, 7, 'C007', 'B010'),
 ('P040', 'MSI MAG CoreLiquid C360', '360mm AIO liquid cooler with vibrant ARGB and efficient heat dissipation.', 639.00, 15, 'C008', 'B008'),
-('P041', 'Arctic Liquid Freezer II 240', 'Quiet 240mm AIO cooler with integrated VRM fan and outstanding thermal performance.', 449.00, 17, 'C008', 'B004'),
+('P041', 'Arctic Liquid Freezer II 240', 'Quiet 240mm AIO cooler with integrated VRM fan and outstanding thermal performance.', 449.00, 12, 'C008', 'B004'),
 ('P042', 'Razer BlackWidow V4 Pro', 'Mechanical RGB keyboard with macro controls and wrist rest for premium typing.', 799.00, 15, 'C009', 'B005'),
 ('P043', 'Logitech G502 X Lightspeed', 'Wireless gaming mouse with HERO 25K sensor and customizable buttons.', 599.00, 25, 'C009', 'B004'),
 ('P044', 'TP-Link Archer TXE75E', 'PCIe Wi-Fi 6E adapter with Bluetooth 5.3 support and low-latency gaming performance.', 229.00, 20, 'C010', 'B008'),
@@ -412,17 +380,6 @@ CREATE TABLE `product_review` (
   `Comment` text DEFAULT NULL,
   `Review_Date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `product_review`
---
-
-INSERT INTO `product_review` (`Review_ID`, `Order_ID`, `Product_ID`, `Rating`, `Comment`, `Review_Date`) VALUES
-('RV0001', '5', 'P029', 3.0, 'asdsdasdas', '2025-05-07 14:54:25'),
-('RV0002', '5', 'P029', 3.0, 'ad', '2025-05-07 15:33:23'),
-('RV0003', '5', 'P029', 3.0, 'asd', '2025-05-07 15:35:38'),
-('RV0004', '5', 'P029', 1.0, 'dasd', '2025-05-07 15:38:20'),
-('RV0005', '5', 'P029', 5.0, 'ads', '2025-05-07 15:38:24');
 
 --
 -- Triggers `product_review`

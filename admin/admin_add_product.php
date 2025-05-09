@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Validate Category_ID format
     if (!preg_match('/^C00[1-9]$/', $category_id)) {
-        echo "<p style='color: red;'>Invalid Category ID. It must start with 'C' followed by 001 to 009.</p>";
+        echo '<div class="error-message">Invalid Category ID. It must start with \'C\' followed by 001 to 009.</div>';
     } else {
         // Generate a new Product_ID
         $stmt = $conn->prepare("SELECT MAX(Product_ID) AS max_id FROM product");
@@ -48,17 +48,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
                     $image_path = "images/" . $image_name . '.' . $imageFileType; // Store relative path
                 } else {
-                    echo "<p style='color: red;'>Error uploading the image.</p>";
+                    echo '<div class="error-message">Error uploading the image. Please try again.</div>';
                 }
             } else {
-                echo "<p style='color: red;'>Invalid image format. Only JPG, JPEG, PNG, and GIF are allowed.</p>";
+                echo '<div class="error-message">Invalid image format. Only JPG, JPEG, PNG, and GIF files are allowed.</div>';
             }
         }
 
         // Insert product into the database
         $stmt = $conn->prepare("INSERT INTO product (Product_ID, Product_Name, Product_Description, Product_Price, Stock_Quantity, Category_ID) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$new_id, $name, $description, $price, $stock_quantity, $category_id]);
-        echo "<p>Product added successfully with Product ID: $new_id.</p>";
+        if ($stmt->execute([$new_id, $name, $description, $price, $stock_quantity, $category_id])) {
+            echo '<div class="success-message">Product added successfully with Product ID: ' . htmlspecialchars($new_id) . '</div>';
+        } else {
+            echo '<div class="error-message">Error adding product. Please try again.</div>';
+        }
     }
 }
 ?>
@@ -78,8 +81,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <label for="stock_quantity">Stock Quantity:</label>
     <input type="number" name="stock_quantity" required><br>
 
-    <label for="category_id">Category ID:</label>
-    <input type="text" name="category_id" placeholder="e.g., C001" required><br>
+    <label for="category_id">Category:</label>
+    <select name="category_id" id="category_id" required>
+        <option value="">Select a Category</option>
+        <?php
+        $categories = $conn->query('SELECT * FROM category ORDER BY Category_Name')->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($categories as $category) {
+            echo '<option value="' . htmlspecialchars($category['Category_ID']) . '">' . 
+                 htmlspecialchars($category['Category_Name']) . '</option>';
+        }
+        ?>
+    </select><br>
 
     <label for="image">Product Image:</label>
     <input type="file" name="image" accept="image/*" required><br>

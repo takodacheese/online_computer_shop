@@ -26,7 +26,6 @@
     // Check if the user is an admin
     if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
         <a href="../admin/admin_dashboard.php" class="nav-link">Admin</a>
-        <a href="../products.php" class="nav-link">Products</a>
         <a href="../member/profile.php" class="nav-link">Profile</a>
         <a href="../acc_security/logout.php" id="logout-link" class="nav-link">Logout</a>
     <?php else: ?>

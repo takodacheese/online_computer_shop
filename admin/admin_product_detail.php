@@ -26,14 +26,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stock = $_POST['stock'];   
 
     if (updateProduct($conn, $product_id, $name, $description, $price, $stock)) {
-        echo "<p>Product updated successfully.</p>";
+        $_SESSION['flash_message'] = "Product updated successfully!";
+        $_SESSION['flash_type'] = "success";
+        header("Location: admin_product_detail.php?id=" . $product_id);
+        exit();
     } else {
-        echo "<p>Error updating product.</p>";
+        $_SESSION['flash_message'] = "Error updating product.";
+        $_SESSION['flash_type'] = "error";
     }
 }
 ?>
 <div class="admin-dashboard">
 <h2>Edit Product (Admin)</h2>
+
+<?php if (isset($_SESSION['flash_message'])): ?>
+    <div class="flash-message <?php echo $_SESSION['flash_type']; ?>">
+        <?php 
+        echo $_SESSION['flash_message'];
+        unset($_SESSION['flash_message']);
+        unset($_SESSION['flash_type']);
+        ?>
+    </div>
+<?php endif; ?>
+
 <form method="POST" action="admin_product_detail.php?id=<?php echo $product_id; ?>" enctype="multipart/form-data" class="edit-product-form">
 
 <label>Product Image:</label>
@@ -80,3 +95,20 @@ if ($image_path) {
 <?php
 include '../includes/footer.php';
 ?>
+
+<script>
+// Auto-hide flash message after 3 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const flashMessage = document.querySelector('.flash-message');
+    if (flashMessage) {
+        setTimeout(function() {
+            flashMessage.style.opacity = '0';
+            setTimeout(function() {
+                flashMessage.style.display = 'none';
+            }, 500); // Wait for fade out animation to complete
+        }, 3000); // Show for 3 seconds
+    }
+});
+</script>
+</body>
+</html>
