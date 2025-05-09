@@ -1424,7 +1424,10 @@ input::placeholder {
         -3px 0 3px rgba(73, 0, 255, 10),
         3px 0 3px rgba(73, 0, 255, 10);
 }
-
+.logo-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
 .login button:hover {
     background-color: #2a00cc;
 }

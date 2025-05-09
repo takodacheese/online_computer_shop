@@ -221,7 +221,7 @@ function updateUserPassword($conn, $user_id, $current_password, $new_password) {
     // Check if the user is an admin or a regular user
     if ($_SESSION['role'] === 'admin') {
         // Fetch admin details from the Admin table
-        $stmt = $conn->prepare("SELECT * FROM Admin WHERE Admin_ID = ?");
+        $stmt = $conn->prepare("SELECT * FROM admin WHERE Admin_ID = ?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
     } else {
