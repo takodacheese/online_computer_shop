@@ -46,17 +46,14 @@ $cancellation = $stmt->fetch(PDO::FETCH_ASSOC);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $new_status = $_POST['status'];
     updateOrderStatus($conn, $Order_ID, $new_status);
-    // If shipped, redirect to show shipping form
     if ($new_status === 'Shipped') {
         header("Location: admin_order_detail.php?id=" . urlencode($Order_ID) . "&ship=1");
         exit();
     }
-    // If delivered, update delivery status and set shipping date
     if ($new_status === 'Delivered') {
         $stmt = $conn->prepare("UPDATE delivery SET Delivery_Status = 'Delivered', Shipping_Date = NOW() WHERE Order_ID = ?");
         $stmt->execute([$Order_ID]);
     }
-    // Re-fetch delivery info after update
     $stmt = $conn->prepare("SELECT * FROM delivery WHERE Order_ID = ?");
     $stmt->execute([$Order_ID]);
     $delivery = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -65,18 +62,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
 }
 // Handle shipping/tracking number assignment
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_tracking'])) {
-    // Auto-generate tracking number
     $tracking = 'TRK' . date('YmdHis') . rand(100, 999);
-    // Generate Delivery_ID (e.g., DEL0001)
     $stmt = $conn->prepare("SELECT MAX(Delivery_ID) as max_id FROM delivery");
     $stmt->execute();
     $max_id = $stmt->fetch(PDO::FETCH_ASSOC)['max_id'] ?? 'DEL0000';
     $next_id = 'DEL' . str_pad((int)substr($max_id, 3) + 1, 5, '0', STR_PAD_LEFT);
-    // Get user address
     $user_stmt = $conn->prepare("SELECT Address FROM user WHERE User_ID = ?");
     $user_stmt->execute([$order['User_ID']]);
     $address = $user_stmt->fetchColumn();
-    // Insert into delivery table
     $stmt = $conn->prepare("INSERT INTO delivery (Delivery_ID, Order_ID, Tracking_Number, Shipping_Address, Recipient_Name, Delivery_Status) VALUES (?, ?, ?, ?, ?, 'In Transit')");
     $stmt->execute([$next_id, $Order_ID, $tracking, $address, $order['Username']]);
     header("Location: admin_order_detail.php?id=" . urlencode($Order_ID));
@@ -92,21 +85,15 @@ $delivery = $stmt->fetch(PDO::FETCH_ASSOC);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['handle_cancellation'])) {
     $action = $_POST['handle_cancellation'];
     $admin_note = $_POST['admin_note'] ?? '';
-    
     if ($action === 'approve') {
-        // Update cancellation status
         $stmt = $conn->prepare("UPDATE order_cancellation SET Approve_Status = 'Approved', Admin_Note = ? WHERE Order_ID = ?");
         $stmt->execute([$admin_note, $Order_ID]);
-        
-        // Update order status to Cancelled
         $stmt = $conn->prepare("UPDATE orders SET Status = 'Cancelled' WHERE Order_ID = ?");
         $stmt->execute([$Order_ID]);
     } else {
-        // Update cancellation status to rejected
         $stmt = $conn->prepare("UPDATE order_cancellation SET Approve_Status = 'Rejected', Admin_Note = ? WHERE Order_ID = ?");
         $stmt->execute([$admin_note, $Order_ID]);
     }
-    
     header("Location: admin_order_detail.php?id=" . urlencode($Order_ID));
     exit();
 }
@@ -162,7 +149,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['handle_cancellation']
     <button type="submit" name="update_status" class="btn"<?= ($order['Status'] === 'Completed' || $order['Status'] === 'Cancelled') ? ' disabled' : '' ?>>Update Status</button>
 </form>
 <?php if ($order['Status'] === 'Shipped' && (!$delivery || ($delivery && $delivery['Delivery_Status'] !== 'Delivered'))): ?>
-<!-- Shipping Management Form -->
 <form method="POST" class="shipping-form" style="margin-bottom:2rem;">
     <button type="submit" name="assign_tracking" class="btn">Assign Delivery & Tracking Number</button>
 </form>

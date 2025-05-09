@@ -4,7 +4,7 @@ require_admin();
 include '../includes/header.php';
 include '../db.php';
 
-// Handle update
+// Handle update for delivery status and tracking number
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delivery_id'])) {
     $delivery_id = $_POST['delivery_id'];
     $status = $_POST['delivery_status'];
@@ -12,7 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delivery_id'])) {
     if ($status === 'Delivered') {
         $stmt = $conn->prepare("UPDATE delivery SET Delivery_Status=?, Tracking_Number=?, Shipping_Date=NOW() WHERE Delivery_ID=?");
         $stmt->execute([$status, $tracking, $delivery_id]);
-        // Also update the related order's status to Completed
         $stmt = $conn->prepare("UPDATE orders SET Status='Completed' WHERE Order_ID=(SELECT Order_ID FROM delivery WHERE Delivery_ID=?)");
         $stmt->execute([$delivery_id]);
     } else {
@@ -25,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delivery_id'])) {
 $stmt = $conn->query("SELECT * FROM delivery ORDER BY Delivery_ID DESC");
 $deliveries = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Delivery status options
 $status_options = ['Pending', 'Shipped', 'Delivered', 'Cancelled'];
 ?>
 <div class="admin-dashboard">

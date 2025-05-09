@@ -4,9 +4,9 @@
 date_default_timezone_set('Asia/Kuala_Lumpur');
 require_once 'db.php'; // Database connection
 
-// ------------------------
-// 🔐 AUTHENTICATION
-// ------------------------
+// =========================
+// AUTHENTICATION & SESSION
+// =========================
 
 /**
  * Validate if user is at least 16 years old
@@ -142,9 +142,9 @@ function require_admin() {
         exit();
     }
 }   
-// ------------------------
-// 👤 USER PROFILE
-// ------------------------
+// =========================
+// USER PROFILE
+// =========================
 
 /**
  * Get user by ID
@@ -224,9 +224,9 @@ function uploadProfilePhoto($user_id, $file) {
     return "Error: Unable to upload profile photo.";
 }
 
-// ------------------------
-// 🛒 SHOPPING CART
-// ------------------------
+// =========================
+// SHOPPING CART
+// =========================
 
 /**
  * Get all cart items with product details for a user
@@ -342,9 +342,9 @@ function clearCart($conn, $user_id) {
     return $stmt->execute([$user_id]);
 }
 
-// ------------------------
-// 🧾 ORDERS
-// ------------------------
+// =========================
+// ORDERS
+// =========================
 
 /**
  * Create order and return new order ID
@@ -404,10 +404,9 @@ function addOrderItems($conn, $Order_ID, $cart_items) {
     return true;
 }
 
-// ------------------------
-// 🔑 PASSWORD RESET (Improved)
-// ------------------------
-// /TODO (SQL): Add 'reset_token_expiry' column (DATETIME) to 'password_resets' table
+// =========================
+// PASSWORD RESET
+// =========================
 
 /**
  * Create a password reset token and store in DB
@@ -447,12 +446,8 @@ function resetUserPassword($conn, $token, $new_password) {
     return true;
 }
 
-// ------------------------
-// 🧠 PASSWORD RESET
-// ------------------------
-
 /**
- * Generate secure token for password reset
+ * Generate secure token for password reset (legacy)
  */
 function createPasswordResetTokenOld($conn, $user_id) {
     $token = bin2hex(random_bytes(32));
@@ -465,7 +460,7 @@ function createPasswordResetTokenOld($conn, $user_id) {
 }
 
 /**
- * Generate reset password URL (customize base URL as needed)
+ * Generate reset password URL
  */
 function generateResetLink($token) {
     return "http://localhost:8000/acc_security/reset_password.php?token=" . urlencode($token);
@@ -482,7 +477,7 @@ function validateResetToken(PDO $conn, string $token): ?int {
 }
 
 /**
- * Reset user password
+ * Reset user password (legacy)
  */
 function resetUserPasswordOld(PDO $conn, int $user_id, string $plainPassword): void {
     $hashedPassword = password_hash($plainPassword, PASSWORD_DEFAULT);
@@ -505,9 +500,9 @@ function validatePasswordStrength(string $password): bool {
     return strlen($password) >= 8; // Add more rules as needed
 }
 
-// ------------------------
-// 🛠️ PRODUCT/UTILITY FUNCTIONS
-// ------------------------
+// =========================
+// PRODUCT/UTILITY FUNCTIONS
+// =========================
 
 /**
  * Handle image upload and return file path or null
@@ -600,9 +595,10 @@ function getOrderItems($conn, $Order_ID) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// ------------------------
-// 📂 CATEGORY MAINTENANCE
-// ------------------------
+// =========================
+// CATEGORY MAINTENANCE
+// =========================
+
 /**
  * Get all categories
  */
@@ -629,9 +625,10 @@ function deleteCategory($conn, $category_id) {
     return $stmt->execute([$category_id]);
 }
 
-// ------------------------
-// 📦 PRODUCT STOCK HANDLING
-// ------------------------
+// =========================
+// PRODUCT STOCK HANDLING
+// =========================
+
 function deductProductStock($conn, $product_id, $quantity) {
     $stmt = $conn->prepare("UPDATE products SET stock = stock - ? WHERE product_id = ?");
     return $stmt->execute([$quantity, $product_id]);
@@ -643,15 +640,8 @@ function checkLowStockAndAlert($conn, $product_id, $threshold = 5) {
     return $stock !== false && $stock < $threshold;
 }
 
-// ------------------------
-// STOCK MANAGEMENT
-// ------------------------
 /**
  * Get low stock products (below threshold)
- * 
- * @param PDO $conn Database connection
- * @param int $threshold Stock threshold (default: 5)
- * @return array Array of low stock products
  */
 function getLowStockProducts(PDO $conn, $threshold = 5) {
     $stmt = $conn->prepare("SELECT * FROM product WHERE Stock_Quantity <= ?");
@@ -661,19 +651,15 @@ function getLowStockProducts(PDO $conn, $threshold = 5) {
 
 /**
  * Deduct stock for a product
- * 
- * @param PDO $conn Database connection
- * @param int $productId Product ID
- * @param int $quantity Quantity to deduct
  */
 function deductStock(PDO $conn, int $productId, int $quantity): void {
     $stmt = $conn->prepare("UPDATE products SET stock = stock - ? WHERE product_id = ?");
     $stmt->execute([$quantity, $productId]);
 }
 
-// ------------------------
+// =========================
 // ORDER STATUS MANAGEMENT
-// ------------------------
+// =========================
 
 /**
  * Update order status
@@ -701,12 +687,6 @@ function updateOrderStatus($conn, $Order_ID, $status, $notes = null) {
 
 /**
  * Cancel an order
- * 
- * @param PDO $conn Database connection
- * @param int $Order_ID Order ID
- * @param string $reason Cancellation reason
- * @param bool $admin_approval Required for 'Processing' status
- * @return bool Success status
  */
 function cancelOrder($conn, $Order_ID, $reason, $admin_approval = false) {
     // Get current order status
@@ -750,9 +730,6 @@ function cancelOrder($conn, $Order_ID, $reason, $admin_approval = false) {
 
 /**
  * Get pending cancellation requests
- * 
- * @param PDO $conn Database connection
- * @return array Array of pending cancellation requests
  */
 function getPendingCancellationRequests($conn) {
     // /TODO: Implement query to get pending cancellation requests
@@ -763,10 +740,6 @@ function getPendingCancellationRequests($conn) {
 
 /**
  * Get order history
- * 
- * @param PDO $conn Database connection
- * @param int $Order_ID Order ID
- * @return array Array of order history entries
  */
 function getOrderHistory($conn, $Order_ID) {
     $stmt = $conn->prepare("
@@ -787,9 +760,6 @@ function getOrderHistory($conn, $Order_ID) {
 
 /**
  * Check if order is eligible for cancellation
- * 
- * @param array $order Order data
- * @return array Array with 'eligible' and 'requires_approval' flags
  */
 function isOrderEligibleForCancellation($order) {
     // Initialize result array
@@ -811,9 +781,9 @@ function isOrderEligibleForCancellation($order) {
     return $result;
 }
 
-// ------------------------
-// 📝 PRODUCT REVIEWS
-// ------------------------
+// =========================
+// PRODUCT REVIEWS
+// =========================
 
 /**
  * Get reviews for a product
@@ -859,9 +829,9 @@ function addReview($conn, $product_id, $user_id, $rating, $comment) {
     return $stmt->execute([$order['Order_ID'], $product_id, $rating, $comment]);
 }
 
-// ------------------------
-// 🛠️ CUSTOM PC BUILDER
-// ------------------------
+// =========================
+// CUSTOM PC BUILDER
+// =========================
 
 /**
  * Get models by selected part (for dynamic dropdowns)
@@ -885,9 +855,9 @@ function getProductById($conn, $product_id) {
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// ------------------------
-// 🧠 UTILITIES
-// ------------------------
+// =========================
+// UTILITIES
+// =========================
 
 /**
  * Log error to file
@@ -913,16 +883,12 @@ function sanitizeInput($input) {
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
 
-// ------------------------
+// =========================
 // FEATURED PRODUCTS
-// ------------------------
+// =========================
 
 /**
  * Get featured products (limit default: 4)
- * 
- * @param PDO $conn Database connection
- * @param int $limit Number of products to fetch
- * @return array Array of featured products
  */
 function getFeaturedProducts($conn, $limit = 4) {
     $stmt = $conn->prepare("
@@ -945,7 +911,6 @@ function getFeaturedProducts($conn, $limit = 4) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Get components for PC Builder
 function getPCBuilderComponents($conn) {
     // Get CPUs
     $stmt = $conn->prepare("
@@ -1068,9 +1033,10 @@ function getPCBuilderComponents($conn) {
     ];
 }
 
-// ------------------------
-// ⚙️ ADMIN DASHBOARD
-// ------------------------
+// =========================
+// ADMIN DASHBOARD
+// =========================
+
 function get_total_orders($conn) {
     $stmt = $conn->prepare("SELECT COUNT(*) FROM orders");
     $stmt->execute();
