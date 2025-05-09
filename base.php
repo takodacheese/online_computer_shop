@@ -185,18 +185,78 @@ function updateUserProfile($conn, $user_id, $Username, $Email, $address, $birthd
         ? "Profile updated successfully." 
         : "Error: Unable to update profile.";
 }
+function updateAdminProfile($conn, $admin_id, $username, $email) {
+    // Handle profile picture upload
+    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
+        $target_dir = "../images/profiles/";
+        $image_name = "admin_" . $admin_id; // Use a unique name for the admin profile picture
+        $imageFileType = strtolower(pathinfo($_FILES['profile_pic']['name'], PATHINFO_EXTENSION));
+        $target_file = $target_dir . $image_name . '.' . $imageFileType;
+
+        // Validate image file type
+        if (in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
+            if (!move_uploaded_file($_FILES['profile_pic']['tmp_name'], $target_file)) {
+                return "Error uploading profile picture.";
+            }
+        } else {
+            return "Invalid image format. Only JPG, JPEG, PNG, and GIF are allowed.";
+        }
+    }
+
+    // Update admin username and email in the database
+    $stmt = $conn->prepare("UPDATE admin SET Username = ?, Email = ? WHERE Admin_ID = ?");
+    $result = $stmt->execute([$username, $email, $admin_id]);
+
+    if ($result) {
+        return "Profile updated successfully.";
+    } else {
+        return "Error updating profile.";
+    }
+}
 
 /**
  * Update password securely
  */
 function updateUserPassword($conn, $user_id, $current_password, $new_password) {
-    $user = getUserById($conn, $user_id);
-    if (!$user || !(password_verify($current_password, $user['Password']) || $current_password === $user['Password'])) {
-        return "Error: Current password is incorrect.";
+    // Check if the user is an admin or a regular user
+    if ($_SESSION['role'] === 'admin') {
+        // Fetch admin details from the Admin table
+        $stmt = $conn->prepare("SELECT * FROM Admin WHERE Admin_ID = ?");
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    } else {
+        // Fetch user details from the User table
+        $stmt = $conn->prepare("SELECT * FROM User WHERE User_ID = ?");
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    // Verify the current password
+    if (!$user || !password_verify($current_password, $user['Password'])) {
+        $_SESSION['flash_message'] = "Error: Current password is incorrect.";
+        $_SESSION['flash_type'] = "error";
+        return false;
+    }
+
+    // Hash the new password
     $hashedPassword = password_hash($new_password, PASSWORD_BCRYPT);
-    $stmt = $conn->prepare("UPDATE User SET Password = ? WHERE User_ID = ?");
-    return $stmt->execute([$hashedPassword, $user_id]) ? "Password updated successfully." : "Error: Unable to update password.";
+
+    // Update the password in the appropriate table
+    if ($_SESSION['role'] === 'admin') {
+        $stmt = $conn->prepare("UPDATE Admin SET Password = ? WHERE Admin_ID = ?");
+    } else {
+        $stmt = $conn->prepare("UPDATE User SET Password = ? WHERE User_ID = ?");
+    }
+
+    if ($stmt->execute([$hashedPassword, $user_id])) {
+        $_SESSION['flash_message'] = "Password updated successfully.";
+        $_SESSION['flash_type'] = "success";
+        return true;
+    } else {
+        $_SESSION['flash_message'] = "Error: Unable to update password.";
+        $_SESSION['flash_type'] = "error";
+        return false;
+    }
 }
 
 /**

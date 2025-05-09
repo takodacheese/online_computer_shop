@@ -7,8 +7,14 @@ require_once '../base.php';
 require_login();
 ?>
 
-
 <?php
+if ($_SESSION['role'] === 'admin') {
+    header("Location: ../admin/admin_dashboard.php");
+    exit();
+}
+?>
+<?php
+
 $user_id = $_SESSION['user_id'];
 $user = getUserById($conn, $user_id); // Fetch user details
 $message = "";
@@ -53,6 +59,7 @@ if (!file_exists($profile_img)) {
     $profile_img = "../images/default-profile.png";
 }
 ?>
+
 <img src="<?= htmlspecialchars($profile_img) ?>" alt="Profile Photo" width="120" height="120">
             </div>
             <h2 class="profile-section-title" style="margin-bottom: 0;">Profile</h2>
@@ -134,11 +141,14 @@ if (!file_exists($profile_img)) {
         </form>
     </div>
 </div>
-<?php if (isset($_SESSION['success_message'])): ?>
-    <div class="success-message" id="flash-message">
-        <?= htmlspecialchars($_SESSION['success_message']) ?>
+<?php if (isset($_SESSION['flash_message'])): ?>
+    <div class="flash_<?php echo $_SESSION['flash_type']; ?>">
+        <?php 
+        echo htmlspecialchars($_SESSION['flash_message']);
+        unset($_SESSION['flash_message']);
+        unset($_SESSION['flash_type']);
+        ?>
     </div>
-    <?php unset($_SESSION['success_message']); ?>
 <?php endif; ?>
 <script>
     document.getElementById('birthdate').addEventListener('change', function() {
