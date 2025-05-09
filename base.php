@@ -231,8 +231,8 @@ function updateUserPassword($conn, $user_id, $current_password, $new_password) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Verify the current password
-    if (!$user || !password_verify($current_password, $user['Password'])) {
+    // Verify the current password - allow both hashed and plaintext passwords
+    if (!$user || (!password_verify($current_password, $user['Password']) && $current_password !== $user['Password'])) {
         $_SESSION['flash_message'] = "Error: Current password is incorrect.";
         $_SESSION['flash_type'] = "error";
         return false;

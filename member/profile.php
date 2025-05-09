@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (isset($_POST['update_password'])) {
-        $message = updateUserPassword($conn, $user_id, $_POST['current_password'], $_POST['new_password']);
+        updateUserPassword($conn, $user_id, $_POST['current_password'], $_POST['new_password']);
     }
 }
 ?>
