@@ -451,14 +451,14 @@ function addOrderItems($conn, $Order_ID, $cart_items) {
         $sql = "INSERT INTO Order_Details (Order_ID, Product_ID, Quantity, Price";
         
         // Check if Build_Description exists
-        if (isset($item['Build_Description'])) {
+        if (isset($item['Build_Description']) && !empty($item['Build_Description'])) {
             $sql .= ", Build_Description";
         }
         
         $sql .= ") VALUES (?, ?, ?, ?";
         
         // Add placeholder for Build_Description if it exists
-        if (isset($item['Build_Description'])) {
+        if (isset($item['Build_Description']) && !empty($item['Build_Description'])) {
             $sql .= ", ?";
         }
         
@@ -475,7 +475,7 @@ function addOrderItems($conn, $Order_ID, $cart_items) {
         ];
         
         // Add Build_Description to parameters if it exists
-        if (isset($item['Build_Description'])) {
+        if (isset($item['Build_Description']) && !empty($item['Build_Description'])) {
             $params[] = $item['Build_Description'];
         }
         
