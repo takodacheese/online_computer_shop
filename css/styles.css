@@ -1266,6 +1266,39 @@ header {
     background-color: #2a00cc;
 }
 
+
+.register input,
+.register textarea {
+    padding: 0.5rem;
+    border: 1px solid rgb(255, 255, 255);
+    border-radius: 4px;
+    color: rgb(255, 255, 255);
+    width: 380px;
+    padding: 8px;
+    margin: 5px 0;
+    font-family: arial;
+    box-shadow: 
+        0 -3px 3px rgba(73, 0, 255, 10),
+        0 3px 3px rgba(73, 0, 255, 10),
+        -3px 0 3px rgba(73, 0, 255, 10),
+        3px 0 3px rgba(73, 0, 255, 10);
+}
+
+.register select {
+    padding: 0.5rem;
+    border: 1px solid rgb(255, 255, 255);
+    border-radius: 4px;
+    color: rgb(255, 255, 255, 0.8);
+    width: 400px;
+    padding: 8px;
+    margin: 5px 0;
+    box-shadow: 
+        0 -3px 3px rgba(73, 0, 255, 10),
+        0 3px 3px rgba(73, 0, 255, 10),
+        -3px 0 3px rgba(73, 0, 255, 10),
+        3px 0 3px rgba(73, 0, 255, 10);
+}
+
 .register p {
     margin-top: 1rem;
     text-align: center;
@@ -1287,28 +1320,6 @@ header {
     font-size: 0.9em;  
 }
 
-/* Style the calendar button */
-input[type="date"]::-webkit-calendar-picker-indicator {
-    background-color: #3300ff; /* Change the background color */
-    color: white; /* Change the icon color */
-    border-radius: 50%; /* Make it circular */
-    padding: 5px; /* Add some padding */
-    cursor: pointer; /* Change the cursor to pointer */
-}
-/* For Firefox */
-input[type="date"]::-moz-calendar-picker-indicator {
-    color:  rgb(255, 255, 255, 0.8);
-    filter: invert(70%);
-
-}
-/*  Add hover effect */
-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-    background-color: #2a00cc; /* Change background color on hover */
-}
-/* Date picker dropdown styling */
-input[type="date"]::-webkit-datetime-edit {
-    color:  rgb(255, 255, 255, 0.8);
-}
 .register_error_message {
     text-align: center;
     font-size: 1.0em;
@@ -1349,19 +1360,6 @@ input::placeholder {
     display: inline-block;
     width: 390px;
 }
-
-.password-toggle {
-    position: absolute;
-    right: 1px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    width: 25px;
-    height: 35px;
-    opacity: 0.7;
-    color: black;
-}
-
 
 /* Login Styles */
 .login h2 {
@@ -1482,78 +1480,6 @@ input::placeholder {
 
 .discord-icon {
     order: 3;
-}
-
-
-/* Forgot-password Styles */
-.forgot-password {
-    max-width: 400px;
-    margin: 50px auto;
-    border: 1px solid rgb(255, 255, 255);
-    padding: 2rem;
-    border-radius: 8px;
-    background-color: black;
-    box-shadow: 
-        0 -3px 3px rgba(73, 0, 255, 10),
-        0 3px 3px rgba(73, 0, 255, 10),
-        -3px 0 3px rgba(73, 0, 255, 10),
-        3px 0 3px rgba(73, 0, 255, 10);
-}
-
-.forgot-password h2 {
-    text-align: center;
-    margin: 0 0 2rem 0;
-    padding: 0.5rem;
-    color: var(--text-color);
-    font-size: 2rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.forgot-password form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.forgot-password label {
-    text-align: left;
-    font-weight: bold;
-}
-
-.forgot-password input {
-    padding: 0.5rem;
-    border-radius: 4px;
-    border: 1px solid rgb(255, 255, 255); /* white border matching √1 frame */
-    box-shadow: 
-        0 -3px 3px rgba(73, 0, 255, 10),
-        0 3px 3px rgba(73, 0, 255, 10),
-        -3px 0 3px rgba(73, 0, 255, 10),
-        3px 0 3px rgba(73, 0, 255, 10);
-}
-
-.forgot-password button {
-    padding: 0.75rem;
-    background-color: #3300ff;
-    color: white;
-    border: 1px solid rgb(255, 255, 255);
-    border-radius: 4px;
-    cursor: pointer;
-    box-shadow: 
-        0 -3px 3px rgba(73, 0, 255, 10),
-        0 3px 3px rgba(73, 0, 255, 10),
-        -3px 0 3px rgba(73, 0, 255, 10),
-        3px 0 3px rgba(73, 0, 255, 10);
-}
-
-.forgot-password button:hover {
-    background-color: #2a00cc;
-}
-
-.forgot-password p {
-    margin-top: 1rem;
-    text-align: center;
-    color: var(--text-color);
 }
 
 /* Footer Styles */
@@ -4072,7 +3998,7 @@ body.payment-success-page {
 
 .password-toggle {
     position: absolute;
-    right: 10px;
+    right: 4px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
@@ -4119,65 +4045,7 @@ body.payment-success-page {
     color: #00fff7;
     text-decoration: underline;
 }
-.forgot-password {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 30px;
-    background: #1a1a1a;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-}
 
-.forgot-password h2 {
-    color: #fff;
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 24px;
-}
-
-.forgot-password form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.forgot-password label {
-    color: #e1e1e1;
-    font-size: 14px;
-    margin-bottom: 5px;
-}
-
-.forgot-password input[type="email"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #333;
-    border-radius: 5px;
-    background: #2a2a2a;
-    color: #fff;
-    font-size: 14px;
-    transition: border-color 0.3s ease;
-}
-
-.forgot-password input[type="email"]:focus {
-    border-color: #00bfff;
-    outline: none;
-}
-
-.forgot-password button {
-    background: #00bfff;
-    color: white;
-    padding: 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-}
-
-.forgot-password button:hover {
-    background: #0099cc;
-}
 
 .error-message {
     color: #ff4444;
@@ -4248,7 +4116,7 @@ body.payment-success-page {
     margin-bottom: 4px;
 }
 .forgot-password input[type="email"] {
-    width: 100%;
+    width: 94%;
     padding: 10px 12px;
     border: 1px solid #444;
     border-radius: 5px;

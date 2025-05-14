@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="password" name="password" id="passwordField" class="form-input" required>
             <img src="../images/passwordeye.png" class="password-toggle" onclick="togglePassword()" 
                  alt="Show Password" title="Toggle visibility" id="toggleIcon">
-        </div>
+        </div><br>
 
          <?php if (isset($_SESSION['error_message'])): ?>
         <div class="login_error_message">
@@ -96,14 +96,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="social-signup">
     <div class="reset-link">       
     <p>-----   Or Sign In With   -----</p>
+    <br>
     <div class="social-icons">
         <a href="https://www.facebook.com/" target="_blank" class="facebook-icon">
-            <img src="../images/facebook.jpg" alt="Facebook Signup">
+            <img src="../images/facebookicon.png" alt="Facebook Signup">
         </a>
         <a href="https://www.instagram.com/accounts/login/" target="_blank" class="instar-icon">
-            <img src="../images/instagram.png" alt="Instagram Signup">
+            <img src="../images/instargramicon.png" alt="Instagram Signup">
         </a>
-        <a href="https://discord.com/login?redirect_to=%2Fstore%2F" target="_blank" class="discord-icon">
+        <a href="https://discordicon.com/login?redirect_to=%2Fstore%2F" target="_blank" class="discord-icon">
             <img src="../images/discordicon.png" alt="Discord Signup">
         </a>
     </div>
@@ -115,5 +116,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <br>
 <p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
 </section>
-
 <?php include '../includes/footer.php'; ?>
