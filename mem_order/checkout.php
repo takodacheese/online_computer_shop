@@ -6,6 +6,11 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Add error logging
+error_log("Starting checkout process");
+error_log("Session data: " . print_r($_SESSION, true));
+error_log("POST data: " . print_r($_POST, true));
+
 // Add Stripe autoloader
 require_once '../vendor/autoload.php';
 
