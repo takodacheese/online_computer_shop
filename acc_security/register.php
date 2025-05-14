@@ -180,12 +180,12 @@ function togglePassword() {
 
     if (passwordField.type === 'password') {
         passwordField.type = 'text';
-        toggleIcon.src = "../images/passwordeye.png";
+        toggleIcon.src = "../images/passwordeyeopen.png";
         toggleIcon.alt = "Hide Password";
         toggleIcon.title = "Hide password";
     } else {
         passwordField.type = 'password';
-        toggleIcon.src = "../images/passwordeyeopen.png";
+        toggleIcon.src = "../images/passwordeye.png";
         toggleIcon.alt = "Show Password";
         toggleIcon.title = "Show password";
     }
