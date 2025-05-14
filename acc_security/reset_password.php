@@ -131,11 +131,11 @@ function togglePassword(fieldId, iconId) {
 
     if (field.type === 'password') {
         field.type = 'text';
-        toggleIcon.src = "../images/passwordeye.png";
+        toggleIcon.src = "../images/passwordeyeopen.png";
         toggleIcon.alt = "Hide Password";
     } else {
         field.type = 'password';
-        toggleIcon.src = "../images/passwordeyeopen.png";
+        toggleIcon.src = "../images/passwordeye.png";
         toggleIcon.alt = "Show Password";
     }
 }
