@@ -63,11 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <form method="POST" action="login.php">
         <label for="Email">Email:</label>
-        <input type="email" name="Email" class="form-input" required><br>
+        <input type="email" name="Email" class="form-input" placeholder="Enter Your Email" required><br>
 
         <label for="password">Password:</label>
         <div class="password-wrapper">
-            <input type="password" name="password" id="passwordField" class="form-input" required>
+            <input type="password" name="password" id="passwordField" class="form-input" placeholder="Enter Your Password" required>
             <img src="../images/passwordeye.png" class="password-toggle" onclick="togglePassword()" 
                  alt="Show Password" title="Toggle visibility" id="toggleIcon">
         </div><br>
@@ -83,6 +83,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <button type="submit">Login</button>
     </form>
+
+    <p>Forgot your password? <a href="forgot_password.php">Reset it here</a>.</p>
+        <br>
+        <div class="social-signup">
+    <div class="reset-link">       
+    <p>-----   Or Sign In With   -----</p>
+    <br>
+    <div class="social-icons">
+        <a href="https://www.facebook.com/" target="_blank" class="facebook-icon">
+            <img src="../images/facebookicon.png" alt="Facebook Signup">
+        </a>
+        <a href="https://www.instagram.com/accounts/login/" target="_blank" class="instar-icon">
+            <img src="../images/instargramicon.png" alt="Instagram Signup">
+        </a>
+        <a href="https://discordicon.com/login?redirect_to=%2Fstore%2F" target="_blank" class="discord-icon">
+            <img src="../images/discordicon.png" alt="Discord Signup">
+        </a>
+    </div>
+</div>
+    </div>
+    <br>
+<p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
+</section>
 
     <script>
     function togglePassword() {
@@ -102,29 +125,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     </script>
-    <p>Forgot your password? <a href="forgot_password.php">Reset it here</a>.</p>
-        <br>
-        <div class="social-signup">
-    <div class="reset-link">       
-    <p>-----   Or Sign In With   -----</p>
-    <br>
-    <div class="social-icons">
-        <a href="https://www.facebook.com/" target="_blank" class="facebook-icon">
-            <img src="../images/facebookicon.png" alt="Facebook Signup">
-        </a>
-        <a href="https://www.instagram.com/accounts/login/" target="_blank" class="instar-icon">
-            <img src="../images/instargramicon.png" alt="Instagram Signup">
-        </a>
-        <a href="https://discordicon.com/login?redirect_to=%2Fstore%2F" target="_blank" class="discord-icon">
-            <img src="../images/discordicon.png" alt="Discord Signup">
-        </a>
-    </div>
-</div>
-
-
-
-    </div>
-    <br>
-<p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
-</section>
 <?php include '../includes/footer.php'; ?>

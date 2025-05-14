@@ -124,13 +124,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (!empty($usernameError)): ?>
             <div class="register_error_message"><?php echo htmlspecialchars($usernameError); ?></div>
         <?php endif; ?>
+        <br>
 
         <label for="Email">Email:</label>
         <input type="email" name="Email" placeholder="Enter Your Email" 
                value="<?php echo isset($_POST['Email']) ? htmlspecialchars($_POST['Email']) : ''; ?>" required>
         <?php if (!empty($emailError)): ?>
             <div class="register_error_message"><?php echo htmlspecialchars($emailError); ?></div>
-        <?php endif; ?>
+        <?php endif; ?><br>
 
         <label for="password">Password:</label>
         <div class="password-wrapper">
@@ -141,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <?php if (!empty($passwordError)): ?>
             <div class="register_error_message"><?php echo htmlspecialchars($passwordError); ?></div>
-        <?php endif; ?>
+        <?php endif; ?><br>
 
         <label for="gender">Gender:</label>
         <select name="gender" required>

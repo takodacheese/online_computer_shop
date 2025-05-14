@@ -4111,7 +4111,7 @@ body.payment-success-page {
 }
 
 /* --- Forgot Password Page Fixes --- */
-.forgot-password {
+.forgot_password {
     max-width: 400px;
     margin: 60px auto 0 auto;
     padding: 32px 28px 24px 28px;
@@ -4123,7 +4123,7 @@ body.payment-success-page {
     flex-direction: column;
     align-items: center;
 }
-.forgot-password h2 {
+.forgot_password h2 {
     color: #fff;
     text-align: center;
     margin-bottom: 24px;
@@ -4139,18 +4139,18 @@ body.payment-success-page {
     text-align: center;
     word-break: break-all;
 }
-.forgot-password form {
+.forgot_password form {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
-.forgot-password label {
+.forgot_password label {
     color: #e1e1e1;
     font-size: 15px;
     margin-bottom: 4px;
 }
-.forgot-password input[type="email"] {
+.forgot_password input[type="email"] {
     width: 94%;
     padding: 10px 12px;
     border: 1px solid #444;
@@ -4162,11 +4162,11 @@ body.payment-success-page {
     box-shadow: none !important;
     outline: none !important;
 }
-.forgot-password input[type="email"]:focus {
+.forgot_password input[type="email"]:focus {
     border-color: #00bfff;
     outline: none;
 }
-.forgot-password button {
+.forgot_password button {
     width: 100%;
     background: #00bfff;
     color: white;
@@ -4180,7 +4180,7 @@ body.payment-success-page {
     box-shadow: none !important;
     outline: none !important;
 }
-.forgot-password button:hover {
+.forgot_password button:hover {
     background: #0099cc;
 }
 .back-to-login {
