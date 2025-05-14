@@ -5022,3 +5022,79 @@ body.payment-success-page {
         width: 100%;
     }
 }
+/* Mirror resetpassword styles */
+.resetpassword {
+    max-width: 400px;
+    margin: 50px auto;
+    border: 1px solid rgb(255, 255, 255);
+    padding: 2rem;
+    border-radius: 8px;
+    background-color: black;
+    color: white;
+    box-shadow: 
+        0 -3px 3px rgba(73, 0, 255, 10),
+        0 3px 3px rgba(73, 0, 255, 10),
+        -3px 0 3px rgba(73, 0, 255, 10),
+        3px 0 3px rgba(73, 0, 255, 10);
+}
+
+.resetpassword form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.resetpassword label {
+    text-align: left;
+    font-weight: bold;
+}
+
+.resetpassword input {
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid rgb(255, 255, 255);
+    box-shadow: 
+        0 -3px 3px rgba(73, 0, 255, 10),
+        0 3px 3px rgba(73, 0, 255, 10),
+        -3px 0 3px rgba(73, 0, 255, 10),
+        3px 0 3px rgba(73, 0, 255, 10);
+}
+
+.resetpassword button {
+    padding: 0.75rem;
+    background-color: #3300ff;
+    color: white;
+    border: 1px solid rgb(255, 255, 255);
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 
+        0 -3px 3px rgba(73, 0, 255, 10),
+        0 3px 3px rgba(73, 0, 255, 10),
+        -3px 0 3px rgba(73, 0, 255, 10),
+        3px 0 3px rgba(73, 0, 255, 10);
+}
+
+.resetpassword button:hover {
+    background-color: #2a00cc;
+}
+
+.resetpassword_error_message {
+    text-align: center;
+    font-size: 1.0em;
+    margin: 5px 0 15px 0;
+    background: #2d1212;
+    border: 1px solid #ff6b6b;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 15px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.resetpassword_success_message {
+    text-align: center;
+    color: #00ff00 !important;
+    background: #122d12 !important;
+    border: 1px solid #6bff6b !important;
+    padding: 15px;
+    border-radius: 4px;
+}
