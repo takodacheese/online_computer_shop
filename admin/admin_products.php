@@ -51,7 +51,7 @@ $recent_orders = get_recent_orders($conn);
                     $imagePath = '';
 
                     foreach ($imageExtensions as $ext) {
-                        $tryPath = "../images/{$baseName}.{$ext}"; // Adjust the path to your images folder
+                        $tryPath = "../images/{$baseName}.{$ext}"; // Adjust the path to images folder
                         if (file_exists($tryPath)) {
                             $imagePath = $tryPath;
                             break;

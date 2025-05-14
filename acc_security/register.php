@@ -5,6 +5,26 @@ include '../includes/header.php';
 require_once '../base.php';
 require_once '../db.php';
 
+// Example of corrected code in the catch block
+try {
+    // Database operations (e.g., prepare, execute)
+} catch (PDOException $e) {
+    $errorInfo = $e->errorInfo; // Assign error info from the exception
+    // Now line 77 can safely access $errorInfo
+    $errorMessage = isset($errorInfo[2]) ? $errorInfo[2] : "An error occurred.";
+    // Handle the error message appropriately
+}
+
+// At the top of your script or function
+$errorInfo = [];
+
+// In your error handling
+if (isset($errorInfo) && is_array($errorInfo) && isset($errorInfo[2])) {
+    $errorMessage = $errorInfo[2];
+} else {
+    $errorMessage = "An unknown error occurred.";
+}
+
 // Initialize error variables
 $usernameError = $emailError = $passwordError = $addressError = $birthdayError = '';
 
@@ -74,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
     } else {
-        $_SESSION['flash_error'] = 'Registration failed. Please check your inputs.'. $errorInfo[2];
+        $_SESSION['flash_error'] = 'Registration failed. Please check your inputs.';
     }
 }
 ?>
@@ -143,6 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (!empty($addressError)): ?>
             <div class="register_error_message"><?php echo htmlspecialchars($addressError); ?></div>
         <?php endif; ?>
+        <br>
 
         <button type="submit">Register</button>
     </form>
@@ -172,6 +193,34 @@ function togglePassword() {
 </script>
 
 
+<style>
+    /*  Add hover effect */
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    color:  rgb(255, 255, 255);
+    filter: invert(100%);
+}
+
+    /* For Webkit browsers like Chrome/Safari */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    color:  rgb(255, 255, 255, 0.8);
+    filter: invert(70%);
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+/* For Firefox */
+input[type="date"]::-moz-calendar-picker-indicator {
+    color:  rgb(255, 255, 255, 0.8);
+    filter: invert(70%);
+
+}
+
+/* Date picker dropdown styling */
+input[type="date"]::-webkit-datetime-edit {
+    color:  rgb(255, 255, 255, 0.8);
+}
+</style>
 <?php
 include '../includes/footer.php';
 ?>
