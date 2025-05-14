@@ -1483,6 +1483,41 @@ input::placeholder {
 }
 
 /* Footer Styles */
+
+/* Print styles for receipt: black and white only */
+@media print {
+  body, .receipt-table, .receipt-table th, .receipt-table td, .receipt-total-row, .build-description {
+    background: #fff !important;
+    color: #000 !important;
+    border-color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  .receipt-table th, .receipt-table td {
+    background: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+  }
+  .receipt-table tr:nth-child(even) td,
+  .receipt-table tr:nth-child(odd) td {
+    background: #fff !important;
+  }
+  .receipt-total-row {
+    color: #000 !important;
+    background: #fff !important;
+    border-top: 2px solid #000 !important;
+  }
+  .build-description {
+    background: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+  }
+  .print-btn, .print-btn-row, .navbar, header, footer, .social-signup, .logo-container, .flash_success, .flash_error, .error-message, .success-message {
+    display: none !important;
+  }
+  a, a:visited { color: #000 !important; text-decoration: underline !important; }
+}
+
 footer {
     position: fixed;
     bottom: 0;

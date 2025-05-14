@@ -14,6 +14,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['flash_error'] = 'Your account has been blocked. Please contact the administrator.';
         header('Location: login.php');
         exit();
+    } elseif ($role === 'temp_blocked') {
+        // Get remaining block time from DB
+        $stmt = $conn->prepare("SELECT blocked_until FROM User WHERE Email = ?");
+        $stmt->execute([$Email]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $blocked_until = $row && $row['blocked_until'] ? strtotime($row['blocked_until']) : false;
+        $now = time();
+        $minutes_left = $blocked_until && $blocked_until > $now ? ceil(($blocked_until - $now) / 60) : 5;
+        $_SESSION['flash_error'] = 'Too many failed login attempts. Please try again in '. $minutes_left .' minute(s).';
+        header('Location: login.php');
+        exit();
     } elseif ($role === 'admin') {
         $_SESSION['flash_success'] = 'Login successful! Welcome Admin.';
         header('Location: ../admin/admin_dashboard.php');

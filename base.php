@@ -70,7 +70,7 @@ function getUserByEmail($conn, $Email) {
  */
 function loginUser(PDO $conn, string $Email, string $password) {
     // Check in the User table
-    $stmt = $conn->prepare("SELECT User_ID AS id, Username, Password, 'user' AS role, Status FROM User WHERE Email = ?");
+    $stmt = $conn->prepare("SELECT User_ID AS id, Username, Password, 'user' AS role, Status, failed_attempts, blocked_until FROM User WHERE Email = ?");
     $stmt->execute([$Email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -81,24 +81,48 @@ function loginUser(PDO $conn, string $Email, string $password) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Verify the password and return the role if successful
-    if ($user) {
-        // For regular users, check if account is blocked
-        if ($user['role'] === 'user' && isset($user['Status']) && $user['Status'] === 'Blocked') {
-            return 'blocked';
+    // For regular users, check if account is blocked (permanent)
+    if ($user['role'] === 'user' && isset($user['Status']) && $user['Status'] === 'Blocked') {
+        return 'blocked';
+    }
+
+    // For regular users, check if temporarily blocked
+    if ($user['role'] === 'user' && isset($user['blocked_until']) && $user['blocked_until']) {
+        $now = date('Y-m-d H:i:s');
+        if (strtotime($user['blocked_until']) > strtotime($now)) {
+            return 'temp_blocked';
         }
-        
-        // Allow both hashed and plaintext passwords (for legacy accounts)
-        if (password_verify($password, $user['Password']) || $password === $user['Password']) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['Username'] = $user['Username'];
-            $_SESSION['role'] = $user['role'];
-            return $user['role'];
+    }
+
+    // Allow both hashed and plaintext passwords (for legacy accounts)
+    if (password_verify($password, $user['Password']) || $password === $user['Password']) {
+        // On successful login, reset failed_attempts and blocked_until for users
+        if ($user['role'] === 'user') {
+            $stmt = $conn->prepare("UPDATE User SET failed_attempts = 0, blocked_until = NULL WHERE User_ID = ?");
+            $stmt->execute([$user['id']]);
+        }
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['Username'] = $user['Username'];
+        $_SESSION['role'] = $user['role'];
+        return $user['role'];
+    } else if ($user['role'] === 'user') {
+        // On failed login, increment failed_attempts
+        $failed_attempts = isset($user['failed_attempts']) ? (int)$user['failed_attempts'] : 0;
+        $failed_attempts++;
+        $block_limit = 5;
+        if ($failed_attempts >= $block_limit) {
+            $blocked_until = date('Y-m-d H:i:s', strtotime('+5 minutes'));
+            $stmt = $conn->prepare("UPDATE User SET failed_attempts = ?, blocked_until = ? WHERE User_ID = ?");
+            $stmt->execute([$failed_attempts, $blocked_until, $user['id']]);
+        } else {
+            $stmt = $conn->prepare("UPDATE User SET failed_attempts = ? WHERE User_ID = ?");
+            $stmt->execute([$failed_attempts, $user['id']]);
         }
     }
 
     return false;
 }
+
 
 /**
  * Check if Email is already registered
