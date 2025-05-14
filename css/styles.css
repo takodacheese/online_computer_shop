@@ -5063,6 +5063,8 @@ body.payment-success-page {
 }
 
 .resetpassword button {
+    font-size: 16px;
+    font-weight: 500;
     padding: 0.75rem;
     background-color: #3300ff;
     color: white;
